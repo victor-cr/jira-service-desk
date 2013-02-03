@@ -1,0 +1,163 @@
+#* @vtlvariable name="action" type="com.bics.jira.mail.web.EditSmartMailHandlerDetailsWebAction" *#
+#set ($modifierKey = $action.browserUtils.getModifierKey())
+#set ($submitAccessKey = $i18n.getText('AUI.form.submit.button.accesskey'))
+#set ($submitTitle = $i18n.getText('AUI.form.submit.button.tooltip', [$submitAccessKey, $modifierKey]))
+#set ($cancelAccessKey = $i18n.getText('AUI.form.cancel.link.accesskey'))
+#set ($cancelTitle = $i18n.getText('AUI.form.cancel.link.tooltip', [$cancelAccessKey, $modifierKey]))
+<html>
+<head>
+    <title>$action.handlerName</title>
+    $webResourceManager.requireResource("com.atlassian.jira.jira-mail-plugin:global-resources")
+</head>
+<body>
+<form class="aui" action="EditSmartHandlerDetails.jspa" method="POST" name="mailHandlerForm" id="mailHandlerForm">
+    <div class="form-body">
+        <h2>$action.handlerName</h2>
+
+        <input type="hidden" name="atl_token" value="$atl_token">
+        <input type="hidden" id="details" name="detailsJson">
+
+        <span class="global-errors-location">
+            #if ($action.getHasErrorMessages())
+                #foreach ($error in $action.getFlushedErrorMessages())
+                #AUImessage("error" "" $textutils.htmlEncode(${error}) "" "" "" "false")
+            #end
+            #end
+        </span>
+
+        put("reporterusername", "jmp.editHandlerDetails.reporterusername").put("bulk", "jmp.editHandlerDetails.bulk").put("forwardEmail", "admin.service.common.handler.forward.email").put("createusers", "jmp.editHandlerDetails.createusers").put("notifyusers", "jmp.editHandlerDetails.notifyusers").put("ccassignee", "jmp.editHandlerDetails.ccassignee").put("ccwatcher", "jmp.editHandlerDetails.ccwatcher").put("port", "jmp.editHandlerDetails.port").put("usessl", "jmp.editHandlerDetails.usessl").build();
+
+
+        <div class="field-group">
+            <label for="project-key">$i18n.getText('common.concepts.project')</label>
+            <span class="element-wrapper">
+                <select id="project-key" name="projectKey" class="select"></select>
+            </span>
+            <div class="description">$i18n.getText('jmp.editHandlerDetails.project.desc')</div>
+        </div>
+
+
+        <div class="field-group">
+            <label for="issue-type-key">$i18n.getText('common.concepts.issuetype')</label>
+            <span class="element-wrapper">
+                <select id="issue-type-key" name="issueTypeKey" class="select"></select>
+            </span>
+            <div class="description">$i18n.getText('jmp.editHandlerDetails.issuetype.desc')</div>
+        </div>
+
+        <div class="field-group">
+            <label for="component-key">$i18n.getText('common.concepts.component')</label>
+            <span class="element-wrapper">
+                <select id="component-key" name="componentKey" class="select"></select>
+            </span>
+            <div class="description">$i18n.getText('msd.editHandlerDetails.component.desc')</div>
+        </div>
+
+        <div class="field-group">
+            <label for="strip-quotes">$i18n.getText('jmp.editHandlerDetails.stripquotes')</label>
+            <span class="element-wrapper">
+                <input id="strip-quotes" name="stripQuotes" type="checkbox" value="true"/>
+            </span>
+            <div class="description">$i18n.getText('jmp.editHandlerDetails.stripquotes.desc')</div>
+        </div>
+
+        <div class="field-group">
+            <label for="split-regexp">$i18n.getText('jmp.editHandlerDetails.splitregex')</label>
+            <span class="element-wrapper">
+                <input id="split-regexp" name="splitRegex" type="text" class="text"/>
+            </span>
+            <div class="description">$i18n.getText('msd.editHandlerDetails.splitregex.desc')</div>
+        </div>
+
+        <div class="field-group">
+            <label for="catch-email">$i18n.getText('jmp.editHandlerDetails.catchemail')</label>
+            <span class="element-wrapper">
+                <input id="catch-email" name="catchEmail" type="text" class="text"/>
+            </span>
+            <div class="description">$i18n.getText('jmp.editHandlerDetails.catchemail.desc')</div>
+        </div>
+
+        <div class="field-group">
+            <label for="create-users">$i18n.getText('jmp.editHandlerDetails.createusers')</label>
+            <span class="element-wrapper">
+                <input id="create-users" name="createUsers" type="checkbox" value="true"/>
+            </span>
+            <div class="description">$i18n.getText('jmp.editHandlerDetails.createusers.desc')</div>
+        </div>
+
+        <div class="field-group">
+            <label for="create-users">$i18n.getText('jmp.editHandlerDetails.createusers')</label>
+            <span class="element-wrapper">
+                <input id="create-users" name="createUsers" type="checkbox" value="true"/>
+            </span>
+            <div class="description">$i18n.getText('jmp.editHandlerDetails.createusers.desc')</div>
+        </div>
+
+        <div class="buttons-container form-footer">
+            <div class="buttons">
+                #if ($action.editing)
+                    #set ($addButtonLabel = $i18n.getText('common.words.save'))
+                #else
+                    #set ($addButtonLabel = $i18n.getText('common.forms.add'))
+                #end
+                <input id="addButton" type="submit" class="button" value="$!addButtonLabel" accesskey="$submitAccessKey" title="$submitTitle">
+                <a href="IncomingMailServers.jspa" class="cancel" accesskey="$cancelAccessKey" title="$cancelTitle">$i18n.getText("AUI.form.cancel.link.text")</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-body">
+
+        <input type="hidden" name="atl_token" value="$atl_token">
+
+        #set ($auiparams = $map.build("name", "reporterusername", "label", $action.fieldLabels.reporterusername, "formname", "mailHandlerForm"))
+        #parse("/templates/formfields/userselect.vm")
+
+        #* should be visible only if createusers is checked *#
+        #set ($auiparams = $map.build("name", "notifyusers", "label", $action.fieldLabels.notifyusers))
+        #set ($auiparams.description = "jmp.editHandlerDetails.notifyusers.desc")
+        #parse("/templates/formfields/checkbox.vm")
+
+        #if ($action.createIssueHandlerSelected || $action.isCreateOrCommentHandlerSelected())
+            #set ($auiparams = $map.build("name", "ccassignee", "label", $action.fieldLabels.ccassignee, "description", 'jmp.editHandlerDetails.ccassignee.desc'))
+            #parse("/templates/formfields/checkbox.vm")
+
+            #set ($auiparams = $map.build("name", "ccwatcher", "label", $action.fieldLabels.ccwatcher,  "description", 'jmp.editHandlerDetails.ccwatcher.desc'))
+            #parse("/templates/formfields/checkbox.vm")
+        #end
+    </div>
+
+    <div class="buttons-container form-footer">
+        <div class="hints-section" style="display: none;">
+            <p>
+                $i18n.getText('jmp.editHandlerDetails.hints')
+            </p>
+            <p class="rejecting-messages-without-author">
+                $i18n.getText('jmp.editHandlerDetails.rejecting.messages')
+            </p>
+        </div>
+        <div class="buttons">
+            <div class="test-placeholder"></div>
+            <span class="icon throbber"></span>
+            #parse("/secure/admin/views/accessKeys.vm")
+            <input id="testButton" type="submit" disabled class="button" value="$i18n.getText('admin.common.words.test')">
+            #if ($action.editing)
+                #set ($addButtonLabel = $i18n.getText('common.words.save'))
+            #else
+                #set ($addButtonLabel = $i18n.getText('common.forms.add'))
+            #end
+            <input id="addButton" type="submit" class="button" value="$!addButtonLabel" accesskey="$submitAccessKey" title="$submitTitle">
+            <a href="IncomingMailServers.jspa" class="cancel" accesskey="$cancelAccessKey" title="$cancelTitle">$i18n.getText("AUI.form.cancel.link.text")</a>
+        </div>
+
+        <script type="text/javascript">
+            (function() {
+                editHandlerDetailsBackbone($action.detailsJson.replace('</', '<\u002f'),
+                    $action.projectsJson.replace('</', '<\u002f'),
+                    $action.bulkOptionsJson.replace('</', '<\u002f'));
+            }());
+        </script>
+    </div>
+</form>
+</body>
+</html>
