@@ -7,16 +7,23 @@
 
     <resource type="i18n" name="i18n" location="com.bics.jira.mail.messages"/>
 
-    <component key="mail-handler-validator" class="com.bics.jira.mail.handler.IssueKeyValidator"/>
+    <component key="model-validator" i18n-name-key="msd.validator.name" class="com.bics.jira.mail.handler.ModelValidatorImpl">
+        <interface>com.bics.jira.mail.ModelValidator</interface>
+    </component>
 
-    <message-handler i18n-name-key="msd.handler.name" key="smartHandler"
-                     class="com.bics.jira.mail.handler.SmartMailHandler"
-                     add-edit-url="/secure/admin/EditSmartHandlerDetails!default.jspa"
+    <component key="issue-builder" i18n-name-key="msd.issue.builder.name" class="com.bics.jira.mail.handler.IssueBuilderImpl">
+        <interface>com.bics.jira.mail.IssueBuilder</interface>
+    </component>
+
+    <component key="issue-locator" i18n-name-key="msd.issue.locator.name" class="com.bics.jira.mail.handler.IssueLocatorImpl">
+        <interface>com.bics.jira.mail.IssueLocator</interface>
+    </component>
+
+    <message-handler key="message-handler" i18n-name-key="msd.handler.name" class="com.bics.jira.mail.handler.ServiceDeskMessageHandler"
+                     add-edit-url="/secure/admin/ServiceDeskMailDetails!default.jspa"
                      weight="0"/>
 
-    <web-resource i18n-name-key="msd.wizard.name" key="edit-handler-details-page">
-        <context>admin.mail.incoming</context>
-
+    <web-resource i18n-name-key="msd.webwork.name" key="edit-handler-details-page">
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
@@ -39,8 +46,8 @@
 
     <webwork1 key="actions" name="Actions" class="java.lang.Object">
         <actions>
-            <action name="com.bics.jira.mail.web.EditSmartMailHandlerDetailsWebAction"
-                    alias="EditSmartHandlerDetails"
+            <action name="com.bics.jira.mail.web.ServiceDeskMailHandlerDetailsWebAction"
+                    alias="ServiceDeskMailDetails"
                     roles-required="admin">
                 <view name="input">/secure/admin/views/editSmartHandlerDetails.vm</view>
                 <view name="securitybreach">/secure/views/securitybreach.jsp</view>

@@ -1,11 +1,11 @@
-#* @vtlvariable name="action" type="com.bics.jira.mail.web.EditSmartMailHandlerDetailsWebAction" *#
+#* @vtlvariable name="action" type="com.bics.jira.mail.web.ServiceDeskMailHandlerDetailsWebAction" *#
 <html>
 <head>
     <title>$action.handlerName</title>
-    $webResourceManager.requireResource("com.bics.jira.mail.service-desk:edit-handler-details-page")
+    $webResourceManager.requireResource($action.pluginKey.concat(":edit-handler-details-page"))
 </head>
 <body>
-<form class="aui" action="EditSmartHandlerDetails.jspa" method="POST" name="mailHandlerForm" id="mailHandlerForm">
+<form class="aui" action="ServiceDeskMailDetails.jspa" method="POST" name="mailHandlerForm" id="mailHandlerForm">
     <div class="form-body">
         <h2>$action.handlerName</h2>
 
@@ -14,38 +14,51 @@
 
         <input type="hidden" name="atl_token" value="$atl_token">
 
-        #set ($auiparams = $map.build("name", "project", "label", "common.concepts.project", "description", "jmp.editHandlerDetails.project.desc"))
-        #parse("/templates/formfields/select.vm")
+        #set ($auiparams = $map.build("name", "projectKey", "label", "common.concepts.project", "description", "jmp.editHandlerDetails.project.desc"))
+        #parse("/templates/formfields/textfield.vm")
+##        #parse("/templates/formfields/select.vm")
 
-        #set ($auiparams = $map.build("name", "issuetype", "label", "common.concepts.issuetype", "description", "jmp.editHandlerDetails.issuetype.desc"))
-        #parse("/templates/formfields/select.vm")
+        #set ($auiparams = $map.build("name", "issueTypeKey", "label", "common.concepts.issuetype", "description", "jmp.editHandlerDetails.issuetype.desc"))
+        #parse("/templates/formfields/textfield.vm")
+##        #parse("/templates/formfields/select.vm")
 
-        #set ($auiparams = $map.build("name", "component", "label", "common.concepts.component", "description", "msd.editHandlerDetails.component.desc"))
-        #parse("/templates/formfields/select.vm")
+        #set ($auiparams = $map.build("name", "componentKey", "label", "common.concepts.component", "description", "msd.editHandlerDetails.component.desc"))
+        #parse("/templates/formfields/textfield.vm")
+##        #parse("/templates/formfields/select.vm")
 
-        #set ($auiparams = $map.build("name", "stripquotes", "label", "jmp.editHandlerDetails.stripquotes", "description", "jmp.editHandlerDetails.stripquotes.desc"))
+        #set ($auiparams = $map.build("name", "versionKey", "label", "common.concepts.version", "description", "msd.editHandlerDetails.version.desc"))
+        #parse("/templates/formfields/textfield.vm")
+##        #parse("/templates/formfields/select.vm")
+
+        #set ($auiparams = $map.build("name", "stripQuotes", "label", "jmp.editHandlerDetails.stripquotes", "description", "jmp.editHandlerDetails.stripquotes.desc"))
         #parse("/templates/formfields/checkbox.vm")
 
-        #set ($auiparams = $map.build("name", "splitregex", "label", "jmp.editHandlerDetails.splitregex", "description", "msd.editHandlerDetails.splitregex.desc"))
+        #set ($auiparams = $map.build("name", "splitRegex", "label", "jmp.editHandlerDetails.splitregex", "description", "msd.editHandlerDetails.splitregex.desc"))
         #parse("/templates/formfields/textfield.vm")
 
-        #set ($auiparams = $map.build("name", "catchemail", "label", "jmp.editHandlerDetails.catchemail", "description", "jmp.editHandlerDetails.catchemail.desc"))
+        #set ($auiparams = $map.build("name", "catchEmail", "label", "jmp.editHandlerDetails.catchemail", "description", "jmp.editHandlerDetails.catchemail.desc"))
         #parse("/templates/formfields/textfield.vm")
 
-        #set ($auiparams = $map.build("name", "createusers", "label", "jmp.editHandlerDetails.createusers", "description", "jmp.editHandlerDetails.createusers.desc"))
+        #set ($auiparams = $map.build("name", "createUsers", "label", "jmp.editHandlerDetails.createusers", "description", "jmp.editHandlerDetails.createusers.desc"))
         #parse("/templates/formfields/checkbox.vm")
 
-        #set ($auiparams = $map.build("name", "reporterusername", "label", "jmp.editHandlerDetails.reporterusername", "formname", "mailHandlerForm"))
+        #set ($auiparams = $map.build("name", "reporterUsername", "label", "jmp.editHandlerDetails.reporterusername", "formname", "mailHandlerForm"))
         #parse("/templates/formfields/userselect.vm")
 
-        #set ($auiparams = $map.build("name", "notifyusers", "label", "jmp.editHandlerDetails.notifyusers", "description", "jmp.editHandlerDetails.notifyusers.desc"))
+        #set ($auiparams = $map.build("name", "notifyUsers", "label", "jmp.editHandlerDetails.notifyusers", "description", "jmp.editHandlerDetails.notifyusers.desc"))
         #parse("/templates/formfields/checkbox.vm")
 
-        #set ($auiparams = $map.build("name", "ccassignee", "label", "jmp.editHandlerDetails.ccassignee", "description", 'jmp.editHandlerDetails.ccassignee.desc'))
+        #set ($auiparams = $map.build("name", "ccAssignee", "label", "jmp.editHandlerDetails.ccassignee", "description", 'jmp.editHandlerDetails.ccassignee.desc'))
         #parse("/templates/formfields/checkbox.vm")
 
-        #set ($auiparams = $map.build("name", "ccwatcher", "label", "jmp.editHandlerDetails.ccwatcher",  "description", 'jmp.editHandlerDetails.ccwatcher.desc'))
+        #set ($auiparams = $map.build("name", "ccWatcher", "label", "jmp.editHandlerDetails.ccwatcher",  "description", 'jmp.editHandlerDetails.ccwatcher.desc'))
         #parse("/templates/formfields/checkbox.vm")
+
+        #set ($auiparams = $map.build("name", "mailIdField", "label", "msd.editHandlerDetails.mailidfield", "description", "msd.editHandlerDetails.mailidfield.desc"))
+        #parse("/templates/formfields/textfield.vm")
+
+        #set ($auiparams = $map.build("name", "transitions", "label", "msd.editHandlerDetails.transitions", "description", "msd.editHandlerDetails.transitions.desc"))
+        #parse("/templates/formfields/textfield.vm")
     </div>
 
     <div class="buttons-container form-footer">
@@ -61,7 +74,7 @@
             <div class="test-placeholder"></div>
             <span class="icon throbber"></span>
             #parse("/secure/admin/views/accessKeys.vm")
-            <input id="testButton" type="submit" disabled class="button" value="$i18n.getText('admin.common.words.test')">
+            <input id="testButton" type="submit" disabled="disabled" class="button" value="$i18n.getText('admin.common.words.test')">
             #if ($action.editing)
                 #set ($addButtonLabel = $i18n.getText('common.words.save'))
             #else

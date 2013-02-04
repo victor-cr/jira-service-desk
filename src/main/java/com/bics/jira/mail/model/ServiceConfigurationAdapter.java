@@ -4,7 +4,7 @@ import com.atlassian.jira.plugins.mail.ServiceConfiguration;
 import com.atlassian.mail.MailException;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
-import com.bics.jira.mail.web.EditSmartMailHandlerDetailsWebAction;
+import com.bics.jira.mail.web.ServiceDeskMailHandlerDetailsWebAction;
 import webwork.action.ActionContext;
 
 import java.util.Map;
@@ -100,7 +100,7 @@ public class ServiceConfigurationAdapter {
                 Plugin mailPlugin = pluginAccessor.getEnabledPlugin("com.atlassian.jira.jira-mail-plugin");
 
                 if (mailPlugin != null) {
-                    configurationClass = mailPlugin.loadClass("com.atlassian.jira.plugins.mail.ServiceConfiguration", EditSmartMailHandlerDetailsWebAction.class);
+                    configurationClass = mailPlugin.loadClass("com.atlassian.jira.plugins.mail.ServiceConfiguration", ServiceDeskMailHandlerDetailsWebAction.class);
 
                     id = (String) configurationClass.getField("ID").get(null);
                 }

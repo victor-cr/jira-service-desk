@@ -1,7 +1,5 @@
 package com.bics.jira.mail.model;
 
-import com.atlassian.configurable.ObjectConfigurationException;
-import com.atlassian.jira.service.JiraServiceContainer;
 import com.atlassian.jira.service.services.file.AbstractMessageHandlingService;
 import com.atlassian.jira.service.util.ServiceUtils;
 import com.google.common.collect.Maps;
@@ -19,6 +17,10 @@ import java.util.Map;
 public class HandlerModel {
     private static final String KEY_PROJECT = "project";
     private static final String KEY_ISSUE_TYPE = "issuetype";
+    private static final String KEY_COMPONENT = "component";
+    private static final String KEY_VERSION = "version";
+    private static final String KEY_MAIL_ID_FIELD = "mailidfield";
+    private static final String KEY_TRANSITIONS = "transitions";
     private static final String KEY_REPORTER_USERNAME = "reporterusername";
     private static final String KEY_CATCH_EMAIL = "catchemail";
     private static final String KEY_SPLIT_REGEX = "splitregex";
@@ -30,6 +32,10 @@ public class HandlerModel {
 
     private String projectKey;
     private String issueTypeKey;
+    private String componentKey;
+    private String versionKey;
+    private String mailIdField;
+    private String transitions;
     private boolean stripQuotes;
     private String reporterUsername;
     private String catchEmail;
@@ -53,6 +59,38 @@ public class HandlerModel {
 
     public void setIssueTypeKey(String issueTypeKey) {
         this.issueTypeKey = issueTypeKey;
+    }
+
+    public String getComponentKey() {
+        return componentKey;
+    }
+
+    public void setComponentKey(String componentKey) {
+        this.componentKey = componentKey;
+    }
+
+    public String getVersionKey() {
+        return versionKey;
+    }
+
+    public void setVersionKey(String versionKey) {
+        this.versionKey = versionKey;
+    }
+
+    public String getMailIdField() {
+        return mailIdField;
+    }
+
+    public void setMailIdField(String mailIdField) {
+        this.mailIdField = mailIdField;
+    }
+
+    public String getTransitions() {
+        return transitions;
+    }
+
+    public void setTransitions(String transitions) {
+        this.transitions = transitions;
     }
 
     public boolean isStripQuotes() {
@@ -122,6 +160,12 @@ public class HandlerModel {
     public Map<String, String[]> toServiceParams() {
         Map<String, String> map = Maps.newLinkedHashMap();
 
+        safePut(map, KEY_PROJECT, valueOf(projectKey));
+        safePut(map, KEY_ISSUE_TYPE, valueOf(issueTypeKey));
+        safePut(map, KEY_COMPONENT, valueOf(componentKey));
+        safePut(map, KEY_VERSION, valueOf(versionKey));
+        safePut(map, KEY_MAIL_ID_FIELD, valueOf(mailIdField));
+        safePut(map, KEY_TRANSITIONS, encode(transitions));
         safePut(map, KEY_REPORTER_USERNAME, valueOf(reporterUsername));
         safePut(map, KEY_CATCH_EMAIL, valueOf(catchEmail));
         safePut(map, KEY_SPLIT_REGEX, encode(splitRegex));
@@ -133,28 +177,28 @@ public class HandlerModel {
 
         Map<String, String[]> key = Maps.newHashMap();
 
-        safePut(key, KEY_PROJECT, valuesOf(projectKey));
-        safePut(key, KEY_ISSUE_TYPE, valuesOf(issueTypeKey));
-        safePut(key, AbstractMessageHandlingService.KEY_HANDLER_PARAMS, valuesOf(ServiceUtils.toParameterString(map)));
+        safePut(key, AbstractMessageHandlingService.KEY_HANDLER_PARAMS, new String[]{ServiceUtils.toParameterString(map)});
 
         return key;
     }
 
-    public void fromServiceParams(JiraServiceContainer container) throws ObjectConfigurationException {
-        this.projectKey = container.getProperty(KEY_PROJECT);
-        this.issueTypeKey = container.getProperty(KEY_ISSUE_TYPE);
-        String handlerParams = container.getProperty(AbstractMessageHandlingService.KEY_HANDLER_PARAMS);
+    public HandlerModel fromServiceParams(Map<String, String> params) {
+        this.projectKey = params.get(KEY_PROJECT);
+        this.issueTypeKey = params.get(KEY_ISSUE_TYPE);
+        this.componentKey = params.get(KEY_COMPONENT);
+        this.versionKey = params.get(KEY_VERSION);
+        this.mailIdField = params.get(KEY_MAIL_ID_FIELD);
+        this.transitions = decode(params.get(KEY_TRANSITIONS));
+        this.reporterUsername = params.get(KEY_REPORTER_USERNAME);
+        this.catchEmail = params.get(KEY_CATCH_EMAIL);
+        this.splitRegex = decode(params.get(KEY_SPLIT_REGEX));
+        this.createUsers = safeGet(params, KEY_CREATE_USERS);
+        this.notifyUsers = safeGet(params, KEY_NOTIFY_USERS);
+        this.ccWatcher = safeGet(params, KEY_CC_WATCHER);
+        this.ccAssignee = safeGet(params, KEY_CC_ASSIGNEE);
+        this.stripQuotes = safeGet(params, KEY_STRIP_QUOTES);
 
-        Map<String, String> res = ServiceUtils.getParameterMap(handlerParams);
-
-        this.reporterUsername = res.get(KEY_REPORTER_USERNAME);
-        this.catchEmail = res.get(KEY_CATCH_EMAIL);
-        this.splitRegex = decode(res.get(KEY_SPLIT_REGEX));
-        this.createUsers = safeGet(res, KEY_CREATE_USERS);
-        this.notifyUsers = safeGet(res, KEY_NOTIFY_USERS);
-        this.ccWatcher = safeGet(res, KEY_CC_WATCHER);
-        this.ccAssignee = safeGet(res, KEY_CC_ASSIGNEE);
-        this.stripQuotes = safeGet(res, KEY_STRIP_QUOTES);
+        return this;
     }
 
     private String encode(String value) {
@@ -175,12 +219,6 @@ public class HandlerModel {
         if (obj != null) {
             map.put(key, obj);
         }
-    }
-
-    private static <T> String[] valuesOf(T obj) {
-        String value = valueOf(obj);
-
-        return value == null ? null : new String[] {value};
     }
 
     private static <T> String valueOf(T obj) {
