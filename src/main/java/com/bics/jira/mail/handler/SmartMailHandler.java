@@ -1,4 +1,4 @@
-package com.bics.jira.mail;
+package com.bics.jira.mail.handler;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.Issue;

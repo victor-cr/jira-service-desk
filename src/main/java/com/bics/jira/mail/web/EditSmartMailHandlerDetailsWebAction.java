@@ -25,7 +25,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -48,12 +50,15 @@ public class EditSmartMailHandlerDetailsWebAction extends JiraWebActionSupport {
     private final PluginAccessor pluginAccessor;
     private final IssueTypeManager issueTypeManager;
     private final ProjectManager projectManager;
-    private final HandlerModel model = new HandlerModel();
+
+    private HandlerModel model = new HandlerModel();
 
     public EditSmartMailHandlerDetailsWebAction(PluginAccessor pluginAccessor, IssueTypeManager issueTypeManager, ProjectManager projectManager) {
         this.pluginAccessor = pluginAccessor;
 
         configuration = new ServiceConfigurationAdapter(pluginAccessor);
+        this.issueTypeManager = issueTypeManager;
+        this.projectManager = projectManager;
     }
 
     public boolean isEditing() {
@@ -62,50 +67,6 @@ public class EditSmartMailHandlerDetailsWebAction extends JiraWebActionSupport {
 
     public HandlerModel getModel() {
         return model;
-    }
-
-    public void setProjectKey(String projectKey) {
-        model.setProjectKey(projectKey);
-    }
-
-    public void setIssueTypeKey(String issueTypeKey) {
-        model.setIssueTypeKey(issueTypeKey);
-    }
-
-    public void setStripQuotes(boolean stripQuotes) {
-        model.setStripQuotes(stripQuotes);
-    }
-
-    public void setReporterUsername(String reporterUsername) {
-        model.setReporterUsername(reporterUsername);
-    }
-
-    public void setCatchEmail(String catchEmail) {
-        model.setCatchEmail(catchEmail);
-    }
-
-    public void setCreateUsers(boolean createUsers) {
-        model.setCreateUsers(createUsers);
-    }
-
-    public void setNotifyUsers(boolean notifyUsers) {
-        model.setNotifyUsers(notifyUsers);
-    }
-
-    public void setCcWatcher(boolean ccWatcher) {
-        model.setCcWatcher(ccWatcher);
-    }
-
-    public void setCcAssignee(boolean ccAssignee) {
-        model.setCcAssignee(ccAssignee);
-    }
-
-    public void setSplitRegex(String splitRegex) {
-        model.setSplitRegex(splitRegex);
-    }
-
-    public BrowserUtils getBrowserUtils() {
-        return new BrowserUtils();
     }
 
     public Collection<Project> getProjects() {
@@ -118,6 +79,22 @@ public class EditSmartMailHandlerDetailsWebAction extends JiraWebActionSupport {
 
     public String getHandlerName() {
         return configuration.isNull() ? "" : pluginAccessor.getEnabledPluginModule(configuration.getHandlerKey()).getName();
+    }
+
+    public String getDetailsJson() {
+        try {
+            return new ObjectMapper().writeValueAsString(model);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setDetailsJson(String detailsJson) {
+        try {
+            model = new ObjectMapper().readValue(detailsJson, HandlerModel.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public JiraServiceContainer getService(Long id) {
@@ -150,7 +127,7 @@ public class EditSmartMailHandlerDetailsWebAction extends JiraWebActionSupport {
                 return returnCompleteWithInlineRedirect(TO_HOME_PAGE);
             }
 
-            copyServiceSettings(serviceContainer);
+            model.fromServiceParams(serviceContainer);
         }
 
         return result;
@@ -202,8 +179,7 @@ public class EditSmartMailHandlerDetailsWebAction extends JiraWebActionSupport {
     private Map<String, String[]> getServiceParams() throws Exception {
         return MapBuilder.<String, String[]>newBuilder()
                 .addAll(configuration.toServiceParams())
-                .add("project", new String[]{projectKey})
-                .add(AbstractMessageHandlingService.KEY_HANDLER_PARAMS, new String[]{ServiceUtils.toParameterString(getHandlerParams())})
+                .addAll(model.toServiceParams())
                 .toMutableMap();
     }
 
@@ -225,18 +201,6 @@ public class EditSmartMailHandlerDetailsWebAction extends JiraWebActionSupport {
                 return container != null && serviceId.equals(container.getId());
             }
         });
-    }
-
-    protected void copyServiceSettings(JiraServiceContainer container) throws ObjectConfigurationException {
-        String params = container.getProperty(AbstractMessageHandlingService.KEY_HANDLER_PARAMS);
-
-        Map<String, String> parameterMap = ServiceUtils.getParameterMap(params);
-
-        projectKey = parameterMap.get(KEY_PROJECT);
-    }
-
-    protected Map<String, String> getHandlerParams() {
-        return MapBuilder.build(KEY_PROJECT, projectKey);
     }
 
     /*

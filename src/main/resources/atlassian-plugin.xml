@@ -7,12 +7,14 @@
 
     <resource type="i18n" name="i18n" location="com.bics.jira.mail.messages"/>
 
-    <message-handler i18n-name-key="smart.handler.name" key="smartHandler"
-                     class="com.bics.jira.mail.SmartMailHandler"
+    <component key="mail-handler-validator" class="com.bics.jira.mail.handler.IssueKeyValidator"/>
+
+    <message-handler i18n-name-key="msd.handler.name" key="smartHandler"
+                     class="com.bics.jira.mail.handler.SmartMailHandler"
                      add-edit-url="/secure/admin/EditSmartHandlerDetails!default.jspa"
                      weight="0"/>
 
-    <web-resource i18n-name-key="smart.wizard.name" key="edit-handler-details-page">
+    <web-resource i18n-name-key="msd.wizard.name" key="edit-handler-details-page">
         <context>admin.mail.incoming</context>
 
         <transformation extension="js">

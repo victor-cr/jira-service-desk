@@ -1,4 +1,4 @@
-package com.bics.jira.mail;
+package com.bics.jira.mail.handler;
 
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;

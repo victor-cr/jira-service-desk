@@ -1,5 +1,7 @@
 package com.bics.jira.mail.model;
 
+import com.atlassian.configurable.ObjectConfigurationException;
+import com.atlassian.jira.service.JiraServiceContainer;
 import com.atlassian.jira.service.services.file.AbstractMessageHandlingService;
 import com.atlassian.jira.service.util.ServiceUtils;
 import com.google.common.collect.Maps;
@@ -138,10 +140,10 @@ public class HandlerModel {
         return key;
     }
 
-    public void fromServiceParams(Map<String, String[]> map) {
-        this.projectKey = safeGet(map, KEY_PROJECT);
-        this.issueTypeKey = safeGet(map, KEY_ISSUE_TYPE);
-        String handlerParams = safeGet(map, AbstractMessageHandlingService.KEY_HANDLER_PARAMS);
+    public void fromServiceParams(JiraServiceContainer container) throws ObjectConfigurationException {
+        this.projectKey = container.getProperty(KEY_PROJECT);
+        this.issueTypeKey = container.getProperty(KEY_ISSUE_TYPE);
+        String handlerParams = container.getProperty(AbstractMessageHandlingService.KEY_HANDLER_PARAMS);
 
         Map<String, String> res = ServiceUtils.getParameterMap(handlerParams);
 
@@ -161,12 +163,6 @@ public class HandlerModel {
 
     private String decode(String value) {
         return StringUtils.isBlank(value) ? null : new String(Base64.decodeBase64(value));
-    }
-
-    private static String safeGet(Map<String, String[]> map, String key) {
-        String[] value = map.get(key);
-
-        return value == null ? null : value[0];
     }
 
     private static boolean safeGet(Map<String, String> map, String key) {
