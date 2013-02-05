@@ -18,15 +18,11 @@
         #parse("/templates/formfields/textfield.vm")
 ##        #parse("/templates/formfields/select.vm")
 
-        #set ($auiparams = $map.build("name", "issueTypeKey", "label", "common.concepts.issuetype", "description", "jmp.editHandlerDetails.issuetype.desc"))
+        #set ($auiparams = $map.build("name", "issueTypeId", "label", "common.concepts.issuetype", "description", "jmp.editHandlerDetails.issuetype.desc"))
         #parse("/templates/formfields/textfield.vm")
 ##        #parse("/templates/formfields/select.vm")
 
-        #set ($auiparams = $map.build("name", "componentKey", "label", "common.concepts.component", "description", "msd.editHandlerDetails.component.desc"))
-        #parse("/templates/formfields/textfield.vm")
-##        #parse("/templates/formfields/select.vm")
-
-        #set ($auiparams = $map.build("name", "versionKey", "label", "common.concepts.version", "description", "msd.editHandlerDetails.version.desc"))
+        #set ($auiparams = $map.build("name", "componentId", "label", "common.concepts.component", "description", "msd.editHandlerDetails.component.desc"))
         #parse("/templates/formfields/textfield.vm")
 ##        #parse("/templates/formfields/select.vm")
 
@@ -53,9 +49,6 @@
 
         #set ($auiparams = $map.build("name", "ccWatcher", "label", "jmp.editHandlerDetails.ccwatcher",  "description", 'jmp.editHandlerDetails.ccwatcher.desc'))
         #parse("/templates/formfields/checkbox.vm")
-
-        #set ($auiparams = $map.build("name", "mailIdField", "label", "msd.editHandlerDetails.mailidfield", "description", "msd.editHandlerDetails.mailidfield.desc"))
-        #parse("/templates/formfields/textfield.vm")
 
         #set ($auiparams = $map.build("name", "transitions", "label", "msd.editHandlerDetails.transitions", "description", "msd.editHandlerDetails.transitions.desc"))
         #parse("/templates/formfields/textfield.vm")

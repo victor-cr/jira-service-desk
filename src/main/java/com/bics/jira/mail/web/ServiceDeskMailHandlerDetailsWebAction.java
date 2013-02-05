@@ -25,7 +25,7 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
     }
 
     public String getIssueTypeKey() {
-        return model.getIssueTypeKey();
+        return model.getIssueTypeId();
     }
 
     public void setCcAssignee(boolean ccAssignee) {
@@ -37,7 +37,7 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
     }
 
     public String getComponentKey() {
-        return model.getComponentKey();
+        return model.getComponentId();
     }
 
     public String getVersionKey() {
@@ -73,7 +73,7 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
     }
 
     public void setIssueTypeKey(String issueTypeKey) {
-        model.setIssueTypeKey(issueTypeKey);
+        model.setIssueTypeId(issueTypeKey);
     }
 
     public void setCreateUsers(boolean createUsers) {
@@ -125,7 +125,7 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
     }
 
     public void setComponentKey(String componentKey) {
-        model.setComponentKey(componentKey);
+        model.setComponentId(componentKey);
     }
 
     public void setCcWatcher(boolean ccWatcher) {

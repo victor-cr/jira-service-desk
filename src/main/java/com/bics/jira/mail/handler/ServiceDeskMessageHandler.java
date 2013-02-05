@@ -3,10 +3,6 @@ package com.bics.jira.mail.handler;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.issue.fields.CustomField;
-import com.atlassian.jira.issue.fields.FieldManager;
-import com.atlassian.jira.project.Project;
-import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.service.util.handler.MessageHandler;
 import com.atlassian.jira.service.util.handler.MessageHandlerContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
@@ -18,6 +14,7 @@ import com.bics.jira.mail.IssueLocator;
 import com.bics.jira.mail.ModelValidator;
 import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
+import com.bics.jira.mail.model.ServiceModel;
 import org.apache.commons.lang.StringUtils;
 
 import javax.mail.Message;
@@ -34,41 +31,38 @@ public class ServiceDeskMessageHandler implements MessageHandler {
     private final ModelValidator modelValidator;
     private final IssueLocator issueLocator;
     private final IssueBuilder issueBuilder;
-    private final ProjectManager projectManager;
-    private final FieldManager fieldManager;
     private final MessageUserProcessor messageUserProcessor;
 
     private final HandlerModel model = new HandlerModel();
-    private Project project;
-    private CustomField customField;
+    private boolean valid;
 
-    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, ProjectManager projectManager, FieldManager fieldManager, MessageUserProcessor messageUserProcessor) {
+    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, MessageUserProcessor messageUserProcessor) {
         this.modelValidator = modelValidator;
         this.issueLocator = issueLocator;
         this.issueBuilder = issueBuilder;
-        this.projectManager = projectManager;
-        this.fieldManager = fieldManager;
         this.messageUserProcessor = messageUserProcessor;
     }
 
     @Override
     public void init(Map<String, String> params, MessageHandlerErrorCollector monitor) {
-        model.fromServiceParams(params);
+        ServiceModel serviceModel = new ServiceModel().fromServiceParams(params);
 
-        if (modelValidator.validateModel(model, monitor)) {
-            monitor.warning("HandlerModel did not pass the validation. Emergency exit.");
-            return;
+        valid = modelValidator.populateHandlerModel(model, serviceModel, monitor);
+
+        if (!valid) {
+            monitor.warning("ServiceModel did not pass the validation. Emergency exit.");
         }
-
-        project = projectManager.getProjectObjByKey(model.getProjectKey());
-        customField = fieldManager.getCustomField(model.getMailIdField());
     }
 
     @Override
     public boolean handleMessage(Message message, MessageHandlerContext context) throws MessagingException {
+        if (!valid) {
+            return false;
+        }
+
         MessageAdapter adapter = new MessageAdapter(message);
 
-        User sender = adapter.getReporter();
+        User sender = adapter.getReporter(model.getReporterUser());
 
         MessageHandlerExecutionMonitor monitor = context.getMonitor();
 
@@ -78,7 +72,7 @@ public class ServiceDeskMessageHandler implements MessageHandler {
             return false;
         }
 
-        Issue issue = issueLocator.find(project, customField, adapter, monitor);
+        Issue issue = issueLocator.find(model.getProject(), adapter, monitor);
 
         String body = MailUtils.getBody(message);
 
@@ -86,7 +80,7 @@ public class ServiceDeskMessageHandler implements MessageHandler {
             context.createComment(issue, sender, body, false);
         } else {
             try {
-                issue = issueBuilder.build(project, customField, adapter, monitor);
+                issue = issueBuilder.build(model.getProject(), adapter, monitor);
 
                 context.createIssue(sender, issue);
             } catch (CreateException e) {

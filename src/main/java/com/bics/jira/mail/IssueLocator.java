@@ -13,5 +13,5 @@ import com.bics.jira.mail.model.MessageAdapter;
  * @since 04.02.13 21:57
  */
 public interface IssueLocator {
-    Issue find(Project project, Field customField, MessageAdapter message, MessageHandlerErrorCollector monitor);
+    Issue find(Project project, MessageAdapter message, MessageHandlerErrorCollector monitor);
 }

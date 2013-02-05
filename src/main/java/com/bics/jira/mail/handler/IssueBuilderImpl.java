@@ -3,7 +3,6 @@ package com.bics.jira.mail.handler;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
-import com.atlassian.jira.issue.fields.Field;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.bics.jira.mail.IssueBuilder;
@@ -23,7 +22,7 @@ public class IssueBuilderImpl implements IssueBuilder {
     }
 
     @Override
-    public Issue build(Project project, Field customField, MessageAdapter message, MessageHandlerErrorCollector monitor) throws CreateException {
+    public Issue build(Project project, MessageAdapter message, MessageHandlerErrorCollector monitor) throws CreateException {
         return null;
     }
 }

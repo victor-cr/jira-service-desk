@@ -49,7 +49,7 @@
             <action name="com.bics.jira.mail.web.ServiceDeskMailHandlerDetailsWebAction"
                     alias="ServiceDeskMailDetails"
                     roles-required="admin">
-                <view name="input">/secure/admin/views/editSmartHandlerDetails.vm</view>
+                <view name="input">/secure/admin/views/serviceDeskDetails.vm</view>
                 <view name="securitybreach">/secure/views/securitybreach.jsp</view>
             </action>
         </actions>

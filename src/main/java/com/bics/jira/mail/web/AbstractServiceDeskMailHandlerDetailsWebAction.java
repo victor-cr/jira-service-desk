@@ -10,7 +10,7 @@ import com.atlassian.jira.service.util.ServiceUtils;
 import com.atlassian.jira.util.collect.MapBuilder;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.plugin.PluginAccessor;
-import com.bics.jira.mail.model.HandlerModel;
+import com.bics.jira.mail.model.ServiceModel;
 import com.bics.jira.mail.model.ServiceConfigurationAdapter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -36,7 +36,7 @@ public abstract class AbstractServiceDeskMailHandlerDetailsWebAction extends Jir
     private final IssueTypeManager issueTypeManager;
     private final ProjectManager projectManager;
 
-    protected final HandlerModel model = new HandlerModel();
+    protected final ServiceModel model = new ServiceModel();
 
     public AbstractServiceDeskMailHandlerDetailsWebAction(PluginAccessor pluginAccessor, IssueTypeManager issueTypeManager, ProjectManager projectManager) {
         this.pluginAccessor = pluginAccessor;
@@ -50,7 +50,7 @@ public abstract class AbstractServiceDeskMailHandlerDetailsWebAction extends Jir
         return !configuration.isNull() && configuration.getServiceId() != null;
     }
 
-    public HandlerModel getModel() {
+    public ServiceModel getModel() {
         return model;
     }
 
