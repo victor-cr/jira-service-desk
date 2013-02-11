@@ -1,13 +1,15 @@
 package com.bics.jira.mail.handler;
 
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.event.user.UserEventType;
 import com.atlassian.jira.exception.CreateException;
+import com.atlassian.jira.exception.PermissionException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.service.util.handler.MessageHandler;
 import com.atlassian.jira.service.util.handler.MessageHandlerContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.service.util.handler.MessageHandlerExecutionMonitor;
-import com.atlassian.jira.service.util.handler.MessageUserProcessor;
+import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.mail.MailUtils;
 import com.bics.jira.mail.IssueBuilder;
 import com.bics.jira.mail.IssueLocator;
@@ -16,9 +18,11 @@ import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
 import com.bics.jira.mail.model.ServiceModel;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import java.util.Map;
 
 /**
@@ -28,19 +32,21 @@ import java.util.Map;
  * @since 03.02.13 12:29
  */
 public class ServiceDeskMessageHandler implements MessageHandler {
+    private static final Logger LOG = Logger.getLogger(ServiceDeskMessageHandler.class);
+
     private final ModelValidator modelValidator;
     private final IssueLocator issueLocator;
     private final IssueBuilder issueBuilder;
-    private final MessageUserProcessor messageUserProcessor;
+    private final UserManager userManager;
 
     private final HandlerModel model = new HandlerModel();
     private boolean valid;
 
-    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, MessageUserProcessor messageUserProcessor) {
+    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, UserManager userManager) {
         this.modelValidator = modelValidator;
         this.issueLocator = issueLocator;
         this.issueBuilder = issueBuilder;
-        this.messageUserProcessor = messageUserProcessor;
+        this.userManager = userManager;
     }
 
     @Override
@@ -62,11 +68,29 @@ public class ServiceDeskMessageHandler implements MessageHandler {
 
         MessageAdapter adapter = new MessageAdapter(message);
 
-        User sender = adapter.getReporter(model.getReporterUser());
+        InternetAddress[] addresses = adapter.getFrom();
+
+        User author = null;
+
+        for (InternetAddress address : addresses) {
+            author = userManager.getUser(address.getAddress());
+
+            if (author == null) {
+                author = model.getReporterUser();
+
+                try {
+                    author = context.createUser(address.getAddress(), address.getAddress(), address.getAddress(), address.getPersonal(), UserEventType.USER_CREATED);
+                } catch (PermissionException e) {
+                    LOG.error("Permission problem: ", e);
+                } catch (CreateException e) {
+                    LOG.error("Creation problem: ", e);
+                }
+            }
+        }
 
         MessageHandlerExecutionMonitor monitor = context.getMonitor();
 
-        if (sender == null) {
+        if (author == null) {
             monitor.error("Message sender(s) '" + StringUtils.join(MailUtils.getSenders(message), ",")
                     + "' do not have corresponding users in JIRA. Message will be ignored");
             return false;
@@ -77,12 +101,12 @@ public class ServiceDeskMessageHandler implements MessageHandler {
         String body = MailUtils.getBody(message);
 
         if (issue != null) {
-            context.createComment(issue, sender, body, false);
+            context.createComment(issue, author, body, false);
         } else {
             try {
                 issue = issueBuilder.build(model.getProject(), adapter, monitor);
 
-                context.createIssue(sender, issue);
+                context.createIssue(author, issue);
             } catch (CreateException e) {
                 throw new MessagingException(e.getMessage(), e);
             }

@@ -1,0 +1,44 @@
+Received: from mailinator.com [72.51.33.80]
+	by ubuntu with POP3 (fetchmail-6.3.22)
+	for <jira@localhost> (single-drop); Wed, 06 Feb 2013 12:30:06 -0800 (PST)
+Received: from mail-ie0-f177.google.com (mail-ie0-f177.google.com [209.85.223.177])
+        by mail.mailinator.com with SMTP (Postfix)
+        for c5366856@mailinator.com;
+        Wed, 06 Feb 2013 20:24:39 +0000 (UTC)
+Received: by mail-ie0-f177.google.com with SMTP id 16so2497157iea.36
+        for <c5366856@mailinator.com>; Wed, 06 Feb 2013 12:24:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20120113;
+        h=mime-version:x-received:date:message-id:subject:from:to
+         :content-type;
+        bh=hkNNQQdZkvZ1YfPAxyoZDMMSnWqbiXKy/QNZJH1YWLI=;
+        b=H8dqSWIHvHjqYk2ROmDDe4mCkZNhjQzUnL5oZfxgAi8ZuBAGDWfeVRHKEexWiCgwDS
+         OcQfn1OVnqaQLnVMx2cMX/ePaLiXNXdF/YEFnm8Wnlr6jreuSTZIBIH1YyZsk4luWvQm
+         8313FKwTSTV57RSBod1oaa336XdqByDjy+8XoofXGFassI7fsV8Xhh8tgCD6BxVoOXqu
+         Lzjv4nbGCDhTgnfd5M72ihdH0mSgp1RoCCnJ5iqov+PttwbjwwpjFs2WKEi+sBzModIw
+         q1iRSqAkzqrcaCH+R2Gqr87IYpqq43vZ/uHwBjWQU4q6aV9szmoBENKtiVn68xs3DZ/R
+         ugzg==
+MIME-Version: 1.0
+X-Received: by 10.50.187.197 with SMTP id fu5mr8711043igc.95.1360182279010;
+ Wed, 06 Feb 2013 12:24:39 -0800 (PST)
+Received: by 10.64.70.230 with HTTP; Wed, 6 Feb 2013 12:24:38 -0800 (PST)
+Date: Wed, 6 Feb 2013 22:24:38 +0200
+Message-ID: <CAPA+7Tro9sA5hgygUG6utBK1eGGA+4zB+bX+DnUKN-WhRzZtXQ@mail.gmail.com>
+Subject: [MAILINATOR] Not important
+From: Victor Polischuk <polischuk.victor@gmail.com>
+To: c5366856@mailinator.com
+Content-Type: multipart/alternative; boundary=14dae9340a9591f8ec04d5141da3
+X-EsetId: E954983CD33E3A33BB19C9
+
+--14dae9340a9591f8ec04d5141da3
+Content-Type: text/plain; charset=ISO-8859-1
+
+Hello World
+
+--14dae9340a9591f8ec04d5141da3
+Content-Type: text/html; charset=ISO-8859-1
+
+<div dir="ltr"><br><div>Hello World</div><div><br></div></div>
+
+--14dae9340a9591f8ec04d5141da3--
+

@@ -21,6 +21,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>net.htmlparser.jericho</groupId>
+            <artifactId>jericho-html</artifactId>
+            <version>3.3</version>
+        </dependency>
+        <dependency>
             <groupId>com.atlassian.jira</groupId>
             <artifactId>jira-api</artifactId>
             <version>${jira.version}</version>

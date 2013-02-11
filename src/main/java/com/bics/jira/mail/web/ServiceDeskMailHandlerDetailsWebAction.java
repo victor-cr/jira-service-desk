@@ -32,16 +32,12 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
         model.setCcAssignee(ccAssignee);
     }
 
-    public void setVersionKey(String versionKey) {
-        model.setVersionKey(versionKey);
-    }
-
-    public String getComponentKey() {
+    public Long getComponentKey() {
         return model.getComponentId();
     }
 
-    public String getVersionKey() {
-        return model.getVersionKey();
+    public void setComponentKey(Long componentKey) {
+        model.setComponentId(componentKey);
     }
 
     public void setStripQuotes(boolean stripQuotes) {
@@ -84,20 +80,12 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
         return model.getReporterUsername();
     }
 
-    public String getMailIdField() {
-        return model.getMailIdField();
-    }
-
     public void setReporterUsername(String reporterUsername) {
         model.setReporterUsername(reporterUsername);
     }
 
     public void setProjectKey(String projectKey) {
         model.setProjectKey(projectKey);
-    }
-
-    public void setMailIdField(String mailIdField) {
-        model.setMailIdField(mailIdField);
     }
 
     public void setSplitRegex(String splitRegex) {
@@ -122,10 +110,6 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
 
     public boolean isNotifyUsers() {
         return model.isNotifyUsers();
-    }
-
-    public void setComponentKey(String componentKey) {
-        model.setComponentId(componentKey);
     }
 
     public void setCcWatcher(boolean ccWatcher) {
