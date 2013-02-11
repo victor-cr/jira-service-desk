@@ -3,6 +3,7 @@ package com.bics.jira.mail.model;
 import com.atlassian.mail.MailUtils;
 import com.atlassian.plugin.util.collect.Predicate;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.mail.Address;
@@ -21,6 +22,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * JavaDoc here
@@ -31,7 +34,12 @@ import java.util.UUID;
 public class MessageAdapter {
     private static final Logger LOG = Logger.getLogger(MessageAdapter.class);
     private static final InternetAddress[] EMPTY = {};
+    private static final Pattern REPLIES = Pattern.compile("(?i)^(?:re:\\s*|fw:\\s*)*(.*)$");
+    private static final String UNKNOWN_SUBJECT = "Unknown Subject";
     private static final String KEY_JIRA_FINGER_PRINT = "X-JIRA-FingerPrint";
+    private static final String KEY_REPLY_SUBJECT = "In-Reply-To";
+    private static final String KEY_MAIL_PRIORITY = "X-Priority";
+    private static final int NORMAL_PRIORITY = 3;
 
     private final Message message;
     private final Part textBody;
@@ -52,8 +60,42 @@ public class MessageAdapter {
         attachments = attachmentPredicate.attachments;
     }
 
-    public String getSubject() throws MessagingException {
-        return message.getSubject();
+    public String getSubject() {
+        try {
+            String subject = message.getSubject();
+
+            String headerArray[] = message.getHeader(KEY_REPLY_SUBJECT);
+
+            if (headerArray != null && headerArray.length != 0 && StringUtils.isNotBlank(headerArray[0])) {
+                subject = headerArray[0];
+            }
+
+            Matcher matcher = REPLIES.matcher(subject);
+
+            return matcher.matches() ? matcher.group(matcher.groupCount() - 1) : subject;
+        } catch (MessagingException e) {
+            LOG.warn("Cannot read subject. ", e);
+        }
+
+        return UNKNOWN_SUBJECT;
+    }
+
+    public int getPriority() {
+        try {
+            String headerArray[] = message.getHeader(KEY_MAIL_PRIORITY);
+
+            return headerArray == null || headerArray.length == 0 ? 0 : Integer.parseInt(headerArray[0].replaceFirst(".*(\\d+).*", "$1"));
+        } catch (MessagingException e) {
+            LOG.warn(e.getMessage(), e);
+            return NORMAL_PRIORITY;
+        } catch (NumberFormatException e) {
+            LOG.warn(e.getMessage(), e);
+            return NORMAL_PRIORITY;
+        }
+    }
+
+    public InternetAddress getAuthor() throws MessagingException {
+        return getFrom()[0]; //TODO: fix it
     }
 
     public InternetAddress[] getFrom() throws MessagingException {
@@ -82,7 +124,6 @@ public class MessageAdapter {
             LOG.warn(e.getMessage(), e);
             return false;
         }
-
     }
 
     public String getPlainTextBody() throws MessagingException {

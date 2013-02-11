@@ -1,0 +1,262 @@
+Received: from ex2k10-pop-prd.glb.bc [10.120.130.42]
+	by el0484.bc with POP3 (fetchmail-6.3.6)
+	for <jboss@localhost> (single-drop); Mon, 11 Feb 2013 19:07:38 +0100 (CET)
+Received: from A04027.BGC.NET ([10.121.135.24]) by A04027.BGC.NET
+ ([10.121.135.24]) with Microsoft SMTP Server id 14.02.0318.004; Mon, 11 Feb
+ 2013 19:07:11 +0100
+From: "THATITHURI Srinivasa Rao (BCS/PSD)" <srinivasa.rao.thatithuri@bics.com>
+To: BCS ITP JAVA <bcs.itp.java@bics.com>
+CC: BICS CUSTOMER CARE <customer.care@bics.com>, "ASABDOUN Said (BCS/OCS)"
+	<said.asabdoun@bics.com>, "GOYAL Neeraj (BCS/PSD)" <neeraj.goyal@bics.com>,
+	"JALLY Isaac (BCS/PSD)" <isaac.jally@bics.com>, "DINAKARAN Paul (BCS/PSD)"
+	<paul.dinakaran@bics.com>
+Subject: BTS Slow
+Thread-Topic: BTS Slow
+Thread-Index: Ac4IgpugumFNcxL3S6W5q9DDoRJcVA==
+Date: Mon, 11 Feb 2013 19:07:09 +0100
+Message-ID: <4d225d1278bc482eaffc147bfdd10502@A04027.BGC.NET>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Exchange-Organization-AuthAs: Internal
+X-MS-Exchange-Organization-AuthMechanism: 04
+X-MS-Exchange-Organization-AuthSource: A04027.BGC.NET
+X-MS-Has-Attach: yes
+X-MS-Exchange-Organization-AutoForwarded: true
+X-MS-Exchange-Organization-SCL: -1
+X-MS-Exchange-Inbox-Rules-Loop: bcs.itp.java@bics.com
+X-MS-TNEF-Correlator:
+Resent-From: <bcs.itp.java@bics.com>
+Content-Type: multipart/related;
+	boundary="_002_4d225d1278bc482eaffc147bfdd10502A04027BGCNET_";
+	type="text/html"
+MIME-Version: 1.0
+
+--_002_4d225d1278bc482eaffc147bfdd10502A04027BGCNET_
+Content-Type: text/html; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:x=3D"urn:schemas-microsoft-com:office:excel" xmlns:p=3D"urn:schemas-m=
+icrosoft-com:office:powerpoint" xmlns:a=3D"urn:schemas-microsoft-com:office=
+:access" xmlns:dt=3D"uuid:C2F41010-65B3-11d1-A29F-00AA00C14882" xmlns:s=3D"=
+uuid:BDC6E3F0-6DA3-11d1-A2A3-00AA00C14882" xmlns:rs=3D"urn:schemas-microsof=
+t-com:rowset" xmlns:z=3D"#RowsetSchema" xmlns:b=3D"urn:schemas-microsoft-co=
+m:office:publisher" xmlns:ss=3D"urn:schemas-microsoft-com:office:spreadshee=
+t" xmlns:c=3D"urn:schemas-microsoft-com:office:component:spreadsheet" xmlns=
+:odc=3D"urn:schemas-microsoft-com:office:odc" xmlns:oa=3D"urn:schemas-micro=
+soft-com:office:activation" xmlns:html=3D"http://www.w3.org/TR/REC-html40" =
+xmlns:q=3D"http://schemas.xmlsoap.org/soap/envelope/" xmlns:rtc=3D"http://m=
+icrosoft.com/officenet/conferencing" xmlns:D=3D"DAV:" xmlns:Repl=3D"http://=
+schemas.microsoft.com/repl/" xmlns:mt=3D"http://schemas.microsoft.com/share=
+point/soap/meetings/" xmlns:x2=3D"http://schemas.microsoft.com/office/excel=
+/2003/xml" xmlns:ppda=3D"http://www.passport.com/NameSpace.xsd" xmlns:ois=
+=3D"http://schemas.microsoft.com/sharepoint/soap/ois/" xmlns:dir=3D"http://=
+schemas.microsoft.com/sharepoint/soap/directory/" xmlns:ds=3D"http://www.w3=
+.org/2000/09/xmldsig#" xmlns:dsp=3D"http://schemas.microsoft.com/sharepoint=
+/dsp" xmlns:udc=3D"http://schemas.microsoft.com/data/udc" xmlns:xsd=3D"http=
+://www.w3.org/2001/XMLSchema" xmlns:sub=3D"http://schemas.microsoft.com/sha=
+repoint/soap/2002/1/alerts/" xmlns:ec=3D"http://www.w3.org/2001/04/xmlenc#"=
+ xmlns:sp=3D"http://schemas.microsoft.com/sharepoint/" xmlns:sps=3D"http://=
+schemas.microsoft.com/sharepoint/soap/" xmlns:xsi=3D"http://www.w3.org/2001=
+/XMLSchema-instance" xmlns:udcs=3D"http://schemas.microsoft.com/data/udc/so=
+ap" xmlns:udcxf=3D"http://schemas.microsoft.com/data/udc/xmlfile" xmlns:udc=
+p2p=3D"http://schemas.microsoft.com/data/udc/parttopart" xmlns:wf=3D"http:/=
+/schemas.microsoft.com/sharepoint/soap/workflow/" xmlns:dsss=3D"http://sche=
+mas.microsoft.com/office/2006/digsig-setup" xmlns:dssi=3D"http://schemas.mi=
+crosoft.com/office/2006/digsig" xmlns:mdssi=3D"http://schemas.openxmlformat=
+s.org/package/2006/digital-signature" xmlns:mver=3D"http://schemas.openxmlf=
+ormats.org/markup-compatibility/2006" xmlns:m=3D"http://schemas.microsoft.c=
+om/office/2004/12/omml" xmlns:mrels=3D"http://schemas.openxmlformats.org/pa=
+ckage/2006/relationships" xmlns:spwp=3D"http://microsoft.com/sharepoint/web=
+partpages" xmlns:ex12t=3D"http://schemas.microsoft.com/exchange/services/20=
+06/types" xmlns:ex12m=3D"http://schemas.microsoft.com/exchange/services/200=
+6/messages" xmlns:pptsl=3D"http://schemas.microsoft.com/sharepoint/soap/Sli=
+deLibrary/" xmlns:spsl=3D"http://microsoft.com/webservices/SharePointPortal=
+Server/PublishedLinksService" xmlns:Z=3D"urn:schemas-microsoft-com:" xmlns:=
+st=3D"&#1;" xmlns=3D"http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DWindows-1=
+252">
+<meta name=3D"Generator" content=3D"Microsoft Word 12 (filtered medium)">
+<!--[if !mso]>
+<style>
+v\:* {behavior:url(#default#VML);}
+o\:* {behavior:url(#default#VML);}
+w\:* {behavior:url(#default#VML);}
+.shape {behavior:url(#default#VML);}
+</style>
+<![endif]--><style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:Tahoma;
+	panose-1:2 11 6 4 3 5 4 4 2 4;}
+@font-face
+	{font-family:"Comic Sans MS";
+	panose-1:3 15 7 2 3 3 2 2 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri","sans-serif";}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:purple;
+	text-decoration:underline;}
+p.MsoAcetate, li.MsoAcetate, div.MsoAcetate
+	{mso-style-priority:99;
+	mso-style-link:"Balloon Text Char";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	font-size:8.0pt;
+	font-family:"Tahoma","sans-serif";}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Times New Roman","serif";
+	color:windowtext;
+	font-weight:normal;
+	font-style:normal;}
+span.BalloonTextChar
+	{mso-style-name:"Balloon Text Char";
+	mso-style-priority:99;
+	mso-style-link:"Balloon Text";
+	font-family:"Tahoma","sans-serif";}
+.MsoChpDefault
+	{mso-style-type:export-only;}
+@page WordSection1
+	{size:612.0pt 792.0pt;
+	margin:72.0pt 72.0pt 72.0pt 72.0pt;}
+div.WordSection1
+	{page:WordSection1;}
+-->
+</style><!--[if gte mso 9]><xml>
+ <o:shapedefaults v:ext=3D"edit" spidmax=3D"2050" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <o:shapelayout v:ext=3D"edit">
+  <o:idmap v:ext=3D"edit" data=3D"1" />
+ </o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"blue" vlink=3D"purple">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,&quot;serif&quot;">Dear Java team,<o:p></o:p></span></p=
+>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,&quot;serif&quot;"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,&quot;serif&quot;">BTS is very slow. Please do the nece=
+ssary ASAP.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,&quot;serif&quot;"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,&quot;serif&quot;"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-GB" style=3D"font-size:10.0pt;font-=
+family:&quot;Comic Sans MS&quot;;
+color:#17365D">Thanks &amp; Regards</span><span lang=3D"EN-GB" style=3D"col=
+or:#17365D">
+</span><b><i><span style=3D"font-size:14.0pt;font-family:Wingdings;color:#1=
+F497D">?</span></i></b><span lang=3D"EN-GB" style=3D"color:#17365D">,<o:p><=
+/o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-GB" style=3D"color:#17365D"><o:p>&n=
+bsp;</o:p></span></p>
+<p class=3D"MsoNormal"><b><span lang=3D"EN-GB" style=3D"color:#1F497D">Srin=
+ivasa Rao T<o:p></o:p></span></b></p>
+<p class=3D"MsoNormal"><b><span lang=3D"EN-GB" style=3D"font-size:10.0pt;co=
+lor:#1F497D">Customer Care Operator</span></b><b><span lang=3D"EN-GB" style=
+=3D"font-size:10.0pt;color:#548DD4"><o:p></o:p></span></b></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-GB" style=3D"font-size:12.0pt;font-=
+family:&quot;Times New Roman&quot;,&quot;serif&quot;"><a href=3D"mailto:cus=
+tomer.care@belgacom-ics.com"><span lang=3D"FR-BE" style=3D"color:
+#DC006B">customer.care@bics.com</span></a></span><span lang=3D"FR-BE" style=
+=3D"font-size:12.0pt;font-family:&quot;Times New Roman&quot;,&quot;serif&qu=
+ot;;color:#FF0066"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-GB" style=3D"font-size:12.0pt;font-=
+family:&quot;Times New Roman&quot;,&quot;serif&quot;"><a href=3D"mailto:tho=
+mas.honnay@bics.com"><span lang=3D"FR-BE" style=3D"color:#DC006B">srinivasa=
+.rao.thatithuri@bics.com</span></a></span><span lang=3D"FR-BE" style=3D"fon=
+t-size:12.0pt;font-family:&quot;Times New Roman&quot;,&quot;serif&quot;;
+color:#DC006B"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"FR-BE" style=3D"font-size:12.0pt;font-=
+family:&quot;Times New Roman&quot;,&quot;serif&quot;;
+color:#555555">BICS SA/NV<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"FR-BE" style=3D"font-size:12.0pt;font-=
+family:&quot;Times New Roman&quot;,&quot;serif&quot;;
+color:#555555">Rue Lebeau 4, 1000 Brussels, Belgium<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,&quot;serif&quot;;
+color:#555555">Tel &#43;32 2 547 51 51 - Fax &#43;32 2 502 36 81</span><spa=
+n lang=3D"FR-BE" style=3D"font-size:12.0pt;font-family:&quot;Times New Roma=
+n&quot;,&quot;serif&quot;;
+color:#555555"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-GB" style=3D"font-size:12.0pt;font-=
+family:&quot;Times New Roman&quot;,&quot;serif&quot;"><a href=3D"http://www=
+.bics.com/"><b><span lang=3D"FR-BE" style=3D"color:#DC006B">www.bics.com</s=
+pan></b></a></span><b><span lang=3D"FR-BE" style=3D"font-size:12.0pt;font-f=
+amily:&quot;Times New Roman&quot;,&quot;serif&quot;;
+color:#DC006B"><o:p></o:p></span></b></p>
+<p class=3D"MsoNormal"><span lang=3D"FR-BE" style=3D"font-size:10.0pt;font-=
+family:&quot;Comic Sans MS&quot;;
+color:#DC006B"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,&quot;sans-serif&quot;;
+color:#555555"><img border=3D"0" width=3D"183" height=3D"67" id=3D"Picture_=
+x0020_1" src=3D"cid:image001.gif@01CE088A.FD62E930" alt=3D"BICS.gif"></span=
+><span lang=3D"EN-GB"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,&quot;serif&quot;"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:12.0pt;font-family:&quot;Ti=
+mes New Roman&quot;,&quot;serif&quot;"><o:p>&nbsp;</o:p></span></p>
+</div>
+</body>
+</html>
+
+--_002_4d225d1278bc482eaffc147bfdd10502A04027BGCNET_
+Content-Type: image/x-citrix-gif; name="image001.gif"
+Content-Description: image001.gif
+Content-Disposition: inline; filename="image001.gif"; size=1431;
+	creation-date="Mon, 11 Feb 2013 18:07:08 GMT";
+	modification-date="Mon, 11 Feb 2013 18:07:08 GMT"
+Content-ID: <image001.gif@01CE088A.FD62E930>
+Content-Transfer-Encoding: base64
+
+R0lGODlhtwBDAKIAAP///+hZntwDbExhlgknb+qz0vDY6I2bvCH5BAAAAAAALAAAAAC3AEMAQAP/
+CLrc/jBKYIadOOvNu/+cIIoFqBAocZhNMQoBK8807b5vuaXqwP9AwgBS4K0ehqAyZXD4lj9dTRPA
+iWIzF1bz4yRTw0UxdVw8UbMvcFCebqyjgFwOr9vvr8YvLDn82gBjKIAAZ2ggB4QtPFJuG1VWWzRV
+ko6Wl5iZHzd4HHILAlIuC3MwcgUuLk0Ac1ipAgwBUqGwrDGjoFKfCq2BWKG4trsAobufdJWaFHAO
+lA0GdcrS09QmkDjV2drbO2RuqKvc4izMYjCxOI0PRuPt7o92yRBrGXuL3g2GfB5n++8TBiDJuhYn
+HCk8LwIYVGCIgyAhDB4C6nLJDxBFmgLOWWju/w7HgAivQDAEBZ8DiRFIlvSnpiQKf+IIipx0R52M
+YERq/dtpSWYcTls4fovDUwHODDdsSvNJAh0OeUWjSsXAbqrVqxGqziAIFWvMgkafLtCodJ1Jr2hZ
+GCgwcKaWg70mVLUIpayClnYV0F0yQOiCvWvyooVWk0uQAUoBQ7w36AFJmHq1MmTk+Gw2tnL8OqQD
+Q7ODPxsMtUHJYC9GDYBPj2MqOAKnOgqzgunAYx/pBbWnVFjS2pLGzBCYJmQQUmzp3IZTNLodeXam
+lgR604RjU3iOscWvM1DZt4VKm8zNXFxYwFAj0A4A70QVaIRnCWxhY9jNV/UJJgBV1s57QP9L6f/S
+xDMFULH51tVdB6Z1VUgALtNWRDCgAgwwp8ASYSoYfnIhHahoKAsJVaDTITRtkVWFhE1EeGKGsKiS
+SojQvPccQjI6VYVBIJ3DyggFQEMBJcdcAUuOJQhkgI+slIDkQedwUmQJbCkgwFowzCTQlFEmKWWC
+AYoQjjNOGafgmDXY0UxnDfhE5prT8ZhmNGzGyQ1msshppzZn2HfnnjVIxuefjvhpAmFeAjoOODMI
+CgJXhnJjRYN6WMaCQI1q8lpTP14RjpiyNVYpmTkSBcqUHYnaqQoR9VfbATVapKdRqoLBRo0A9PeE
+BazemSNXYCaHqn/0EKGoeC6hUBaww6Z1Kaf/ctWHSiKHPRAebmsc8KxKgDykwioGAAaZgtbpSFWw
+KUXBGKrnogtBt2w44dwD/b3q1bKYjsuDBtoaFB50LJgnFaGmylBvPTzQWityRvlpiMEjjbcenCbE
+l1CPzb5E27uB+ImwDMDKa+k116jDXgQA3wFVPxdbLIbG97rRrRIeUyOxgMRlV+h2BW9gWkQKU4aJ
+YtUsK0+4V5Ri80x3/dAqRStbBh2kHewFNQhHIyRLj0RTx7PSEQB9LiHadgeBq/ngN3bO1PhUFkLP
+HM2Rfxb4p8i0k63Bhn4GcWdtAbFK+g4nayFTp2shaaaYEmJLm+zBxSpC30o7McUwERJz2UIi//Fa
+uwG7APJtayINeo5rrjzZMbkEhE396Wp1qH5mJKdPcNRJOq2ewW+D02C1BzcUGBalO3Y2yq68aJpp
+KMHH1jskC1HqZKYf6vibDr2vQukuyG+TteWkbJF9e90DeSIt1s9xFy2xzILLJzh9P0wvWU5Y/jDF
+YJEZlrVrk3XnyJ9I3NUT6tCHiNGWD2HNQleLD9YGaAvwHQRrWgCJRnwhJQndIkKhAAlmeHFBUrWD
+aL6TBnug4bpLzA4pHjyUpiSmizj8JBMUi8qSNlDCLBhNEqlrgdZstyfJ6fB7xbMCD/dkOgaEKne+
+cNMQ7+TDUT1qiTxkSwzDhA0oWvF1AbviJQISAAA7
+
+--_002_4d225d1278bc482eaffc147bfdd10502A04027BGCNET_--

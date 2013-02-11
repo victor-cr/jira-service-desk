@@ -96,16 +96,16 @@ public class ServiceDeskMessageHandler implements MessageHandler {
             return false;
         }
 
-        Issue issue = issueLocator.find(model.getProject(), adapter, monitor);
-
-        String body = MailUtils.getBody(message);
+        Issue issue = issueLocator.find(model, adapter, monitor);
 
         if (issue != null) {
+            String body = adapter.getComments().get(0);
+
             context.createComment(issue, author, body, false);
         } else {
-            try {
-                issue = issueBuilder.build(model.getProject(), adapter, monitor);
+            issue = issueBuilder.build(model, adapter, monitor);
 
+            try {
                 context.createIssue(author, issue);
             } catch (CreateException e) {
                 throw new MessagingException(e.getMessage(), e);
