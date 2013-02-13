@@ -1,11 +1,13 @@
 package com.bics.jira.mail.handler;
 
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.event.user.UserEventType;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.PermissionException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.issue.status.Status;
 import com.atlassian.jira.issue.watchers.WatcherManager;
 import com.atlassian.jira.service.util.handler.MessageHandler;
 import com.atlassian.jira.service.util.handler.MessageHandlerContext;
@@ -13,6 +15,7 @@ import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.service.util.handler.MessageHandlerExecutionMonitor;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.web.util.AttachmentException;
+import com.atlassian.jira.workflow.IssueWorkflowManager;
 import com.atlassian.mail.MailUtils;
 import com.bics.jira.mail.CommentExtractor;
 import com.bics.jira.mail.IssueBuilder;
@@ -22,12 +25,14 @@ import com.bics.jira.mail.model.Attachment;
 import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
 import com.bics.jira.mail.model.ServiceModel;
+import com.opensymphony.workflow.loader.ActionDescriptor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -42,6 +47,8 @@ public class ServiceDeskMessageHandler implements MessageHandler {
     private final ModelValidator modelValidator;
     private final IssueLocator issueLocator;
     private final IssueBuilder issueBuilder;
+    private final IssueService issueService;
+    private final IssueWorkflowManager issueWorkflowManager;
     private final UserManager userManager;
     private final CommentExtractor commentExtractor;
     private final WatcherManager watcherManager;
@@ -49,10 +56,12 @@ public class ServiceDeskMessageHandler implements MessageHandler {
     private final HandlerModel model = new HandlerModel();
     private boolean valid;
 
-    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, UserManager userManager, CommentExtractor commentExtractor, WatcherManager watcherManager) {
+    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, IssueService issueService, IssueWorkflowManager issueWorkflowManager, UserManager userManager, CommentExtractor commentExtractor, WatcherManager watcherManager) {
         this.modelValidator = modelValidator;
         this.issueLocator = issueLocator;
         this.issueBuilder = issueBuilder;
+        this.issueService = issueService;
+        this.issueWorkflowManager = issueWorkflowManager;
         this.userManager = userManager;
         this.commentExtractor = commentExtractor;
         this.watcherManager = watcherManager;
@@ -103,6 +112,25 @@ public class ServiceDeskMessageHandler implements MessageHandler {
             String body = commentExtractor.extractComment(model, adapter);
 
             context.createComment(issue, author, body, false);
+
+            Status oldStatus = issue.getStatusObject();
+            Map<Status, Status> transitions = model.getTransitions();
+
+            if (transitions != null && transitions.containsKey(oldStatus)) {
+                Collection<ActionDescriptor> actions = issueWorkflowManager.getAvailableActions(issue);
+
+                if (actions != null) {
+                    for (ActionDescriptor action : actions) {
+                        if (action.getName() == null) {
+                            //TODO:validate
+                        }
+                    }
+
+//                    issueService.validateTransition(author, issue.getId(), );
+//
+                }
+
+            }
         } else {
             MutableIssue newIssue = issueBuilder.build(model, adapter, monitor);
 
