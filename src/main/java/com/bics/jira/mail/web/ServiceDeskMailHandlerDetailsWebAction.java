@@ -24,7 +24,7 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
         return model.getProjectKey();
     }
 
-    public String getIssueTypeKey() {
+    public String getIssueTypeId() {
         return model.getIssueTypeId();
     }
 
@@ -68,8 +68,8 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
         return model.getTransitions();
     }
 
-    public void setIssueTypeKey(String issueTypeKey) {
-        model.setIssueTypeId(issueTypeKey);
+    public void setIssueTypeId(String issueTypeId) {
+        model.setIssueTypeId(issueTypeId);
     }
 
     public void setCreateUsers(boolean createUsers) {

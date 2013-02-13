@@ -11,6 +11,7 @@ import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
 import com.atlassian.query.QueryImpl;
+import com.atlassian.query.clause.Clause;
 import com.bics.jira.mail.IssueLocator;
 import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
@@ -34,9 +35,11 @@ public class IssueLocatorImpl implements IssueLocator {
     private static final Logger LOG = Logger.getLogger(IssueLocatorImpl.class);
     private static final long RESOLUTION_DELTA = 1000L * 60 * 60 * 24 * 30;
 
+    private final IssueManager issueManager;
     private final SearchService searchService;
 
-    public IssueLocatorImpl(SearchService searchService) {
+    public IssueLocatorImpl(IssueManager issueManager, SearchService searchService) {
+        this.issueManager = issueManager;
         this.searchService = searchService;
     }
 
@@ -44,19 +47,29 @@ public class IssueLocatorImpl implements IssueLocator {
     public Issue find(HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) {
         Project project = model.getProject();
 
-        Query query = JqlQueryBuilder.newClauseBuilder()
-                .project(project.getId())
-                .resolutionDateBetween(new Date(System.currentTimeMillis() - RESOLUTION_DELTA), new Date())
-                .summary(message.getSubject())
-                .buildQuery();
+        String subject = message.getSubject().replaceAll("\\W", " ");
+
+        Query unresolvedQuery = JqlQueryBuilder.newClauseBuilder()
+                .project(project.getId()).and()
+                .unresolved().and()
+                .summary(subject).buildQuery();
+
+        Query recentlyResolvedQuery = JqlQueryBuilder.newClauseBuilder()
+                .project(project.getId()).and()
+                .resolutionDateBetween(new Date(System.currentTimeMillis() - RESOLUTION_DELTA), new Date()).and()
+                .summary(subject).buildQuery();
 
         try {
-            SearchResults results = searchService.search(project.getLead(), query, PagerFilter.getUnlimitedFilter());
+            List<Issue> issues = searchService.search(project.getLead(), unresolvedQuery, new PagerFilter(1)).getIssues();
 
-            List<Issue> issues = results.getIssues();
+            if (issues.isEmpty()) {
+                issues = searchService.search(project.getLead(), recentlyResolvedQuery, new PagerFilter(1)).getIssues();
+            }
 
             if (!issues.isEmpty()) {
-                return issues.get(0);
+                Issue issue = issues.get(0);
+
+                return issueManager.getIssueObject(issue.getId());
             }
         } catch (SearchException e) {
             LOG.error("Cannot search for an issue.", e);

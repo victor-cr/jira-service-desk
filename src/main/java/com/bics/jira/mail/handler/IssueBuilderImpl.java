@@ -13,6 +13,7 @@ import com.atlassian.jira.issue.security.IssueSecurityLevelManager;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.web.FieldVisibilityManager;
+import com.bics.jira.mail.CommentExtractor;
 import com.bics.jira.mail.IssueBuilder;
 import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
@@ -33,14 +34,16 @@ public class IssueBuilderImpl implements IssueBuilder {
     private final IssueSecurityLevelManager issueSecurityLevelManager;
     private final CustomFieldManager customFieldManager;
     private final ConstantsManager constantsManager;
+    private final CommentExtractor commentExtractor;
     private final FieldVisibilityManager fieldVisibilityManager;
 
-    public IssueBuilderImpl(IssueFactory issueFactory, IssueSecurityLevelManager issueSecurityLevelManager, CustomFieldManager customFieldManager, ConstantsManager constantsManager, FieldVisibilityManager fieldVisibilityManager) {
-        this.issueFactory = issueFactory;
-        this.issueSecurityLevelManager = issueSecurityLevelManager;
-        this.customFieldManager = customFieldManager;
-        this.constantsManager = constantsManager;
+    public IssueBuilderImpl(FieldVisibilityManager fieldVisibilityManager, CommentExtractor commentExtractor, ConstantsManager constantsManager, CustomFieldManager customFieldManager, IssueSecurityLevelManager issueSecurityLevelManager, IssueFactory issueFactory) {
         this.fieldVisibilityManager = fieldVisibilityManager;
+        this.commentExtractor = commentExtractor;
+        this.constantsManager = constantsManager;
+        this.customFieldManager = customFieldManager;
+        this.issueSecurityLevelManager = issueSecurityLevelManager;
+        this.issueFactory = issueFactory;
     }
 
     @Override
@@ -62,7 +65,9 @@ public class IssueBuilderImpl implements IssueBuilder {
         }
 
         if (!fieldVisibilityManager.isFieldHiddenInAllSchemes(project.getId(), IssueFieldConstants.DESCRIPTION, Collections.singletonList(issueTypeId))) {
-            issue.setDescription(message.getComments().get(0));
+            String body = commentExtractor.extractBody(model, message);
+
+            issue.setDescription(body);
         }
 
         if (levelId != null) {

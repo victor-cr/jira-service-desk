@@ -12,8 +12,7 @@ import java.util.Arrays;
  * @since 10.02.13 14:17
  */
 public enum MimeType {
-    MIXED(new ContentType("multipart", "mixed", null)),
-    ALTERNATIVE(new ContentType("multipart", "alternative", null)),
+    MULTIPART(new ContentType("multipart", "*", null)),
     HTML(new ContentType("text", "html", null)),
     TEXT(new ContentType("text", "plain", null)),
     OTHER(null);

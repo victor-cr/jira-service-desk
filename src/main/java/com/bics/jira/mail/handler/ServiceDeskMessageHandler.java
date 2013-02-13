@@ -11,6 +11,7 @@ import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.service.util.handler.MessageHandlerExecutionMonitor;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.mail.MailUtils;
+import com.bics.jira.mail.CommentExtractor;
 import com.bics.jira.mail.IssueBuilder;
 import com.bics.jira.mail.IssueLocator;
 import com.bics.jira.mail.ModelValidator;
@@ -38,15 +39,17 @@ public class ServiceDeskMessageHandler implements MessageHandler {
     private final IssueLocator issueLocator;
     private final IssueBuilder issueBuilder;
     private final UserManager userManager;
+    private final CommentExtractor commentExtractor;
 
     private final HandlerModel model = new HandlerModel();
     private boolean valid;
 
-    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, UserManager userManager) {
+    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, UserManager userManager, CommentExtractor commentExtractor) {
         this.modelValidator = modelValidator;
         this.issueLocator = issueLocator;
         this.issueBuilder = issueBuilder;
         this.userManager = userManager;
+        this.commentExtractor = commentExtractor;
     }
 
     @Override
@@ -99,7 +102,7 @@ public class ServiceDeskMessageHandler implements MessageHandler {
         Issue issue = issueLocator.find(model, adapter, monitor);
 
         if (issue != null) {
-            String body = adapter.getComments().get(0);
+            String body = commentExtractor.extractComment(model, adapter);
 
             context.createComment(issue, author, body, false);
         } else {

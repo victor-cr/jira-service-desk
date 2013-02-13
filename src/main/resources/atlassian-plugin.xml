@@ -19,6 +19,10 @@
         <interface>com.bics.jira.mail.IssueLocator</interface>
     </component>
 
+    <component key="comment-extractor" i18n-name-key="msd.comment.extractor.name" class="com.bics.jira.mail.handler.CommentExtractorImpl">
+        <interface>com.bics.jira.mail.CommentExtractor</interface>
+    </component>
+
     <message-handler key="message-handler" i18n-name-key="msd.handler.name" class="com.bics.jira.mail.handler.ServiceDeskMessageHandler"
                      add-edit-url="/secure/admin/ServiceDeskMailDetails!default.jspa"
                      weight="0"/>

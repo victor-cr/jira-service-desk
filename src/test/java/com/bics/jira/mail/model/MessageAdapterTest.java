@@ -14,7 +14,6 @@ import java.io.InputStream;
  * @since 06.02.13 22:36
  */
 public class MessageAdapterTest extends Assert {
-    private static final String LINE_SEPARATOR = System.lineSeparator();
     private static final String FILE_MULTIPART_SIMPLE = "MultipartSimple.txt";
     private static final String FILE_MULTIPART_REGULAR = "MultipartRegular.txt";
     private static final String FILE_TORTURE_TEST = "InfamousTortureTest.txt";

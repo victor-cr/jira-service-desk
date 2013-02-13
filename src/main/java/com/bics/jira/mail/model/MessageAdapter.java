@@ -37,6 +37,7 @@ public class MessageAdapter {
     private static final Pattern REPLIES = Pattern.compile("(?i)^(?:re:\\s*|fw:\\s*)*(.*)$");
     private static final String UNKNOWN_SUBJECT = "Unknown Subject";
     private static final String KEY_JIRA_FINGER_PRINT = "X-JIRA-FingerPrint";
+    private static final String KEY_THREAD_TOPIC = "Thread-Topic";
     private static final String KEY_REPLY_SUBJECT = "In-Reply-To";
     private static final String KEY_MAIL_PRIORITY = "X-Priority";
     private static final int NORMAL_PRIORITY = 3;
@@ -64,15 +65,17 @@ public class MessageAdapter {
         try {
             String subject = message.getSubject();
 
-            String headerArray[] = message.getHeader(KEY_REPLY_SUBJECT);
+            String inReplyTo = getHeader(KEY_REPLY_SUBJECT);
 
-            if (headerArray != null && headerArray.length != 0 && StringUtils.isNotBlank(headerArray[0])) {
-                subject = headerArray[0];
+            if (StringUtils.isNotBlank(inReplyTo)) {
+                subject = inReplyTo;
             }
 
             Matcher matcher = REPLIES.matcher(subject);
 
-            return matcher.matches() ? matcher.group(matcher.groupCount() - 1) : subject;
+            subject = matcher.matches() ? matcher.group(matcher.groupCount() - 1) : subject;
+
+            return StringUtils.abbreviate(subject, 200);
         } catch (MessagingException e) {
             LOG.warn("Cannot read subject. ", e);
         }
@@ -82,12 +85,9 @@ public class MessageAdapter {
 
     public int getPriority() {
         try {
-            String headerArray[] = message.getHeader(KEY_MAIL_PRIORITY);
+            String header = getHeader(KEY_MAIL_PRIORITY);
 
-            return headerArray == null || headerArray.length == 0 ? 0 : Integer.parseInt(headerArray[0].replaceFirst(".*(\\d+).*", "$1"));
-        } catch (MessagingException e) {
-            LOG.warn(e.getMessage(), e);
-            return NORMAL_PRIORITY;
+            return header == null ? NORMAL_PRIORITY : Integer.parseInt(header.replaceFirst(".*(\\d+).*", "$1"));
         } catch (NumberFormatException e) {
             LOG.warn(e.getMessage(), e);
             return NORMAL_PRIORITY;
@@ -110,20 +110,14 @@ public class MessageAdapter {
         return Arrays.copyOf(allRecipients, allRecipients.length, EMPTY.getClass());
     }
 
-    public List<String> getComments() throws MessagingException {
-        return null;
-//        return message.getAllRecipients();
+    public boolean isLoopMail(String instanceFingerPrint) {
+        String[] headers = getHeaders(KEY_JIRA_FINGER_PRINT);
+
+        return headers == null || Arrays.asList(headers).contains(instanceFingerPrint);
     }
 
-    public boolean isLoopMail(String instanceFingerPrint) {
-        try {
-            String headerArray[] = message.getHeader(KEY_JIRA_FINGER_PRINT);
-
-            return headerArray == null || Arrays.asList(headerArray).contains(instanceFingerPrint);
-        } catch (MessagingException e) {
-            LOG.warn(e.getMessage(), e);
-            return false;
-        }
+    public boolean hasThreadTopic() {
+        return getHeader(KEY_THREAD_TOPIC) != null;
     }
 
     public String getPlainTextBody() throws MessagingException {
@@ -166,6 +160,23 @@ public class MessageAdapter {
         }
     }
 
+    private String getHeader(String key) {
+        String[] headers = getHeaders(key);
+
+        return headers == null ? null : headers[0];
+    }
+
+    private String[] getHeaders(String key) {
+        try {
+            String[] headers = message.getHeader(key);
+
+            return headers == null || headers.length == 0 ? null : headers;
+        } catch (MessagingException e) {
+            LOG.warn(e.getMessage(), e);
+            return null;
+        }
+    }
+
     private static String convertText(Part part) throws MessagingException {
         try {
             if (part == null || MailUtils.isContentEmpty(part)) {
@@ -185,7 +196,7 @@ public class MessageAdapter {
 
         MimeType mimeType = MimeType.valueOf(part);
 
-        if (mimeType != MimeType.ALTERNATIVE && mimeType != MimeType.MIXED) {
+        if (mimeType != MimeType.MULTIPART) {
             for (Iterator<Predicate<Part>> iterator = predicates.iterator(); iterator.hasNext(); ) {
                 if (!iterator.next().evaluate(part)) {
                     iterator.remove();
