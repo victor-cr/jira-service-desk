@@ -11,9 +11,14 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -128,18 +133,32 @@ public class MessageAdapter {
         return convertText(htmlBody);
     }
 
-    public List<MailUtils.Attachment> getAttachments() throws MessagingException {
+    public Collection<Attachment> getAttachments() throws MessagingException {
         if (attachments == null || attachments.isEmpty()) {
             return Collections.emptyList();
         }
 
         try {
-            List<MailUtils.Attachment> list = new LinkedList<MailUtils.Attachment>();
+            Collection<Attachment> list = new LinkedList<Attachment>();
 
             for (Part part : attachments) {
-                String contentType = MailUtils.getContentType(part).toLowerCase();
+                File storedFile = File.createTempFile("attachment", "jira");
                 String fileName = part.getFileName();
+                ContentType contentType = new ContentType(part.getContentType());
                 InputStream content = part.getInputStream();
+
+                try {
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(storedFile));
+
+                    try {
+                        IOUtils.copy(content, out);
+                    } finally {
+                        out.close();
+                    }
+                } finally {
+                    content.close();
+                }
+
 
                 if (fileName == null) {
                     fileName = UUID.randomUUID().toString();
@@ -147,11 +166,7 @@ public class MessageAdapter {
                     fileName = MailUtils.fixMimeEncodedFilename(fileName);
                 }
 
-                try {
-                    list.add(new MailUtils.Attachment(contentType, fileName, IOUtils.toByteArray(content)));
-                } finally {
-                    content.close();
-                }
+                list.add(new Attachment(storedFile, contentType, fileName));
             }
 
             return list;

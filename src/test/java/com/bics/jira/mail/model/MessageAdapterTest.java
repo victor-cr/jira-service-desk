@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.ContentType;
 import javax.mail.internet.MimeMessage;
 import java.io.InputStream;
 
@@ -72,8 +73,11 @@ public class MessageAdapterTest extends Assert {
         MessageAdapter adapter = message(FILE_MULTIPART_REGULAR);
 
         assertEquals(1, adapter.getAttachments().size());
-        assertEquals("barcode.jpg", adapter.getAttachments().get(0).getFilename());
-        assertEquals("image/jpeg", adapter.getAttachments().get(0).getContentType());
+
+        Attachment first = adapter.getAttachments().iterator().next();
+
+        assertEquals("barcode.jpg", first.getFileName());
+        assertTrue(new ContentType("image/jpeg").match(first.getContentType()));
     }
 
     @Test

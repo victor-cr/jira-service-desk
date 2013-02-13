@@ -12,11 +12,13 @@ import com.atlassian.jira.service.util.handler.MessageHandlerContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.service.util.handler.MessageHandlerExecutionMonitor;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.web.util.AttachmentException;
 import com.atlassian.mail.MailUtils;
 import com.bics.jira.mail.CommentExtractor;
 import com.bics.jira.mail.IssueBuilder;
 import com.bics.jira.mail.IssueLocator;
 import com.bics.jira.mail.ModelValidator;
+import com.bics.jira.mail.model.Attachment;
 import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
 import com.bics.jira.mail.model.ServiceModel;
@@ -109,8 +111,18 @@ public class ServiceDeskMessageHandler implements MessageHandler {
             try {
                 issue = context.createIssue(author, newIssue);
             } catch (CreateException e) {
+                monitor.error(e.getMessage(), e);
+
                 throw new MessagingException(e.getMessage(), e);
             }
+        }
+
+        try {
+            for (Attachment attachment : adapter.getAttachments()) {
+                context.createAttachment(attachment.getStoredFile(), attachment.getFileName(), attachment.getContentType().toString(), author, issue);
+            }
+        } catch (AttachmentException e) {
+            monitor.error(e.getMessage(), e);
         }
 
         for (InternetAddress recipient : adapter.getAllRecipients()) {
