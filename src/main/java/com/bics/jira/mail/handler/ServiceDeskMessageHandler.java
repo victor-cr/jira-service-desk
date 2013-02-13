@@ -5,6 +5,8 @@ import com.atlassian.jira.event.user.UserEventType;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.PermissionException;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.issue.watchers.WatcherManager;
 import com.atlassian.jira.service.util.handler.MessageHandler;
 import com.atlassian.jira.service.util.handler.MessageHandlerContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
@@ -40,16 +42,18 @@ public class ServiceDeskMessageHandler implements MessageHandler {
     private final IssueBuilder issueBuilder;
     private final UserManager userManager;
     private final CommentExtractor commentExtractor;
+    private final WatcherManager watcherManager;
 
     private final HandlerModel model = new HandlerModel();
     private boolean valid;
 
-    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, UserManager userManager, CommentExtractor commentExtractor) {
+    public ServiceDeskMessageHandler(ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, UserManager userManager, CommentExtractor commentExtractor, WatcherManager watcherManager) {
         this.modelValidator = modelValidator;
         this.issueLocator = issueLocator;
         this.issueBuilder = issueBuilder;
         this.userManager = userManager;
         this.commentExtractor = commentExtractor;
+        this.watcherManager = watcherManager;
     }
 
     @Override
@@ -76,18 +80,10 @@ public class ServiceDeskMessageHandler implements MessageHandler {
         User author = null;
 
         for (InternetAddress address : addresses) {
-            author = userManager.getUser(address.getAddress());
+            author = ensureUser(address, context);
 
             if (author == null) {
                 author = model.getReporterUser();
-
-                try {
-                    author = context.createUser(address.getAddress(), address.getAddress(), address.getAddress(), address.getPersonal(), UserEventType.USER_CREATED);
-                } catch (PermissionException e) {
-                    LOG.error("Permission problem: ", e);
-                } catch (CreateException e) {
-                    LOG.error("Creation problem: ", e);
-                }
             }
         }
 
@@ -106,15 +102,41 @@ public class ServiceDeskMessageHandler implements MessageHandler {
 
             context.createComment(issue, author, body, false);
         } else {
-            issue = issueBuilder.build(model, adapter, monitor);
+            MutableIssue newIssue = issueBuilder.build(model, adapter, monitor);
+
+            newIssue.setReporter(author);
 
             try {
-                context.createIssue(author, issue);
+                issue = context.createIssue(author, newIssue);
             } catch (CreateException e) {
                 throw new MessagingException(e.getMessage(), e);
             }
         }
 
+        for (InternetAddress recipient : adapter.getAllRecipients()) {
+            User user = ensureUser(recipient, context);
+
+            if (user != null && !watcherManager.isWatching(user, issue)) {
+                watcherManager.startWatching(user, issue);
+            }
+        }
+
         return true;
+    }
+
+    private User ensureUser(InternetAddress address, MessageHandlerContext context) {
+        User user = userManager.getUser(address.getAddress());
+
+        if (user == null) {
+            try {
+                user = context.createUser(address.getAddress(), address.getAddress(), address.getAddress(), address.getPersonal(), UserEventType.USER_CREATED);
+            } catch (PermissionException e) {
+                LOG.error("Permission problem: ", e);
+            } catch (CreateException e) {
+                LOG.error("Creation problem: ", e);
+            }
+        }
+
+        return user;
     }
 }

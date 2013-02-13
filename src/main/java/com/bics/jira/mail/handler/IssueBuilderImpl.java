@@ -47,7 +47,7 @@ public class IssueBuilderImpl implements IssueBuilder {
     }
 
     @Override
-    public Issue build(HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws MessagingException {
+    public MutableIssue build(HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws MessagingException {
         Project project = model.getProject();
         String issueTypeId = model.getIssueType().getId();
         User defaultReporter = model.getReporterUser();
