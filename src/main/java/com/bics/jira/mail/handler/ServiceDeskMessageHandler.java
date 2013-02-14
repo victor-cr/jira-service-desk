@@ -114,9 +114,9 @@ public class ServiceDeskMessageHandler implements MessageHandler {
             context.createComment(issue, author, body, false);
 
             Status oldStatus = issue.getStatusObject();
-            Map<Status, Status> transitions = model.getTransitions();
+            int[] transitions = model.getTransitions();
 
-            if (transitions != null && transitions.containsKey(oldStatus)) {
+            if (transitions != null) {
                 Collection<ActionDescriptor> actions = issueWorkflowManager.getAvailableActions(issue);
 
                 if (actions != null) {

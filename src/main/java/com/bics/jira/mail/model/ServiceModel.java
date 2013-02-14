@@ -31,7 +31,7 @@ public class ServiceModel {
     private String projectKey;
     private String issueTypeId;
     private Long componentId;
-    private String transitions;
+    private String[] transitions;
     private boolean stripQuotes;
     private String reporterUsername;
     private String catchEmail;
@@ -65,11 +65,11 @@ public class ServiceModel {
         this.componentId = componentId;
     }
 
-    public String getTransitions() {
+    public String[] getTransitions() {
         return transitions;
     }
 
-    public void setTransitions(String transitions) {
+    public void setTransitions(String[] transitions) {
         this.transitions = transitions;
     }
 
@@ -143,7 +143,7 @@ public class ServiceModel {
         safePut(map, KEY_PROJECT, valueOf(projectKey));
         safePut(map, KEY_ISSUE_TYPE, valueOf(issueTypeId));
         safePut(map, KEY_COMPONENT, valueOf(componentId));
-        safePut(map, KEY_TRANSITIONS, encode(transitions));
+        safePut(map, KEY_TRANSITIONS, arrayEncode(transitions));
         safePut(map, KEY_REPORTER_USERNAME, valueOf(reporterUsername));
         safePut(map, KEY_CATCH_EMAIL, valueOf(catchEmail));
         safePut(map, KEY_SPLIT_REGEX, encode(splitRegex));
@@ -164,7 +164,7 @@ public class ServiceModel {
         this.projectKey = params.get(KEY_PROJECT);
         this.issueTypeId = params.get(KEY_ISSUE_TYPE);
         this.componentId = safeGetL(params, KEY_COMPONENT);
-        this.transitions = decode(params.get(KEY_TRANSITIONS));
+        this.transitions = arrayDecode(params.get(KEY_TRANSITIONS));
         this.reporterUsername = params.get(KEY_REPORTER_USERNAME);
         this.catchEmail = params.get(KEY_CATCH_EMAIL);
         this.splitRegex = decode(params.get(KEY_SPLIT_REGEX));
@@ -177,11 +177,19 @@ public class ServiceModel {
         return this;
     }
 
-    private String encode(String value) {
+    private static String arrayEncode(String[] data) {
+        return data == null || data.length == 0 ? null : encode(StringUtils.join(data, ','));
+    }
+
+    private static String[] arrayDecode(String data) {
+        return StringUtils.isBlank(data) ? null : StringUtils.split(decode(data), ',');
+    }
+
+    private static String encode(String value) {
         return StringUtils.isBlank(value) ? null : Base64.encodeBase64String(value.getBytes());
     }
 
-    private String decode(String value) {
+    private static String decode(String value) {
         return StringUtils.isBlank(value) ? null : new String(Base64.decodeBase64(value));
     }
 

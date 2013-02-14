@@ -3,11 +3,9 @@ package com.bics.jira.mail.model;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.issue.issuetype.IssueType;
-import com.atlassian.jira.issue.status.Status;
 import com.atlassian.jira.project.Project;
 
 import javax.mail.internet.InternetAddress;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -20,7 +18,7 @@ public class HandlerModel {
     private Project project;
     private IssueType issueType;
     private ProjectComponent projectComponent;
-    private Map<Status, Status> transitions;
+    private int[] transitions;
     private User reporterUser;
     private InternetAddress catchEmail;
     private Pattern splitRegex;
@@ -54,11 +52,11 @@ public class HandlerModel {
         this.projectComponent = projectComponent;
     }
 
-    public Map<Status, Status> getTransitions() {
+    public int[] getTransitions() {
         return transitions;
     }
 
-    public void setTransitions(Map<Status, Status> transitions) {
+    public void setTransitions(int[] transitions) {
         this.transitions = transitions;
     }
 

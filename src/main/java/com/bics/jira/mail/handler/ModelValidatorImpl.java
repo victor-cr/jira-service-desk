@@ -7,25 +7,24 @@ import com.atlassian.jira.bc.project.component.ProjectComponentManager;
 import com.atlassian.jira.config.IssueTypeManager;
 import com.atlassian.jira.config.StatusManager;
 import com.atlassian.jira.issue.issuetype.IssueType;
-import com.atlassian.jira.issue.status.Status;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
-import com.atlassian.jira.service.util.ServiceUtils;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.user.util.UserManager;
+import com.atlassian.jira.workflow.JiraWorkflow;
+import com.atlassian.jira.workflow.WorkflowManager;
+import com.atlassian.jira.workflow.WorkflowSchemeManager;
 import com.bics.jira.mail.ModelValidator;
 import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.ServiceModel;
-import org.apache.commons.lang.StringUtils;
+import com.opensymphony.workflow.loader.ActionDescriptor;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Formatter;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -42,14 +41,18 @@ public class ModelValidatorImpl implements ModelValidator {
     private final StatusManager statusManager;
     private final UserManager userManager;
     private final PermissionManager permissionManager;
+    private final WorkflowManager workflowManager;
+    private final WorkflowSchemeManager workflowSchemeManager;
 
-    public ModelValidatorImpl(PermissionManager permissionManager, UserManager userManager, StatusManager statusManager, ProjectComponentManager projectComponentManager, IssueTypeManager issueTypeManager, ProjectManager projectManager) {
-        this.permissionManager = permissionManager;
-        this.userManager = userManager;
-        this.statusManager = statusManager;
-        this.projectComponentManager = projectComponentManager;
-        this.issueTypeManager = issueTypeManager;
+    public ModelValidatorImpl(ProjectManager projectManager, IssueTypeManager issueTypeManager, ProjectComponentManager projectComponentManager, StatusManager statusManager, UserManager userManager, PermissionManager permissionManager, WorkflowManager workflowManager, WorkflowSchemeManager workflowSchemeManager) {
         this.projectManager = projectManager;
+        this.issueTypeManager = issueTypeManager;
+        this.projectComponentManager = projectComponentManager;
+        this.statusManager = statusManager;
+        this.userManager = userManager;
+        this.permissionManager = permissionManager;
+        this.workflowManager = workflowManager;
+        this.workflowSchemeManager = workflowSchemeManager;
     }
 
     public boolean populateHandlerModel(HandlerModel handlerModel, ServiceModel serviceModel, MessageHandlerErrorCollector monitor) {
@@ -59,7 +62,7 @@ public class ModelValidatorImpl implements ModelValidator {
 
         IssueType issueType = validator.validateIssueType(serviceModel.getIssueTypeId(), project);
         ProjectComponent projectComponent = validator.validateProjectComponent(serviceModel.getComponentId(), project);
-        Map<Status, Status> transitions = validator.validateStatusTransitions(serviceModel.getTransitions());
+        int[] transitions = validator.validateStatusTransitions(serviceModel.getTransitions(), project, issueType);
         InternetAddress catchAddress = validator.validateCatchEmail(serviceModel.getCatchEmail());
         User reporterUser = validator.validateReporterUser(serviceModel.getReporterUsername(), project);
         Pattern splitRegex = validator.validateSplitRegex(serviceModel.getSplitRegex());
@@ -135,35 +138,44 @@ public class ModelValidatorImpl implements ModelValidator {
             }
         }
 
-        public Map<Status, Status> validateStatusTransitions(String transitions) {
-            if (StringUtils.isBlank(transitions)) {
+        public int[] validateStatusTransitions(String[] transitions, Project project, IssueType issueType) {
+            if (transitions == null || transitions.length == 0) {
                 monitor.info("Transitions are not set.");
-                return Collections.emptyMap();
+                return null;
             }
 
-            try {
-                int i = 0;
-                Map<String, String> map = ServiceUtils.getParameterMap(StringUtils.replace(transitions, "->", "="));
-                Map<Status, Status> transitionMap = new LinkedHashMap<Status, Status>();
+            if (project == null || issueType == null) {
+                return null;
+            }
 
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    i++;
+            JiraWorkflow workflow = workflowManager.getWorkflow(project.getId(), issueType.getId());
 
-                    Status leftHand = statusManager.getStatus(entry.getKey());
-                    Status rightHand = statusManager.getStatus(entry.getValue());
+            if (workflow == null) {
+                assertError(true, "The project " + project.getName() + " does not have a workflow for the issue type " + issueType.getName() + ".");
+                return null;
+            }
 
-                    assertError(leftHand == null, "Transition %d has incorrect left-hand status code %s.", i, entry.getKey());
-                    assertError(rightHand == null, "Transition %d has incorrect right-hand status code %s.", i, entry.getValue());
-                    assertError(transitionMap.containsKey(leftHand), "Transition %d has duplicated left-hand status %s from previous transitions.", i, entry.getKey());
+            int[] codes = new int[transitions.length];
+            Collection<ActionDescriptor> actions = workflow.getAllActions();
 
-                    transitionMap.put(leftHand, rightHand);
+            for (int i = 0; i < transitions.length; i++) {
+                try {
+                    int code = Integer.parseInt(transitions[i]);
+
+                    for (ActionDescriptor action : actions) {
+                        if (action.getId() == code || code == 0) {
+                            codes[i] = code;
+                            break;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    monitor.warning("Parsing error. Ignoring.", e);
                 }
 
-                return transitionMap;
-            } catch (RuntimeException e) {
-                assertError(true, "Transitions format is incorrect. Please refer to the field description.");
-                return Collections.emptyMap();
+                assertError(codes[i] == 0, "The project " + project.getName() + " does not have a workflow action with id " + transitions[i] + " for the issue type " + issueType.getName() + ".");
             }
+
+            return codes;
         }
 
         public InternetAddress validateCatchEmail(String catchEmail) {

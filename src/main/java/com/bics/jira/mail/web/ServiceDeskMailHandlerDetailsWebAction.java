@@ -56,16 +56,16 @@ public class ServiceDeskMailHandlerDetailsWebAction extends AbstractServiceDeskM
         return model.isCreateUsers();
     }
 
-    public void setTransitions(String transitions) {
+    public void setTransitions(String[] transitions) {
         model.setTransitions(transitions);
+    }
+
+    public String[] getTransitions() {
+        return model.getTransitions();
     }
 
     public boolean isStripQuotes() {
         return model.isStripQuotes();
-    }
-
-    public String getTransitions() {
-        return model.getTransitions();
     }
 
     public void setIssueTypeId(String issueTypeId) {
