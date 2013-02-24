@@ -28,8 +28,8 @@ public class StripQuotesTextConverter implements BodyConverter {
     }
 
     @Override
-    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean full) {
-        return !full && model.isStripQuotes();
+    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean stripQuotes) {
+        return stripQuotes && model.isStripQuotes();
     }
 
     @Override

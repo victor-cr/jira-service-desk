@@ -3,25 +3,18 @@ package com.bics.jira.mail.handler;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
+import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.search.SearchException;
-import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
-import com.atlassian.query.QueryImpl;
-import com.atlassian.query.clause.Clause;
 import com.bics.jira.mail.IssueLocator;
 import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
 import org.apache.log4j.Logger;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.Scorer;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -44,7 +37,7 @@ public class IssueLocatorImpl implements IssueLocator {
     }
 
     @Override
-    public Issue find(HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) {
+    public MutableIssue find(HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) {
         Project project = model.getProject();
 
         String subject = message.getSubject().replaceAll("\\W", " ");

@@ -16,7 +16,7 @@ public class DefaultHtmlConverter implements BodyConverter {
     private final HtmlToTextConverter htmlToTextConverter = new HtmlToTextConverter();
 
     @Override
-    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean full) {
+    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean stripQuotes) {
         return true;
     }
 

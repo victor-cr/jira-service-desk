@@ -33,15 +33,15 @@ public class CommentExtractorImpl implements CommentExtractor {
 
     @Override
     public String extractComment(HandlerModel model, MessageAdapter message) throws MessagingException {
-        return extract(model, message, false);
+        return extract(model, message, model.isStripQuotes());
     }
 
     @Override
     public String extractBody(HandlerModel model, MessageAdapter message) throws MessagingException {
-        return extract(model, message, true);
+        return extract(model, message, false);
     }
 
-    private String extract(HandlerModel model, MessageAdapter message, boolean full) throws MessagingException {
+    private String extract(HandlerModel model, MessageAdapter message, boolean stripQuotes) throws MessagingException {
         String text = message.getHtmlTextBody();
 
         if (StringUtils.isBlank(text)) {
@@ -50,12 +50,12 @@ public class CommentExtractorImpl implements CommentExtractor {
             return StringUtils.isBlank(text) ? "" : get(model, message, false, textConverters).convert(text);
         }
 
-        return get(model, message, false, htmlConverters).convert(text);
+        return get(model, message, stripQuotes, htmlConverters).convert(text);
     }
 
-    private BodyConverter get(HandlerModel model, MessageAdapter message, boolean full, Collection<? extends BodyConverter> converters) {
+    private BodyConverter get(HandlerModel model, MessageAdapter message, boolean stripQuotes, Collection<? extends BodyConverter> converters) {
         for (BodyConverter converter : converters) {
-            if (converter.isSupported(model, message, full)) {
+            if (converter.isSupported(model, message, stripQuotes)) {
                 return converter;
             }
         }

@@ -169,7 +169,7 @@ public class ModelValidatorImpl implements ModelValidator {
                         }
                     }
                 } catch (NumberFormatException e) {
-                    monitor.warning("Parsing error. Ignoring.", e);
+                    monitor.warning("Parsing error: " + transitions[i] + ". Ignoring...", e);
                 }
 
                 assertError(codes[i] == 0, "The project " + project.getName() + " does not have a workflow action with id " + transitions[i] + " for the issue type " + issueType.getName() + ".");

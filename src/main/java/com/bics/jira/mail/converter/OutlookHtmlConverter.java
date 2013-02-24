@@ -20,7 +20,7 @@ import org.jsoup.select.NodeVisitor;
  */
 public class OutlookHtmlConverter implements BodyConverter {
     @Override
-    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean full) {
+    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean stripQuotes) {
         return message.hasThreadTopic();
     }
 

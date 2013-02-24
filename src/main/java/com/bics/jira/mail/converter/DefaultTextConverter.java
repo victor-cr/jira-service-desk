@@ -11,7 +11,7 @@ import com.bics.jira.mail.model.MessageAdapter;
  */
 public class DefaultTextConverter implements BodyConverter {
     @Override
-    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean full) {
+    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean stripQuotes) {
         return true;
     }
 
