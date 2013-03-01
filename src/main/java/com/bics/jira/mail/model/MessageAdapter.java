@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 public class MessageAdapter {
     private static final Logger LOG = Logger.getLogger(MessageAdapter.class);
     private static final InternetAddress[] EMPTY = {};
-    private static final Pattern REPLIES = Pattern.compile("(?i)^(?:re:\\s*|fw:\\s*)*(.*)$");
+    private static final Pattern REPLIES = Pattern.compile("(?i)^\\s*(?:re:\\s*|fw:\\s*)*");
     private static final String UNKNOWN_SUBJECT = "Unknown Subject";
     private static final String KEY_JIRA_FINGER_PRINT = "X-JIRA-FingerPrint";
     private static final String KEY_THREAD_TOPIC = "Thread-Topic";
@@ -76,9 +76,7 @@ public class MessageAdapter {
                 subject = inReplyTo;
             }
 
-            Matcher matcher = REPLIES.matcher(subject);
-
-            subject = matcher.matches() ? matcher.group(matcher.groupCount() - 1) : subject;
+            subject = REPLIES.matcher(subject).replaceAll("");
 
             return StringUtils.abbreviate(subject, 200);
         } catch (MessagingException e) {

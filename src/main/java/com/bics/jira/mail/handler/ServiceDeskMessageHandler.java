@@ -132,7 +132,6 @@ public class ServiceDeskMessageHandler implements MessageHandler {
             if (action == null) {
                 context.createComment(issue, author, body, false);
             } else {
-
                 IssueInputParameters params = issueService.newIssueInputParameters();
 
                 params.setComment(body);

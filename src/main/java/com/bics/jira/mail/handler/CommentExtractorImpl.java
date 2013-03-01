@@ -27,8 +27,15 @@ public class CommentExtractorImpl implements CommentExtractor {
     private final Collection<? extends BodyConverter> textConverters;
 
     public CommentExtractorImpl() throws IOException {
-        htmlConverters = Arrays.asList(new StripQuotesOutlookHtmlConverter(), new OutlookHtmlConverter(), new DefaultHtmlConverter());
-        textConverters = Arrays.asList(new StripQuotesTextConverter(), new DefaultTextConverter());
+        htmlConverters = Arrays.asList(
+                new StripQuotesOutlookHtmlConverter(),
+                new OutlookHtmlConverter(),
+                new DefaultHtmlConverter()
+        );
+        textConverters = Arrays.asList(
+                new StripQuotesTextConverter(),
+                new DefaultTextConverter()
+        );
     }
 
     @Override
@@ -47,7 +54,7 @@ public class CommentExtractorImpl implements CommentExtractor {
         if (StringUtils.isBlank(text)) {
             text = message.getPlainTextBody();
 
-            return StringUtils.isBlank(text) ? "" : get(model, message, false, textConverters).convert(text);
+            return StringUtils.isBlank(text) ? "" : get(model, message, stripQuotes, textConverters).convert(text);
         }
 
         return get(model, message, stripQuotes, htmlConverters).convert(text);
