@@ -39,7 +39,10 @@ import java.util.regex.Pattern;
 public class MessageAdapter {
     private static final Logger LOG = Logger.getLogger(MessageAdapter.class);
     private static final InternetAddress[] EMPTY = {};
-    private static final Pattern REPLIES = Pattern.compile("(?i)^\\s*(?:re:\\s*|fw:\\s*)*");
+    private static final Pattern REPLIES = Pattern.compile("(?i)^\\s*(?:re:\\s*|fw:\\s*)+");
+    private static final Pattern NON_PRINTABLE = Pattern.compile("[^\\p{Print}]");
+    private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
     private static final String UNKNOWN_SUBJECT = "Unknown Subject";
     private static final String KEY_JIRA_FINGER_PRINT = "X-JIRA-FingerPrint";
     private static final String KEY_THREAD_TOPIC = "Thread-Topic";
@@ -76,9 +79,11 @@ public class MessageAdapter {
                 subject = inReplyTo;
             }
 
-            subject = REPLIES.matcher(subject).replaceAll("");
+            subject = REPLIES.matcher(subject).replaceAll(" ");
+            subject = NON_PRINTABLE.matcher(subject).replaceAll(" ");
+            subject = WHITESPACE.matcher(subject).replaceAll(" ");
 
-            return StringUtils.abbreviate(subject, 200);
+            return StringUtils.abbreviate(StringUtils.trim(subject), 200);
         } catch (MessagingException e) {
             LOG.warn("Cannot read subject. ", e);
         }

@@ -18,6 +18,7 @@ public class MessageAdapterTest extends Assert {
     private static final String FILE_MULTIPART_SIMPLE = "MultipartSimple.txt";
     private static final String FILE_MULTIPART_REGULAR = "MultipartRegular.txt";
     private static final String FILE_TORTURE_TEST = "InfamousTortureTest.txt";
+    private static final String FILE_UTF8_SUBJECT = "UTF8Subject.txt";
 
     @Test
     public void testGetSubject_MultipartSimple() throws MessagingException {
@@ -108,6 +109,13 @@ public class MessageAdapterTest extends Assert {
         MessageAdapter adapter = message(FILE_TORTURE_TEST);
 
         assertEquals(11, adapter.getAttachments().size());
+    }
+
+    @Test
+    public void testGetSubject_UTF8() throws MessagingException {
+        MessageAdapter adapter = message(FILE_UTF8_SUBJECT);
+
+        assertEquals("Instant Roaming Pricing Tool Unknown values are present in <BMB_BICS_HUB_ROAMING_ACCUMULATED_DATA_20130302100907.csv> traffic file in PROD", adapter.getSubject());
     }
 
     private static String trim(String str) {
