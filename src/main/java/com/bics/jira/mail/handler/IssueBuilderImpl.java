@@ -85,7 +85,9 @@ public class IssueBuilderImpl implements IssueBuilder {
     private void setPriority(MutableIssue issue, MessageAdapter message) {
         List<Priority> priorities = new ArrayList<Priority>(constantsManager.getPriorityObjects());
 
-        int index = (int) Math.ceil((double) message.getPriority() * priorities.size() / 5D);
+        Collections.sort(priorities);
+
+        int index = (int) Math.ceil((double) (message.getPriority() - 1) * priorities.size() / 5D);
 
         if (index >= priorities.size()) {
             index = priorities.size() - 1;
