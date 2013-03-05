@@ -40,7 +40,7 @@ public class MessageAdapter {
     private static final Logger LOG = Logger.getLogger(MessageAdapter.class);
     private static final InternetAddress[] EMPTY = {};
     private static final Pattern REPLIES = Pattern.compile("(?i)^\\s*(?:re:\\s*|fw:\\s*)+");
-    private static final Pattern NON_PRINTABLE = Pattern.compile("[^\\p{Print}]");
+    private static final Pattern NON_PRINTABLE = Pattern.compile("[^\\p{Punct}\\p{LD}\\s]");
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
     private static final String UNKNOWN_SUBJECT = "Unknown Subject";
