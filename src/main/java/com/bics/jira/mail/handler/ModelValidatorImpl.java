@@ -203,7 +203,7 @@ public class ModelValidatorImpl implements ModelValidator {
             assertError(user == null, "Default reporter user %s was not found.", reporterUsername);
 
             if (user != null && project != null) {
-                assertError(permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, user), "Default reporter user %s has no rights to create an issue in the project %s.", user.getName(), project.getName());
+                assertError(!permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, user), "Default reporter user %s has no rights to create an issue in the project %s.", user.getName(), project.getName());
             }
 
             return user;

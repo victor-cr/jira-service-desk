@@ -13,12 +13,14 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeUtility;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -73,7 +75,7 @@ public class MessageAdapter {
         try {
             String subject = message.getSubject();
 
-            String inReplyTo = getHeader(KEY_REPLY_SUBJECT);
+            String inReplyTo = getHeader(KEY_THREAD_TOPIC);
 
             if (StringUtils.isNotBlank(inReplyTo)) {
                 subject = inReplyTo;
@@ -181,7 +183,12 @@ public class MessageAdapter {
     private String getHeader(String key) {
         String[] headers = getHeaders(key);
 
-        return headers == null ? null : headers[0];
+        try {
+            return headers == null ? null : MimeUtility.decodeText(MimeUtility.unfold(headers[0]));
+        } catch (UnsupportedEncodingException e) {
+            LOG.warn(e.getMessage(), e);
+            return null;
+        }
     }
 
     private String[] getHeaders(String key) {

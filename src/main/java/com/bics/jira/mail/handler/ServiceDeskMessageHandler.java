@@ -14,10 +14,13 @@ import com.atlassian.jira.issue.watchers.WatcherManager;
 import com.atlassian.jira.project.DefaultAssigneeException;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.security.PermissionManager;
+import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.service.util.handler.MessageHandler;
 import com.atlassian.jira.service.util.handler.MessageHandlerContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.service.util.handler.MessageHandlerExecutionMonitor;
+import com.atlassian.jira.user.UserUtils;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.web.util.AttachmentException;
@@ -42,6 +45,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,14 +65,14 @@ public class ServiceDeskMessageHandler implements MessageHandler {
     private final IssueService issueService;
     private final ProjectManager projectManager;
     private final WorkflowManager workflowManager;
-    private final UserManager userManager;
+    private final PermissionManager permissionManager;
     private final CommentExtractor commentExtractor;
     private final WatcherManager watcherManager;
 
+    private final Map<String, String> params = new HashMap<String, String>();
     private final HandlerModel model = new HandlerModel();
-    private boolean valid;
 
-    public ServiceDeskMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, IssueService issueService, ProjectManager projectManager, WorkflowManager workflowManager, UserManager userManager, CommentExtractor commentExtractor, WatcherManager watcherManager) {
+    public ServiceDeskMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, ModelValidator modelValidator, IssueLocator issueLocator, IssueBuilder issueBuilder, IssueService issueService, ProjectManager projectManager, WorkflowManager workflowManager, PermissionManager permissionManager, CommentExtractor commentExtractor, WatcherManager watcherManager) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.modelValidator = modelValidator;
         this.issueLocator = issueLocator;
@@ -76,25 +80,27 @@ public class ServiceDeskMessageHandler implements MessageHandler {
         this.issueService = issueService;
         this.projectManager = projectManager;
         this.workflowManager = workflowManager;
-        this.userManager = userManager;
+        this.permissionManager = permissionManager;
         this.commentExtractor = commentExtractor;
         this.watcherManager = watcherManager;
     }
 
     @Override
     public void init(Map<String, String> params, MessageHandlerErrorCollector monitor) {
-        ServiceModel serviceModel = new ServiceModel().fromServiceParams(params);
-
-        valid = modelValidator.populateHandlerModel(model, serviceModel, monitor);
-
-        if (!valid) {
-            monitor.warning("ServiceModel did not pass the validation. Emergency exit.");
-        }
+        this.params.clear();
+        this.params.putAll(params);
     }
 
     @Override
     public boolean handleMessage(Message message, MessageHandlerContext context) throws MessagingException {
+        MessageHandlerExecutionMonitor monitor = context.getMonitor();
+
+        ServiceModel serviceModel = new ServiceModel().fromServiceParams(params);
+
+        boolean valid = modelValidator.populateHandlerModel(model, serviceModel, monitor);
+
         if (!valid) {
+            monitor.warning("ServiceModel did not pass the validation. Emergency exit.");
             return false;
         }
 
@@ -107,12 +113,17 @@ public class ServiceDeskMessageHandler implements MessageHandler {
         for (InternetAddress address : addresses) {
             author = ensureUser(address, context);
 
-            if (author == null) {
-                author = model.getReporterUser();
+            if (author != null) {
+                break;
             }
         }
 
-        MessageHandlerExecutionMonitor monitor = context.getMonitor();
+        if (author == null || !permissionManager.hasPermission(Permissions.CREATE_ISSUE, model.getProject(), author)) {
+            monitor.error("Message sender(s) '" + StringUtils.join(MailUtils.getSenders(message), ",")
+                    + "' do not have permission to create an issue. Default reporter fallback.");
+
+            author = model.getReporterUser();
+        }
 
         if (author == null) {
             monitor.error("Message sender(s) '" + StringUtils.join(MailUtils.getSenders(message), ",")
@@ -206,11 +217,13 @@ public class ServiceDeskMessageHandler implements MessageHandler {
     }
 
     private User ensureUser(InternetAddress address, MessageHandlerContext context) {
-        User user = userManager.getUser(address.getAddress());
+        User user = UserUtils.getUserByEmail(address.getAddress());
 
-        if (user == null) {
+        if (user == null && model.isCreateUsers()) {
+            Integer eventId = model.isNotifyUsers() ? UserEventType.USER_CREATED : null;
+
             try {
-                user = context.createUser(address.getAddress(), address.getAddress(), address.getAddress(), address.getPersonal(), UserEventType.USER_CREATED);
+                user = context.createUser(address.getAddress(), address.getAddress(), address.getAddress(), address.getPersonal(), eventId);
             } catch (PermissionException e) {
                 LOG.error("Permission problem: ", e);
             } catch (CreateException e) {
