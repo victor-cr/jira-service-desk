@@ -11,16 +11,20 @@
         <interface>com.bics.jira.mail.ModelValidator</interface>
     </component>
 
-    <component key="issue-builder" i18n-name-key="msd.issue.builder.name" class="com.bics.jira.mail.handler.IssueBuilderImpl">
-        <interface>com.bics.jira.mail.IssueBuilder</interface>
+    <component key="user-helper" i18n-name-key="msd.helper.user.name" class="com.bics.jira.mail.helper.UserHelperImpl">
+        <interface>com.bics.jira.mail.UserHelper</interface>
     </component>
 
-    <component key="issue-locator" i18n-name-key="msd.issue.locator.name" class="com.bics.jira.mail.handler.IssueLocatorImpl">
+    <component key="issue-builder" i18n-name-key="msd.issue.builder.name" class="com.bics.jira.mail.helper.IssueHelperImpl">
+        <interface>com.bics.jira.mail.IssueHelper</interface>
+    </component>
+
+    <component key="issue-locator" i18n-name-key="msd.issue.locator.name" class="com.bics.jira.mail.helper.IssueLocatorImpl">
         <interface>com.bics.jira.mail.IssueLocator</interface>
     </component>
 
-    <component key="comment-extractor" i18n-name-key="msd.comment.extractor.name" class="com.bics.jira.mail.handler.CommentExtractorImpl">
-        <interface>com.bics.jira.mail.CommentExtractor</interface>
+    <component key="comment-extractor" i18n-name-key="msd.comment.extractor.name" class="com.bics.jira.mail.helper.MailHelperImpl">
+        <interface>com.bics.jira.mail.MailHelper</interface>
     </component>
 
     <message-handler key="message-handler" i18n-name-key="msd.handler.name" class="com.bics.jira.mail.handler.ServiceDeskMessageHandler"

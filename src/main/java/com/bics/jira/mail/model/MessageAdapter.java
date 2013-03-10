@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -44,13 +43,16 @@ public class MessageAdapter {
     private static final Pattern REPLIES = Pattern.compile("(?i)^\\s*(?:re:\\s*|fw:\\s*)+");
     private static final Pattern NON_PRINTABLE = Pattern.compile("[^\\p{Punct}\\p{LD}\\s]");
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+    private static final Pattern PRIORITY = Pattern.compile(".*(\\d+).*");
 
     private static final String UNKNOWN_SUBJECT = "Unknown Subject";
     private static final String KEY_JIRA_FINGER_PRINT = "X-JIRA-FingerPrint";
     private static final String KEY_THREAD_TOPIC = "Thread-Topic";
     private static final String KEY_REPLY_SUBJECT = "In-Reply-To";
     private static final String KEY_MAIL_PRIORITY = "X-Priority";
+    private static final int HIGH_PRIORITY = 1;
     private static final int NORMAL_PRIORITY = 3;
+    private static final int LOW_PRIORITY = 5;
 
     private final Message message;
     private final Part textBody;
@@ -93,19 +95,24 @@ public class MessageAdapter {
         return UNKNOWN_SUBJECT;
     }
 
-    public int getPriority() {
+    public int getPriority(int number) {
+        int priority = NORMAL_PRIORITY;
+
         try {
             String header = getHeader(KEY_MAIL_PRIORITY);
 
-            return header == null ? NORMAL_PRIORITY : Integer.parseInt(header.replaceFirst(".*(\\d+).*", "$1"));
+            if (header != null) {
+                priority = Integer.parseInt(PRIORITY.matcher(header).replaceFirst("$1"));
+            }
         } catch (NumberFormatException e) {
             LOG.warn(e.getMessage(), e);
-            return NORMAL_PRIORITY;
         }
-    }
 
-    public InternetAddress getAuthor() throws MessagingException {
-        return getFrom()[0]; //TODO: fix it
+        if (priority > LOW_PRIORITY) {
+            priority = LOW_PRIORITY;
+        }
+
+        return (priority - HIGH_PRIORITY) * number / LOW_PRIORITY;
     }
 
     public InternetAddress[] getFrom() throws MessagingException {

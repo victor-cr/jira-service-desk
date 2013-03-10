@@ -1,6 +1,6 @@
-package com.bics.jira.mail.handler;
+package com.bics.jira.mail.helper;
 
-import com.bics.jira.mail.CommentExtractor;
+import com.bics.jira.mail.MailHelper;
 import com.bics.jira.mail.converter.BodyConverter;
 import com.bics.jira.mail.converter.DefaultHtmlConverter;
 import com.bics.jira.mail.converter.DefaultTextConverter;
@@ -22,11 +22,11 @@ import java.util.Collection;
  * @author Victor Polischuk
  * @since 13/02/13 01:32
  */
-public class CommentExtractorImpl implements CommentExtractor {
+public class MailHelperImpl implements MailHelper {
     private final Collection<? extends BodyConverter> htmlConverters;
     private final Collection<? extends BodyConverter> textConverters;
 
-    public CommentExtractorImpl() throws IOException {
+    public MailHelperImpl() throws IOException {
         htmlConverters = Arrays.asList(
                 new StripQuotesOutlookHtmlConverter(),
                 new OutlookHtmlConverter(),
