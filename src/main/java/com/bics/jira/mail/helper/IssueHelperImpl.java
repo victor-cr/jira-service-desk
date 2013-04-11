@@ -21,6 +21,7 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.priority.Priority;
 import com.atlassian.jira.issue.search.SearchException;
+import com.atlassian.jira.issue.search.util.TextTermEscaper;
 import com.atlassian.jira.issue.security.IssueSecurityLevelManager;
 import com.atlassian.jira.issue.status.Status;
 import com.atlassian.jira.issue.watchers.WatcherManager;
@@ -33,6 +34,7 @@ import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.jira.web.util.AttachmentException;
 import com.atlassian.jira.workflow.JiraWorkflow;
 import com.atlassian.jira.workflow.WorkflowManager;
+import com.atlassian.license.util.StringUtils;
 import com.atlassian.query.Query;
 import com.bics.jira.mail.IssueHelper;
 import com.bics.jira.mail.MailHelper;
@@ -42,6 +44,7 @@ import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import com.opensymphony.workflow.loader.StepDescriptor;
+import org.apache.lucene.queryParser.QueryParser;
 
 import javax.mail.MessagingException;
 import java.util.ArrayList;
@@ -58,7 +61,6 @@ import java.util.regex.Pattern;
  * @since 04.02.13 21:38
  */
 public class IssueHelperImpl implements IssueHelper {
-    private static final Pattern PREPARER = Pattern.compile("\\W+");
     private static final long RESOLUTION_DELTA = 1000L * 60 * 60 * 24 * 30;
 
     private final IssueFactory issueFactory;
@@ -343,6 +345,6 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     private static String prepareSummary(String subject) {
-        return PREPARER.matcher(subject).replaceAll(" ").trim();
+        return QueryParser.escape(subject);
     }
 }

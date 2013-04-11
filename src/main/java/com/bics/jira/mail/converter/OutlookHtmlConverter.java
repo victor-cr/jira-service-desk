@@ -109,7 +109,10 @@ public class OutlookHtmlConverter implements BodyConverter {
         UNDERSCORE("u", "+", "+"),
         STRIKE("strike", "-", "-"),
         NEW_LINE("br", "", "\n"),
-        PARAGRAPH("p", "", "\n");
+        PARAGRAPH("p", "", "\n"),
+        TR("tr", "\n", "|"),
+        TD("td", "|", ""),
+        TH("th", "||", "");
 
         private final String tagName;
         private final String head;
