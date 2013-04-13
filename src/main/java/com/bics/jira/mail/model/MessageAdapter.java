@@ -50,6 +50,7 @@ public class MessageAdapter {
     private static final String KEY_THREAD_TOPIC = "Thread-Topic";
     private static final String KEY_REPLY_SUBJECT = "In-Reply-To";
     private static final String KEY_MAIL_PRIORITY = "X-Priority";
+    private static final String KEY_CONTENT_ID = "Content-ID";
     private static final int HIGH_PRIORITY = 1;
     private static final int NORMAL_PRIORITY = 3;
     private static final int LOW_PRIORITY = 5;
@@ -155,9 +156,18 @@ public class MessageAdapter {
 
             for (Part part : attachments) {
                 File storedFile = File.createTempFile("attachment", "jira");
-                String fileName = part.getFileName();
+                String[] fileNames = part.getHeader("Content-ID");
                 ContentType contentType = new ContentType(part.getContentType());
                 InputStream content = part.getInputStream();
+                String fileName = null;
+
+                if (fileNames != null && fileNames.length > 0) {
+                    fileName = StringUtils.strip(StringUtils.substringBeforeLast(StringUtils.substringBetween(fileNames[0], "<", ">"), "@"));
+                }
+
+                if (StringUtils.isEmpty(fileName)) {
+                    fileName = part.getFileName();
+                }
 
                 try {
                     OutputStream out = new BufferedOutputStream(new FileOutputStream(storedFile));

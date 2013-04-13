@@ -24,7 +24,7 @@ public class StripQuotesOutlookHtmlConverter extends OutlookHtmlConverter implem
 
         formatters.add(new OutlookAnswerIgnore());
 
-        this.formatters = getFormatters();
+        this.formatters = formatters;
     }
 
     @Override

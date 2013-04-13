@@ -20,6 +20,10 @@ public class Attachment {
         this.fileName = fileName;
     }
 
+    public long getSize() {
+        return storedFile.length();
+    }
+
     public File getStoredFile() {
         return storedFile;
     }

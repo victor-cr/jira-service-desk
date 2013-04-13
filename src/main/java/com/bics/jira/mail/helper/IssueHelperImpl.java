@@ -42,10 +42,13 @@ import com.bics.jira.mail.UserHelper;
 import com.bics.jira.mail.model.Attachment;
 import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import com.opensymphony.workflow.loader.StepDescriptor;
 import org.apache.lucene.queryParser.QueryParser;
 
+import javax.annotation.Nullable;
 import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -118,7 +121,7 @@ public class IssueHelperImpl implements IssueHelper {
             comment(author, assignee, issue, model, message, monitor);
         }
 
-        if (userHelper.canCreateAttachment(author, project)) {
+        if (attachmentManager.attachmentsEnabled() && userHelper.canCreateAttachment(author, project)) {
             attach(author, issue, message.getAttachments());
         } else {
             monitor.warning("User " + author.getName() + " cannot create attachments in the project " + project.getKey() + ". Ignoring.");
@@ -226,7 +229,7 @@ public class IssueHelperImpl implements IssueHelper {
         params.setComment(body);
         params.setAssigneeId(assignee == null ? issue.getAssigneeId() : assignee.getName());
         params.setApplyDefaultValuesWhenParameterNotProvided(true);
-        params.setSkipScreenCheck(true);
+//        params.setSkipScreenCheck(true);
 
         IssueService.TransitionValidationResult validationResult = issueService.validateTransition(author, issue.getId(), action.getId(), params);
 
@@ -238,8 +241,22 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     protected void attach(User author, MutableIssue issue, Collection<Attachment> attachments) throws AttachmentException {
-        for (Attachment attachment : attachments) {
-            attachmentManager.createAttachment(attachment.getStoredFile(), attachment.getFileName(), attachment.getContentType().toString(), author, issue);
+        List<com.atlassian.jira.issue.attachment.Attachment> existentAttachments = attachmentManager.getAttachments(issue);
+
+        for (final Attachment attachment : attachments) {
+            boolean exists = Iterables.any(existentAttachments, new Predicate<com.atlassian.jira.issue.attachment.Attachment>() {
+                @Override
+                public boolean apply(@Nullable com.atlassian.jira.issue.attachment.Attachment input) {
+                    return input != null &&
+                            attachment.getFileName().equals(input.getFilename()) &&
+                            attachment.getContentType().match(input.getMimetype()) &&
+                            attachment.getSize() == input.getFilesize();
+                }
+            });
+
+            if (!exists) {
+                attachmentManager.createAttachment(attachment.getStoredFile(), attachment.getFileName(), attachment.getContentType().toString(), author, issue);
+            }
         }
     }
 
