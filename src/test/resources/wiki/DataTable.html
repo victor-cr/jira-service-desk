@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body style="margin-left:0px; margin-top:0px;">
+Test table #1 (horizontal header)
+<table class='testTable'>
+    <tbody>
+    <tr>
+        <th class='header'>Statistics Type / Date</th>
+        <th class='header'>PC Availability</th>
+        <th class='header'>LS Availability</th>
+        <th class='header'>LS Load</th>
+        <th class='header'>Links Availability</th>
+        <th class='header'>Links Congestion</th>
+        <th class='header'>Links Load</th>
+    </tr>
+    <tr>
+        <td>215/03/2013</td>
+        <td>10</td>
+        <td>2384</td>
+        <td>3384</td>
+        <td>43360</td>
+        <td>53360</td>
+        <td>63360</td>
+    </tr>
+    </tbody>
+</table>
+
+Test table #2 (vertical header)
+<table class='testTable'>
+    <tbody>
+    <tr>
+        <th class='header'>Statistics Type / Date</th>
+        <th class='header'>PC Availability</th>
+        <td class='header'>LS Availability</td>
+        <td class='header'>LS Load</td>
+        <td class='header'>Links Availability</td>
+        <td class='header'>Links Congestion</td>
+        <td class='header'>Links Load</td>
+    </tr>
+    <tr>
+        <th>215/03/2013</th>
+        <th>10</th>
+        <td>2384</td>
+        <td>3384</td>
+        <td>43360</td>
+        <td>53360</td>
+        <td>63360</td>
+    </tr>
+    </tbody>
+</table>
+
+Test table #3/4 (two tables close to each other +- header)
+<table class='testTable'>
+    <thead>
+    <tr>
+        <th class='header'>Statistics Type / Date</th>
+        <th class='header'>PC Availability</th>
+        <th class='header'>LS Availability</th>
+        <th class='header'>LS Load</th>
+        <th class='header'>Links Availability</th>
+        <th class='header'>Links Congestion</th>
+        <th class='header'>Links Load</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>215/03/2013</td>
+        <td>10</td>
+        <td>2384</td>
+        <td>3384</td>
+        <td>43360</td>
+        <td>53360</td>
+        <td>63360</td>
+    </tr>
+    </tbody>
+</table>
+<table class='testTable'>
+    <tr>
+        <td class='header'>Statistics Type / Date</td>
+        <td class='header'>PC Availability</td>
+        <td class='header'>LS Availability</td>
+        <td class='header'>LS Load</td>
+        <td class='header'>Links Availability</td>
+        <td class='header'>Links Congestion</td>
+        <td class='header'>Links Load</td>
+    </tr>
+    <tr>
+        <td>215/03/2013</td>
+        <td>10</td>
+        <td>2384</td>
+        <td>3384</td>
+        <td>43360</td>
+        <td>53360</td>
+        <td>63360</td>
+    </tr>
+</table>
+
+Test table #5 (colspan)
+<table class='testTable'>
+    <tr>
+        <th class='header'>Statistics Type / Date</th>
+        <th class='header'>PC Availability</th>
+        <th class='header'>LS Availability</th>
+        <th class='header'>LS Load</th>
+        <th class='header'>Links Availability</th>
+        <th class='header'>Links Congestion</th>
+        <th class='header'>Links Load</th>
+    </tr>
+    <tr>
+        <td>215/03/2013</td>
+        <td>10</td>
+        <td>2384</td>
+        <td>3384</td>
+        <td>43360</td>
+        <td>53360</td>
+        <td>63360</td>
+    </tr>
+    <tr>
+        <td colspan="6">Total</td>
+        <td>here</td>
+    </tr>
+</table>
+
+Test table #6 (rowspan)
+<table class='testTable'>
+    <tr>
+        <th class='header'>Statistics Type / Date</th>
+        <th class='header' rowspan="2">PC Availability</th>
+        <th class='header'>LS Availability</th>
+        <th class='header'>LS Load</th>
+        <th class='header'>Links Availability</th>
+        <th class='header'>Links Congestion</th>
+        <th class='header'>Links Load</th>
+    </tr>
+    <tr>
+        <td>215/03/2013</td>
+        <td>2384</td>
+        <td>3384</td>
+        <td>43360</td>
+        <td>53360</td>
+        <td>63360</td>
+    </tr>
+</table>
+
+Test table #7 (colspan + rowspan)
+<table class='testTable'>
+    <tr>
+        <th class='header' rowspan="3">Statistics Type / Date</th>
+        <th class='header' rowspan="2">PC Availability</th>
+        <th class='header'>LS Availability</th>
+        <th class='header'>LS Load</th>
+        <th class='header'>Links Availability</th>
+        <th class='header'>Links Congestion</th>
+        <th class='header'>Links Load</th>
+    </tr>
+    <tr>
+        <td>2384</td>
+        <td>3384</td>
+        <td>43360</td>
+        <td>53360</td>
+        <td>63360</td>
+    </tr>
+    <tr>
+        <td colspan="5">Total</td>
+        <td>here</td>
+    </tr>
+</table>
+
+
+</body>
+</html>

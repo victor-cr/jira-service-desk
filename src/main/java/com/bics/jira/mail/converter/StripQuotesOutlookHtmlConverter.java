@@ -1,10 +1,14 @@
 package com.bics.jira.mail.converter;
 
-import com.bics.jira.mail.converter.html.WikiNodeVisitor;
+import com.bics.jira.mail.converter.html.NodeFormatter;
+import com.bics.jira.mail.converter.html.Tag;
+import com.bics.jira.mail.converter.html.TreeContext;
 import com.bics.jira.mail.model.HandlerModel;
 import com.bics.jira.mail.model.MessageAdapter;
 import org.jsoup.nodes.Node;
-import org.jsoup.select.NodeVisitor;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * JavaDoc here
@@ -13,29 +17,36 @@ import org.jsoup.select.NodeVisitor;
  * @since 10.02.13 1:54
  */
 public class StripQuotesOutlookHtmlConverter extends OutlookHtmlConverter implements BodyConverter {
+    private final Collection<NodeFormatter> formatters;
+
+    public StripQuotesOutlookHtmlConverter() {
+        ArrayList<NodeFormatter> formatters = new ArrayList<NodeFormatter>(super.getFormatters());
+
+        formatters.add(new OutlookAnswerIgnore());
+
+        this.formatters = getFormatters();
+    }
+
     @Override
     public boolean isSupported(HandlerModel model, MessageAdapter message, boolean stripQuotes) {
         return stripQuotes && super.isSupported(model, message, stripQuotes);
     }
 
     @Override
-    protected WikiNodeVisitor createNodeVisitor() {
-        return new StripWikiNodeVisitor();
+    protected Collection<NodeFormatter> getFormatters() {
+        return formatters;
     }
 
-    private static class StripWikiNodeVisitor extends WikiNodeVisitor implements NodeVisitor {
+    private static class OutlookAnswerIgnore implements NodeFormatter {
         private static final String DIV_STYLE = "border:none;border-top:solid #B5C4DF 1.0pt;padding:3.0pt 0cm 0cm 0cm";
-        private boolean strip;
 
         @Override
-        protected boolean isIgnored(Node node) {
-            if (strip || super.isIgnored(node)) {
-                return true;
-            }
+        public boolean isSupported(TreeContext context, Node node) {
+            return Tag.DIV.is(node) && DIV_STYLE.equalsIgnoreCase(node.attr("style"));
+        }
 
-            strip = "div".equalsIgnoreCase(node.nodeName()) && DIV_STYLE.equalsIgnoreCase(node.attr("style"));
-
-            return strip;
+        @Override
+        public void format(TreeContext context, Node node) {
         }
     }
 }

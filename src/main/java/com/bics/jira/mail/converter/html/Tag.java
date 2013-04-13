@@ -9,6 +9,9 @@ import org.jsoup.nodes.Node;
  * @since 12/04/13 12:15
  */
 public enum Tag {
+    A,
+    DIV,
+    SPAN,
     HEAD,
     SCRIPT,
     STYLE,
@@ -25,12 +28,16 @@ public enum Tag {
     TH,
     TD,
     UL,
+    IMG,
     OL,
-    LI,
-    _UNKNOWN;
+    LI;
 
     public boolean is(Node node) {
         return node != null && this.name().equalsIgnoreCase(node.nodeName());
+    }
+
+    public org.jsoup.parser.Tag toTag() {
+        return org.jsoup.parser.Tag.valueOf(this.name());
     }
 
     public static Tag valueOf(Node node) {
@@ -39,7 +46,7 @@ public enum Tag {
 
             return Tag.valueOf(nodeName);
         } catch (RuntimeException e) {
-            return _UNKNOWN;
+            return null;
         }
     }
 }

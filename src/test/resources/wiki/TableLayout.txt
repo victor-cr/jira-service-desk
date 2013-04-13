@@ -1,13 +1,13 @@
+!left.jpg|width=179,height=602!
+| !leftupper.jpg|width=38,height=26! | | !rightupper.jpg|width=24,height=26! |
+| !leftcorner.jpg|height=12! | | !rightcorner.jpg|width=24,height=12! |
 
-|!left.jpg|width=179,height=602!|
+| !logo.jpg|width=249,height=90! | |
+
+| Job Average Daily Aggregation for day 10/4/2013 SUCCEEDED with incomplete data. (Production) |
+
+!shadow.jpg|width=650,height=16!
+| Cannot enrich data with rdb info - ipti datasource is not available.
 |
-|!leftupper.jpg|width=38,height=26!||!rightupper.jpg|width=24,height=26!|
-|!leftcorner.jpg|height=12!||!rightcorner.jpg|width=24,height=12!||
-|
-|!logo.jpg|width=249,height=90!|||
-|
-|Job Average Daily Aggregation for day 10/4/2013 SUCCEEDED with incomplete data. (Production)||
-|!shadow.jpg|width=650,height=16!|
-|
-|Cannot enrich data with rdb info - ipti datasource is not available.
-|||!right.jpg|width=186,height=601!|
+
+!right.jpg|width=186,height=601!
