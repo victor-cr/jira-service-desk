@@ -47,6 +47,7 @@ public class StripQuotesOutlookHtmlConverter extends OutlookHtmlConverter implem
 
         @Override
         public void format(TreeContext context, Node node) {
+            context.stop();
         }
     }
 }

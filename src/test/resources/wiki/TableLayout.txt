@@ -7,7 +7,6 @@
 | Job Average Daily Aggregation for day 10/4/2013 SUCCEEDED with incomplete data. (Production) |
 
 !shadow.jpg|width=650,height=16!
-| Cannot enrich data with rdb info - ipti datasource is not available.
-|
+| Cannot enrich data with rdb info - ipti datasource is not available. |
 
 !right.jpg|width=186,height=601!

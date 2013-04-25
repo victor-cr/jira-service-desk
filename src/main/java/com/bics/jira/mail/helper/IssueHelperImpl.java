@@ -21,7 +21,6 @@ import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.priority.Priority;
 import com.atlassian.jira.issue.search.SearchException;
-import com.atlassian.jira.issue.search.util.TextTermEscaper;
 import com.atlassian.jira.issue.security.IssueSecurityLevelManager;
 import com.atlassian.jira.issue.status.Status;
 import com.atlassian.jira.issue.watchers.WatcherManager;
@@ -34,7 +33,6 @@ import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.jira.web.util.AttachmentException;
 import com.atlassian.jira.workflow.JiraWorkflow;
 import com.atlassian.jira.workflow.WorkflowManager;
-import com.atlassian.license.util.StringUtils;
 import com.atlassian.query.Query;
 import com.bics.jira.mail.IssueHelper;
 import com.bics.jira.mail.MailHelper;
@@ -46,6 +44,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import com.opensymphony.workflow.loader.StepDescriptor;
+import org.apache.commons.lang.StringUtils;
 import org.apache.lucene.queryParser.QueryParser;
 
 import javax.annotation.Nullable;
@@ -55,7 +54,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * JavaDoc here
@@ -213,7 +211,7 @@ public class IssueHelperImpl implements IssueHelper {
         return issueManager.getIssueObject(issueObject.getId());
     }
 
-    protected void comment(User author, User assignee, Issue issue, HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
+    protected void comment(User author, User assignee, MutableIssue issue, HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
         String body = mailHelper.extractComment(model, message);
 
         ActionDescriptor action = lookupAction(issue, model.getTransitions(), monitor);
@@ -238,6 +236,9 @@ public class IssueHelperImpl implements IssueHelper {
         IssueService.IssueResult result = issueService.transition(author, validationResult);
 
         verifyResult(result, monitor);
+
+        issue.setStatusObject(result.getIssue().getStatusObject());
+        issue.setResolutionObject(result.getIssue().getResolutionObject());
     }
 
     protected void attach(User author, MutableIssue issue, Collection<Attachment> attachments) throws AttachmentException {
@@ -362,6 +363,56 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     private static String prepareSummary(String subject) {
-        return QueryParser.escape(subject);
+        if (StringUtils.isBlank(subject)) {
+            return "";
+        }
+
+        boolean whitespace = true;
+        StringBuilder out = new StringBuilder(subject.length());
+
+        char[] a = subject.toCharArray();
+
+        for (int i = 0; i < a.length; i++) {
+            char ch = a[i];
+
+            switch (ch) {
+                case '+':
+                case '&':
+                case '|':
+                case '!':
+                case '(':
+                case ')':
+                case '{':
+                case '}':
+                case '[':
+                case ']':
+                case '^':
+                case '"':
+                case '~':
+                case '*':
+                case '?':
+                case ':':
+                case '\\':
+                    out.append(' ');
+                    whitespace = true;
+                    break;
+                case '-':
+                    int j = i + 1;
+                    if (whitespace || j == a.length || isWhitespace(a[j])) {
+                        out.append(' ');
+                        whitespace = true;
+                        break;
+                    }
+                default:
+                    whitespace = isWhitespace(ch);
+                    out.append(ch);
+            }
+        }
+
+        return out.toString();
+    }
+
+    private static boolean isWhitespace(char c) {
+        return Character.isWhitespace(c) || c == '\u00A0' || c == '\u2007' || c == '\u202F';
     }
 }

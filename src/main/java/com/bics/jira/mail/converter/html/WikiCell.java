@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
  * @since 13/04/13 11:41
  */
 public class WikiCell implements NodeFormatter {
+    private static final String HTML_ATTR_NOWRAP = "nowrap";
     private static final String HTML_ATTR_COLSPAN = "colspan";
     private static final String HTML_ATTR_ROWSPAN = "rowspan";
     private static final String CELL_STOP = "|";
@@ -60,7 +61,9 @@ public class WikiCell implements NodeFormatter {
         }
 
         printLeft(context);
-        context.appendInner();
+
+        context.nowrap().appendInner();
+
         printRight(context);
     }
 
