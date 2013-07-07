@@ -1,0 +1,3 @@
+Anchor
+[*Someone*|mailto:some1@home.com]
+[google|http://google.com]

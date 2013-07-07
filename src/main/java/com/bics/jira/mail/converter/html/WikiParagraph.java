@@ -16,6 +16,6 @@ public class WikiParagraph implements NodeFormatter {
 
     @Override
     public void format(TreeContext context, Node node) {
-        context.newLine().appendInner();
+        context.newLine().content();
     }
 }

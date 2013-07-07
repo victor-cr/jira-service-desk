@@ -16,6 +16,6 @@ public class WikiListContainer implements NodeFormatter {
 
     @Override
     public void format(TreeContext context, Node node) {
-        context.newLine().appendInner().newLine();
+        context.newLine().content().newLine();
     }
 }

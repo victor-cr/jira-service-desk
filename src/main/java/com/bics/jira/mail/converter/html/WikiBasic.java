@@ -1,5 +1,6 @@
 package com.bics.jira.mail.converter.html;
 
+import org.apache.commons.lang.StringUtils;
 import org.jsoup.nodes.Node;
 
 /**
@@ -30,13 +31,24 @@ public class WikiBasic implements NodeFormatter {
 
     @Override
     public void format(TreeContext context, Node node) {
+        TreeContext.Checkpoint checkpoint = context.checkpoint();
+
         for (Tag tag : tags) {
             if (context.hasParent(tag)) {
-                context.optional().whitespace().appendInner().whitespace();
+                context.whitespace().content().whitespace();
+
+                if (StringUtils.isBlank(checkpoint.diff())) {
+                    checkpoint.rollback();
+                }
+
                 return;
             }
         }
 
-        context.optional().whitespace().append(symbol).glue().appendInner().glue().append(symbol).whitespace();
+        context.whitespace().symbol(symbol).trimContent().symbol(symbol).whitespace();
+
+        if (StringUtils.trimToEmpty(checkpoint.diff()).equals(symbol + symbol)) {
+            checkpoint.rollback();
+        }
     }
 }

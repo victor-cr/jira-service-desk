@@ -15,11 +15,11 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 /**
-* Java Doc here
-*
-* @author Victor Polischuk
-* @since 17/04/13 13:54
-*/
+ * Java Doc here
+ *
+ * @author Victor Polischuk
+ * @since 17/04/13 13:54
+ */
 public class TreeContextImpl implements TreeContext {
     final StringBuilder out = new StringBuilder();
     private final Iterable<NodeFormatter> formatters;
@@ -64,24 +64,28 @@ public class TreeContextImpl implements TreeContext {
     }
 
     @Override
-    public TreeContext optional() {
-        return new OptionalTreeContext(this);
+    public Checkpoint checkpoint() {
+        return new SimpleCheckpoint(out.length(), pendingWhitespace);
     }
 
     @Override
     public TreeContext newLine() {
-        return isNewLine() ? this : append("\n");
-    }
+        if (!isNewLine()) {
+            out.append('\n');
+        }
 
-    @Override
-    public TreeContext glue() {
-        pendingWhitespace = false;
         return this;
     }
 
     @Override
-    public TreeContext nowrap() {
-        return new NowrapTreeContext(this);
+    public TreeContext doubleLine() {
+        newLine();
+
+        if (!isNewLine(2, out.length())) {
+            out.append('\n');
+        }
+
+        return this;
     }
 
     @Override
@@ -92,8 +96,16 @@ public class TreeContextImpl implements TreeContext {
     }
 
     @Override
-    public TreeContext append(String sequence) {
+    public TreeContext symbol(String sequence) {
+        return text(sequence);
+    }
+
+    @Override
+    public TreeContext text(String sequence) {
         if (active && !StringUtils.isEmpty(sequence)) {
+            sequence = StringUtils.replaceChars(sequence, "\n\r\u00A0\u2007\u202F", "     ");
+            sequence = StringUtils.trimToEmpty(sequence);
+
             if (pendingWhitespace && !isWhitespace() && !Character.isWhitespace(sequence.charAt(0))) {
                 out.append(" ");
             }
@@ -106,7 +118,54 @@ public class TreeContextImpl implements TreeContext {
     }
 
     @Override
-    public TreeContext appendInner() {
+    public TreeContext content() {
+        appendInner(this);
+
+        return this;
+    }
+
+    @Override
+    public TreeContext nowrapContent() {
+        int index = out.length();
+
+        appendInner(this);
+
+        while (index < out.length()) {
+            if (out.charAt(index) == '\n') {
+                out.setCharAt(index, ' ');
+            }
+
+            index++;
+        }
+
+        return this;
+    }
+
+    @Override
+    public TreeContext trimContent() {
+        int len = out.length();
+
+        pendingWhitespace = false;
+        appendInner(this);
+        pendingWhitespace = false;
+
+        String content = out.substring(len);
+        String trimmed = StringUtils.trimToEmpty(content);
+
+        if (!content.equals(trimmed)) {
+            out.setLength(len);
+            out.append(trimmed);
+        }
+
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return out.toString();
+    }
+
+    protected TreeContext appendInner(TreeContext context) {
         Node root = current;
 
         if (current.childNodeSize() != 0) {
@@ -114,17 +173,17 @@ public class TreeContextImpl implements TreeContext {
 
             while (active && current != null) {
                 for (NodeFormatter formatter : formatters) {
-                    if (formatter.isSupported(this, current)) {
+                    if (formatter.isSupported(context, current)) {
                         accepted.offerFirst(current);
-                        cleanupSpaces();
-                        formatter.format(this, current);
-                        cleanupSpaces();
+//                        cleanupSpaces();
+                        formatter.format(context, current);
+//                        cleanupSpaces();
                         break;
                     }
                 }
 
                 if (accepted.peekFirst() != current) {
-                    appendInner();
+                    context.content();
                 } else {
                     accepted.removeFirst();
                 }
@@ -134,30 +193,20 @@ public class TreeContextImpl implements TreeContext {
 
             current = root;
         }
+
         return this;
     }
 
-    @Override
-    public String toString() {
-        return out.toString();
-    }
+    private boolean isNewLine(int number, int length) {
+        int last = length - 1;
 
-    private void cleanupSpaces() {
-        int i = out.length() - 1;
-
-        while (i >= 0 && Character.isSpaceChar(out.charAt(i))) {
-            i--;
-        }
-
-        if (++i != out.length()) {
-            out.setLength(i);
-        }
+        return number == 0 || length == 0 || out.charAt(last) == '\n' && isNewLine(number - 1, last);
     }
 
     private boolean isNewLine() {
         int length = out.length();
 
-        return length == 0 || out.charAt(length - 1) == '\n' || out.charAt(length - 1) == '\r';
+        return length == 0 || length > 1 && out.charAt(length - 1) == '\n' && out.charAt(length - 2) == '\n';
     }
 
     private boolean isWhitespace() {
@@ -178,5 +227,28 @@ public class TreeContextImpl implements TreeContext {
         }
 
         return false;
+    }
+
+    private final class SimpleCheckpoint implements Checkpoint {
+        private final int length;
+        private final boolean whitespace;
+
+        private SimpleCheckpoint(int length, boolean pendingWhitespace) {
+            this.length = length;
+            this.whitespace = pendingWhitespace;
+        }
+
+        @Override
+        public String diff() {
+            return length >= out.length() ? "" : out.substring(length);
+        }
+
+        @Override
+        public void rollback() {
+            if (length < out.length()) {
+                pendingWhitespace = whitespace;
+                out.setLength(length);
+            }
+        }
     }
 }

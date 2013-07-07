@@ -18,6 +18,6 @@ public class WikiTableRow implements NodeFormatter {
 
     @Override
     public void format(TreeContext context, Node node) {
-        context.newLine().append(ROW_START).appendInner().newLine();
+        context.symbol(ROW_START).content().newLine();
     }
 }

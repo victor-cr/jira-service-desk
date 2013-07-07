@@ -36,19 +36,19 @@ public class WikiInlineImage implements NodeFormatter {
 
         String imageName = StringUtils.substringBeforeLast(src.substring(4), INLINE_SUFFIX_SRC);
 
-        context.whitespace().append(IMAGE_START).append(imageName);
+        context.whitespace().symbol(IMAGE_START).symbol(imageName);
 
         boolean hasWidth = StringUtils.isNotBlank(width);
 
         if (hasWidth) {
-            context.append(IMAGE_ATTR_SECTION).append(WIKI_WIDTH).append(IMAGE_ATTR_ASSIGNMENT).append(width);
+            context.symbol(IMAGE_ATTR_SECTION).symbol(WIKI_WIDTH).symbol(IMAGE_ATTR_ASSIGNMENT).symbol(width);
         }
 
         if (StringUtils.isNotBlank(height)) {
-            context.append(hasWidth ? IMAGE_ATTR_SEPARATOR : IMAGE_ATTR_SECTION).append(WIKI_HEIGHT).append(IMAGE_ATTR_ASSIGNMENT).append(height);
+            context.symbol(hasWidth ? IMAGE_ATTR_SEPARATOR : IMAGE_ATTR_SECTION).symbol(WIKI_HEIGHT).symbol(IMAGE_ATTR_ASSIGNMENT).symbol(height);
         }
 
-        context.append(IMAGE_STOP).whitespace();
+        context.symbol(IMAGE_STOP).whitespace();
     }
 
     protected boolean isInline(Node node) {

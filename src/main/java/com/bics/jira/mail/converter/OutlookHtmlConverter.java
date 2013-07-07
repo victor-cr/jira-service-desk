@@ -2,7 +2,6 @@ package com.bics.jira.mail.converter;
 
 import com.bics.jira.mail.converter.html.NodeFormatter;
 import com.bics.jira.mail.converter.html.Tag;
-import com.bics.jira.mail.converter.html.TreeContext;
 import com.bics.jira.mail.converter.html.WikiBasic;
 import com.bics.jira.mail.converter.html.WikiCell;
 import com.bics.jira.mail.converter.html.WikiHeaderCell;
@@ -59,7 +58,7 @@ public class OutlookHtmlConverter implements BodyConverter {
 
         TreeContextImpl context = new TreeContextImpl(getFormatters(), document);
 
-        context.appendInner();
+        context.content();
 
         return context.toString();
     }

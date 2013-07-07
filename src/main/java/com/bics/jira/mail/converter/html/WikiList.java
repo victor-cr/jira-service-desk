@@ -29,10 +29,10 @@ public class WikiList implements NodeFormatter {
         for (Tag tag : tags) {
             switch (tag) {
                 case UL:
-                    context.append(UL);
+                    context.symbol(UL);
                     break;
                 case OL:
-                    context.append(OL);
+                    context.symbol(OL);
                     break;
             }
         }
@@ -43,6 +43,6 @@ public class WikiList implements NodeFormatter {
             prefix.reverse();
         }
 
-        context.newLine().append(prefix.toString()).whitespace().appendInner();
+        context.newLine().symbol(prefix.toString()).whitespace().content();
     }
 }

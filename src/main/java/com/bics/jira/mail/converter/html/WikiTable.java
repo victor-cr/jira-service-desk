@@ -16,6 +16,6 @@ public class WikiTable implements NodeFormatter {
 
     @Override
     public void format(TreeContext context, Node node) {
-        context.newLine().appendInner().newLine().append("\n");
+        context.newLine().content().newLine();
     }
 }

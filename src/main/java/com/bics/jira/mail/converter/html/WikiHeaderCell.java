@@ -20,7 +20,7 @@ public class WikiHeaderCell extends WikiCell implements NodeFormatter {
 
     @Override
     protected void printLeft(TreeContext context) {
-        context.append(CELL_START).whitespace();
+        context.symbol(CELL_START).whitespace();
     }
 
     @Override

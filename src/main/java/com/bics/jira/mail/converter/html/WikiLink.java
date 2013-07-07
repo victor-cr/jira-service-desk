@@ -14,6 +14,7 @@ import java.net.URL;
  */
 public class WikiLink implements NodeFormatter {
     private static final String LINK_START = "[";
+    private static final String LINK_SEPARATOR = "|";
     private static final String LINK_STOP = "]";
     private static final String HTML_HREF = "href";
 
@@ -27,7 +28,17 @@ public class WikiLink implements NodeFormatter {
         String link = encode(url(node));
 
         if (StringUtils.isNotBlank(link)) {
-            context.appendInner().whitespace().append(LINK_START).append(link).append(LINK_STOP).whitespace();
+            context.whitespace().symbol(LINK_START);
+
+            TreeContext.Checkpoint checkpoint = context.checkpoint();
+
+            context.trimContent().symbol(LINK_SEPARATOR);
+
+            if (checkpoint.diff().equals(LINK_SEPARATOR)) {
+                checkpoint.rollback();
+            }
+
+            context.symbol(link).symbol(LINK_STOP).whitespace();
         }
     }
 

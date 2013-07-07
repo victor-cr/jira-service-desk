@@ -18,6 +18,8 @@ public class OutlookHtmlConverterTest extends Assert {
     private static final String FILE_TABLE_LAYOUT = "TableLayout";
     private static final String FILE_DATA_TABLE = "DataTable";
     private static final String FILE_BOLD_TEXT = "BoldText";
+    private static final String FILE_ESCAPABLE_TEXT = "EscapableText";
+    private static final String FILE_LINK = "Link";
 
     private final OutlookHtmlConverter converter = new OutlookHtmlConverter();
 
@@ -39,6 +41,16 @@ public class OutlookHtmlConverterTest extends Assert {
     @Test
     public void testConvert_BoldText() throws Exception {
         assertFiles(FILE_BOLD_TEXT);
+    }
+
+    @Test
+    public void testConvert_EscapableText() throws Exception {
+        assertFiles(FILE_ESCAPABLE_TEXT);
+    }
+
+    @Test
+    public void testConvert_Link() throws Exception {
+        assertFiles(FILE_LINK);
     }
 
     private void assertFiles(String testName) {

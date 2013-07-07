@@ -15,17 +15,27 @@ public interface TreeContext {
 
     Iterable<Tag> path();
 
-    TreeContext optional();
+    Checkpoint checkpoint();
 
     TreeContext newLine();
 
+    TreeContext doubleLine();
+
     TreeContext whitespace();
 
-    TreeContext glue();
+    TreeContext nowrapContent();
 
-    TreeContext nowrap();
+    TreeContext symbol(String sequence);
 
-    TreeContext append(String sequence);
+    TreeContext text(String sequence);
 
-    TreeContext appendInner();
+    TreeContext trimContent();
+
+    TreeContext content();
+
+    interface Checkpoint {
+        String diff();
+
+        void rollback();
+    }
 }

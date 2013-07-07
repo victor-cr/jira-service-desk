@@ -1,5 +1,6 @@
 *Stp:* ZRC64TIH
 *Network Id:* 10
+
 | *Statistics Type / Date* | *PC Availability* | *LS Availability* | *LS Load* | *Links Availability* | *Links Congestion* | *Links Load* |
 | 215/03/2013 | 10 | 2384 | 3384 | 43360 | 53360 | 63360 |
 
