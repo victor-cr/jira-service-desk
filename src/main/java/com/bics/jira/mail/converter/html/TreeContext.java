@@ -19,11 +19,7 @@ public interface TreeContext {
 
     TreeContext newLine();
 
-    TreeContext doubleLine();
-
     TreeContext whitespace();
-
-    TreeContext nowrapContent();
 
     TreeContext symbol(String sequence);
 

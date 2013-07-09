@@ -78,17 +78,6 @@ public class TreeContextImpl implements TreeContext {
     }
 
     @Override
-    public TreeContext doubleLine() {
-        newLine();
-
-        if (!isNewLine(2, out.length())) {
-            out.append('\n');
-        }
-
-        return this;
-    }
-
-    @Override
     public TreeContext whitespace() {
         pendingWhitespace = true;
 
@@ -120,23 +109,6 @@ public class TreeContextImpl implements TreeContext {
     @Override
     public TreeContext content() {
         appendInner(this);
-
-        return this;
-    }
-
-    @Override
-    public TreeContext nowrapContent() {
-        int index = out.length();
-
-        appendInner(this);
-
-        while (index < out.length()) {
-            if (out.charAt(index) == '\n') {
-                out.setCharAt(index, ' ');
-            }
-
-            index++;
-        }
 
         return this;
     }
@@ -199,12 +171,6 @@ public class TreeContextImpl implements TreeContext {
         }
 
         return this;
-    }
-
-    private boolean isNewLine(int number, int length) {
-        int last = length - 1;
-
-        return number == 0 || length == 0 || out.charAt(last) == '\n' && isNewLine(number - 1, last);
     }
 
     private boolean isNewLine() {
