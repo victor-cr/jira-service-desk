@@ -61,7 +61,7 @@ public class WikiCell implements NodeFormatter {
 
         printLeft(context);
 
-        context.nowrapContent();
+        context.trimContent();
 
         printRight(context);
     }

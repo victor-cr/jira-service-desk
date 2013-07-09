@@ -143,6 +143,10 @@ public class TreeContextImpl implements TreeContext {
 
     @Override
     public TreeContext trimContent() {
+        if (pendingWhitespace) {
+            out.append(' ');
+        }
+
         int len = out.length();
 
         pendingWhitespace = false;
