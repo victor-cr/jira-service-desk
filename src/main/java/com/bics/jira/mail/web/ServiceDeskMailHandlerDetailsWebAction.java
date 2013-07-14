@@ -32,17 +32,13 @@ public abstract class ServiceDeskMailHandlerDetailsWebAction extends JiraWebActi
 
     private final ServiceConfigurationAdapter configuration;
     private final PluginAccessor pluginAccessor;
-    private final IssueTypeManager issueTypeManager;
-    private final ProjectManager projectManager;
 
     protected final CreateOrCommentWebModel model = new CreateOrCommentWebModel();
 
-    public ServiceDeskMailHandlerDetailsWebAction(PluginAccessor pluginAccessor, IssueTypeManager issueTypeManager, ProjectManager projectManager) {
+    public ServiceDeskMailHandlerDetailsWebAction(PluginAccessor pluginAccessor) {
         this.pluginAccessor = pluginAccessor;
 
         configuration = new ServiceConfigurationAdapter(pluginAccessor);
-        this.issueTypeManager = issueTypeManager;
-        this.projectManager = projectManager;
     }
 
     public boolean isEditing() {

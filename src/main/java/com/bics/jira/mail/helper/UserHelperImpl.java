@@ -37,7 +37,7 @@ import java.util.TreeSet;
  * @author Victor Polischuk
  * @since 28.02.13 21:37
  */
-public final class UserHelperImpl implements UserHelper {
+public class UserHelperImpl implements UserHelper {
     private final UserUtil userUtil;
     private final PermissionManager permissionManager;
     private final ProjectManager projectManager;

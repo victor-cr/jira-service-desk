@@ -1,7 +1,5 @@
-package com.bics.jira.mail.model;
+package com.bics.jira.mail.model.mail;
 
-import com.bics.jira.mail.model.mail.Attachment;
-import com.bics.jira.mail.model.mail.MessageAdapter;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -33,16 +33,16 @@ import java.util.Map;
  * @since 03.02.13 12:29
  */
 public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> implements MessageHandler {
-    private final JiraAuthenticationContext jiraAuthenticationContext;
-    private final ModelValidator<M> modelValidator;
-    private final IssueHelper<M> issueHelper;
-    private final UserHelper userHelper;
-
+    protected final JiraAuthenticationContext jiraAuthenticationContext;
+    protected final ModelValidator<M> modelValidator;
+    protected final IssueHelper<M> issueHelper;
+    protected final UserHelper userHelper;
     protected final M model;
+
     private final Map<String, String> params = new HashMap<String, String>();
     private boolean valid;
 
-    public ServiceDeskMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, ModelValidator modelValidator, IssueHelper issueHelper, UserHelper userHelper) {
+    public ServiceDeskMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, ModelValidator<M> modelValidator, IssueHelper<M> issueHelper, UserHelper userHelper) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.modelValidator = modelValidator;
         this.issueHelper = issueHelper;

@@ -1,12 +1,7 @@
 package com.bics.jira.mail.web;
 
-import com.atlassian.jira.config.IssueTypeManager;
-import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.sal.api.websudo.WebSudoRequired;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * JavaDoc here
@@ -16,8 +11,8 @@ import java.util.Map;
  */
 @WebSudoRequired
 public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailHandlerDetailsWebAction {
-    public CreateOrCommentMailHandlerDetailsWebAction(PluginAccessor pluginAccessor, IssueTypeManager issueTypeManager, ProjectManager projectManager) {
-        super(pluginAccessor, issueTypeManager, projectManager);
+    public CreateOrCommentMailHandlerDetailsWebAction(PluginAccessor pluginAccessor) {
+        super(pluginAccessor);
     }
 
     public String getProjectKey() {
@@ -114,17 +109,5 @@ public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailH
 
     public void setCcWatcher(boolean ccWatcher) {
         model.setCcWatcher(ccWatcher);
-    }
-
-    @Override
-    @Deprecated
-    public Collection<String> getErrorMessages() {
-        return super.getErrorMessages();
-    }
-
-    @Override
-    @Deprecated
-    public Map<String, String> getErrors() {
-        return super.getErrors();
     }
 }
