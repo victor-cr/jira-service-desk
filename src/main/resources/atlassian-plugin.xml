@@ -7,7 +7,7 @@
 
     <resource type="i18n" name="i18n" location="com.bics.jira.mail.messages"/>
 
-    <component key="model-validator" i18n-name-key="msd.validator.name" class="com.bics.jira.mail.handler.ModelValidatorImpl">
+    <component key="model-validator" i18n-name-key="msd.validator.name" class="com.bics.jira.mail.model.validator.CreateOrCommentModelValidator">
         <interface>com.bics.jira.mail.ModelValidator</interface>
     </component>
 
@@ -15,7 +15,7 @@
         <interface>com.bics.jira.mail.UserHelper</interface>
     </component>
 
-    <component key="issue-builder" i18n-name-key="msd.helper.issue.name" class="com.bics.jira.mail.helper.IssueHelperImpl">
+    <component key="issue-builder" i18n-name-key="msd.helper.issue.name" class="com.bics.jira.mail.helper.CreateOrCommentIssueHelper">
         <interface>com.bics.jira.mail.IssueHelper</interface>
     </component>
 
@@ -24,7 +24,7 @@
     </component>
 
     <message-handler key="message-handler" i18n-name-key="msd.handler.name"
-                     class="com.bics.jira.mail.handler.ServiceDeskMessageHandler"
+                     class="com.bics.jira.mail.handler.CreateOrCommentMessageHandler"
                      add-edit-url="/secure/admin/ServiceDeskMailDetails!default.jspa" weight="0"/>
 
     <web-resource i18n-name-key="msd.webwork.name" key="edit-handler-details-page">
@@ -50,7 +50,7 @@
 
     <webwork1 key="actions" name="Actions" class="java.lang.Object">
         <actions>
-            <action name="com.bics.jira.mail.web.ServiceDeskMailHandlerDetailsWebAction"
+            <action name="com.bics.jira.mail.web.CreateOrCommentMailHandlerDetailsWebAction"
                     alias="ServiceDeskMailDetails" roles-required="admin">
                 <view name="input">/secure/admin/views/serviceDeskDetails.vm</view>
                 <view name="securitybreach">/secure/views/securitybreach.jsp</view>

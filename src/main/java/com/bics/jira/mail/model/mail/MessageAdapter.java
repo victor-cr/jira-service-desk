@@ -1,4 +1,4 @@
-package com.bics.jira.mail.model;
+package com.bics.jira.mail.model.mail;
 
 import com.atlassian.mail.MailUtils;
 import com.atlassian.plugin.util.collect.Predicate;

@@ -1,7 +1,8 @@
 package com.bics.jira.mail.converter;
 
-import com.bics.jira.mail.model.HandlerModel;
-import com.bics.jira.mail.model.MessageAdapter;
+import com.bics.jira.mail.model.CreateOrCommentModel;
+import com.bics.jira.mail.model.ServiceDeskModel;
+import com.bics.jira.mail.model.mail.MessageAdapter;
 
 /**
  * JavaDoc here
@@ -10,7 +11,7 @@ import com.bics.jira.mail.model.MessageAdapter;
  * @since 10.02.13 1:54
  */
 public interface BodyConverter {
-    boolean isSupported(HandlerModel model, MessageAdapter message, boolean stripQuotes);
+    boolean isSupported(ServiceDeskModel model, MessageAdapter message, boolean stripQuotes);
 
     String convert(String body);
 }

@@ -37,15 +37,14 @@ import com.atlassian.query.Query;
 import com.bics.jira.mail.IssueHelper;
 import com.bics.jira.mail.MailHelper;
 import com.bics.jira.mail.UserHelper;
-import com.bics.jira.mail.model.Attachment;
-import com.bics.jira.mail.model.HandlerModel;
-import com.bics.jira.mail.model.MessageAdapter;
+import com.bics.jira.mail.model.mail.Attachment;
+import com.bics.jira.mail.model.CreateOrCommentModel;
+import com.bics.jira.mail.model.mail.MessageAdapter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import com.opensymphony.workflow.loader.StepDescriptor;
 import org.apache.commons.lang.StringUtils;
-import org.apache.lucene.queryParser.QueryParser;
 
 import javax.annotation.Nullable;
 import javax.mail.MessagingException;
@@ -61,7 +60,7 @@ import java.util.List;
  * @author Victor Polischuk
  * @since 04.02.13 21:38
  */
-public class IssueHelperImpl implements IssueHelper {
+public class CreateOrCommentIssueHelper implements IssueHelper<CreateOrCommentModel> {
     private static final long RESOLUTION_DELTA = 1000L * 60 * 60 * 24 * 30;
 
     private final IssueFactory issueFactory;
@@ -79,7 +78,7 @@ public class IssueHelperImpl implements IssueHelper {
     private final MailHelper mailHelper;
     private final FieldVisibilityManager fieldVisibilityManager;
 
-    public IssueHelperImpl(IssueFactory issueFactory, IssueService issueService, IssueManager issueManager, AttachmentManager attachmentManager, WatcherManager watcherManager, WorkflowManager workflowManager, SearchService searchService, CommentManager commentManager, IssueSecurityLevelManager issueSecurityLevelManager, CustomFieldManager customFieldManager, ConstantsManager constantsManager, UserHelper userHelper, MailHelper mailHelper, FieldVisibilityManager fieldVisibilityManager) {
+    public CreateOrCommentIssueHelper(IssueFactory issueFactory, IssueService issueService, IssueManager issueManager, AttachmentManager attachmentManager, WatcherManager watcherManager, WorkflowManager workflowManager, SearchService searchService, CommentManager commentManager, IssueSecurityLevelManager issueSecurityLevelManager, CustomFieldManager customFieldManager, ConstantsManager constantsManager, UserHelper userHelper, MailHelper mailHelper, FieldVisibilityManager fieldVisibilityManager) {
         this.issueFactory = issueFactory;
         this.issueService = issueService;
         this.issueManager = issueManager;
@@ -97,7 +96,7 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     @Override
-    public Issue process(User author, HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException, PermissionException {
+    public Issue process(User author, CreateOrCommentModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException, PermissionException {
         Project project = model.getProject();
 
         MutableIssue issue = find(author, project, message.getSubject(), monitor);
@@ -163,7 +162,7 @@ public class IssueHelperImpl implements IssueHelper {
         return null;
     }
 
-    protected MutableIssue create(User author, User assignee, HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws CreateException, MessagingException {
+    protected MutableIssue create(User author, User assignee, CreateOrCommentModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws CreateException, MessagingException {
         monitor.info("Creating new issue for an author: " + author.getName());
 
         Project project = model.getProject();
@@ -211,7 +210,7 @@ public class IssueHelperImpl implements IssueHelper {
         return issueManager.getIssueObject(issueObject.getId());
     }
 
-    protected void comment(User author, User assignee, MutableIssue issue, HandlerModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
+    protected void comment(User author, User assignee, MutableIssue issue, CreateOrCommentModel model, MessageAdapter message, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
         String body = mailHelper.extractComment(model, message);
 
         ActionDescriptor action = lookupAction(issue, model.getTransitions(), monitor);
@@ -291,7 +290,7 @@ public class IssueHelperImpl implements IssueHelper {
         return !fieldVisibilityManager.isFieldHiddenInAllSchemes(project.getId(), fieldName, Collections.singletonList(issueType.getId()));
     }
 
-    private User getAssignee(Collection<User> users, HandlerModel model) {
+    private User getAssignee(Collection<User> users, CreateOrCommentModel model) {
         if (users != null && !users.isEmpty() && model.isCcAssignee()) {
             for (User user : users) {
                 if (userHelper.canAssignTo(user, model.getProject())) {

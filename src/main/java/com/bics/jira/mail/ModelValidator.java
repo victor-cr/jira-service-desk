@@ -1,8 +1,10 @@
 package com.bics.jira.mail;
 
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
-import com.bics.jira.mail.model.HandlerModel;
-import com.bics.jira.mail.model.ServiceModel;
+import com.bics.jira.mail.model.CreateOrCommentModel;
+import com.bics.jira.mail.model.ServiceDeskModel;
+
+import java.util.Map;
 
 /**
  * JavaDoc here
@@ -10,6 +12,6 @@ import com.bics.jira.mail.model.ServiceModel;
  * @author Victor Polischuk
  * @since 04.02.13 21:57
  */
-public interface ModelValidator {
-    boolean populateHandlerModel(HandlerModel handlerModel, ServiceModel model, MessageHandlerErrorCollector monitor);
+public interface ModelValidator<M extends ServiceDeskModel> {
+    boolean populateHandlerModel(M model, Map<String, String> params, MessageHandlerErrorCollector monitor);
 }

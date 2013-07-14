@@ -15,8 +15,8 @@ import com.atlassian.mail.MailUtils;
 import com.bics.jira.mail.IssueHelper;
 import com.bics.jira.mail.ModelValidator;
 import com.bics.jira.mail.UserHelper;
+import com.bics.jira.mail.model.CreateOrCommentModel;
 import com.bics.jira.mail.model.mail.MessageAdapter;
-import com.bics.jira.mail.model.ServiceDeskModel;
 import org.apache.commons.lang.StringUtils;
 
 import javax.mail.Message;
@@ -32,27 +32,22 @@ import java.util.Map;
  * @author Victor Polischuk
  * @since 03.02.13 12:29
  */
-public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> implements MessageHandler {
+public class CommentOnlyMessageHandler implements MessageHandler {
     private final JiraAuthenticationContext jiraAuthenticationContext;
-    private final ModelValidator<M> modelValidator;
-    private final IssueHelper<M> issueHelper;
+    private final ModelValidator modelValidator;
+    private final IssueHelper issueHelper;
     private final UserHelper userHelper;
 
-    protected final M model;
     private final Map<String, String> params = new HashMap<String, String>();
+    private final CreateOrCommentModel model = new CreateOrCommentModel();
     private boolean valid;
 
-    public ServiceDeskMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, ModelValidator modelValidator, IssueHelper issueHelper, UserHelper userHelper) {
+    public CommentOnlyMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, ModelValidator modelValidator, IssueHelper issueHelper, UserHelper userHelper) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.modelValidator = modelValidator;
         this.issueHelper = issueHelper;
         this.userHelper = userHelper;
-        this.model = createModel();
     }
-
-    protected abstract M createModel();
-
-    protected abstract Predicate<User> searchPredicate(MessageAdapter adapter);
 
     @Override
     public void init(Map<String, String> params, MessageHandlerErrorCollector monitor) {
@@ -77,7 +72,12 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
 
         Collection<User> authors = userHelper.ensure(addresses, model.isCreateUsers(), model.isNotifyUsers(), monitor);
 
-        User author = CollectionUtil.findFirstMatch(authors, searchPredicate(adapter));
+        User author = CollectionUtil.findFirstMatch(authors, new Predicate<User>() {
+            @Override
+            public boolean evaluate(User user) {
+                return userHelper.canCreateIssue(user, model.getProject());
+            }
+        });
 
         if (author == null && model.getReporterUser() != null) {
             monitor.warning("Message sender(s) '" + StringUtils.join(MailUtils.getSenders(message), ",")

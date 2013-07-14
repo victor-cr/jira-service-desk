@@ -4,7 +4,7 @@ import com.atlassian.jira.plugins.mail.ServiceConfiguration;
 import com.atlassian.mail.MailException;
 import com.atlassian.plugin.Plugin;
 import com.atlassian.plugin.PluginAccessor;
-import com.bics.jira.mail.web.ServiceDeskMailHandlerDetailsWebAction;
+import com.bics.jira.mail.web.CreateOrCommentMailHandlerDetailsWebAction;
 import webwork.action.ActionContext;
 
 import java.util.Map;
@@ -53,7 +53,7 @@ public class ServiceConfigurationAdapter {
     }
 
     public long getDelay() {
-        return (Long) invoke("getDelay");
+        return invoke("getDelay");
     }
 
     public String getServiceName() {
@@ -100,7 +100,7 @@ public class ServiceConfigurationAdapter {
                 Plugin mailPlugin = pluginAccessor.getEnabledPlugin("com.atlassian.jira.jira-mail-plugin");
 
                 if (mailPlugin != null) {
-                    configurationClass = mailPlugin.loadClass("com.atlassian.jira.plugins.mail.ServiceConfiguration", ServiceDeskMailHandlerDetailsWebAction.class);
+                    configurationClass = mailPlugin.loadClass("com.atlassian.jira.plugins.mail.ServiceConfiguration", CreateOrCommentMailHandlerDetailsWebAction.class);
 
                     id = (String) configurationClass.getField("ID").get(null);
                 }

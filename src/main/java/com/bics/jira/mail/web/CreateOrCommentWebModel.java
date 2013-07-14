@@ -1,4 +1,4 @@
-package com.bics.jira.mail.model;
+package com.bics.jira.mail.web;
 
 import com.atlassian.jira.service.services.file.AbstractMessageHandlingService;
 import com.atlassian.jira.service.util.ServiceUtils;
@@ -14,7 +14,7 @@ import java.util.Map;
  * @author Victor Polischuk
  * @since 03.02.13 22:29
  */
-public class ServiceModel {
+public class CreateOrCommentWebModel {
     private static final String KEY_PROJECT = "project";
     private static final String KEY_ISSUE_TYPE = "issuetype";
     private static final String KEY_COMPONENT = "component";
@@ -160,7 +160,7 @@ public class ServiceModel {
         return key;
     }
 
-    public ServiceModel fromServiceParams(Map<String, String> params) {
+    public CreateOrCommentWebModel fromServiceParams(Map<String, String> params) {
         this.projectKey = params.get(KEY_PROJECT);
         this.issueTypeId = params.get(KEY_ISSUE_TYPE);
         this.componentId = safeGetL(params, KEY_COMPONENT);

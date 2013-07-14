@@ -13,8 +13,9 @@ import com.bics.jira.mail.converter.html.WikiTable;
 import com.bics.jira.mail.converter.html.WikiTableRow;
 import com.bics.jira.mail.converter.html.WikiText;
 import com.bics.jira.mail.converter.html.context.TreeContextImpl;
-import com.bics.jira.mail.model.HandlerModel;
-import com.bics.jira.mail.model.MessageAdapter;
+import com.bics.jira.mail.model.CreateOrCommentModel;
+import com.bics.jira.mail.model.ServiceDeskModel;
+import com.bics.jira.mail.model.mail.MessageAdapter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -48,7 +49,7 @@ public class OutlookHtmlConverter implements BodyConverter {
     ));
 
     @Override
-    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean stripQuotes) {
+    public boolean isSupported(ServiceDeskModel model, MessageAdapter message, boolean stripQuotes) {
         return message.hasThreadTopic();
     }
 

@@ -1,4 +1,4 @@
-package com.bics.jira.mail.model;
+package com.bics.jira.mail.model.mail;
 
 import javax.mail.internet.ContentType;
 import java.io.File;

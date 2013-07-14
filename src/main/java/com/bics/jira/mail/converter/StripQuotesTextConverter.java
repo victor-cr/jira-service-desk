@@ -1,8 +1,9 @@
 package com.bics.jira.mail.converter;
 
 import com.atlassian.core.util.ClassLoaderUtils;
-import com.bics.jira.mail.model.HandlerModel;
-import com.bics.jira.mail.model.MessageAdapter;
+import com.bics.jira.mail.model.CreateOrCommentModel;
+import com.bics.jira.mail.model.ServiceDeskModel;
+import com.bics.jira.mail.model.mail.MessageAdapter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 
@@ -28,7 +29,7 @@ public class StripQuotesTextConverter implements BodyConverter {
     }
 
     @Override
-    public boolean isSupported(HandlerModel model, MessageAdapter message, boolean stripQuotes) {
+    public boolean isSupported(ServiceDeskModel model, MessageAdapter message, boolean stripQuotes) {
         return stripQuotes && model.isStripQuotes();
     }
 

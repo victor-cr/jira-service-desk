@@ -1,11 +1,10 @@
-package com.bics.jira.mail.handler;
+package com.bics.jira.mail.model.validator;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.EntityNotFoundException;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.bc.project.component.ProjectComponentManager;
 import com.atlassian.jira.config.IssueTypeManager;
-import com.atlassian.jira.config.StatusManager;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
@@ -15,16 +14,14 @@ import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.workflow.JiraWorkflow;
 import com.atlassian.jira.workflow.WorkflowManager;
-import com.atlassian.jira.workflow.WorkflowSchemeManager;
 import com.bics.jira.mail.ModelValidator;
-import com.bics.jira.mail.model.HandlerModel;
-import com.bics.jira.mail.model.ServiceModel;
+import com.bics.jira.mail.model.CreateOrCommentModel;
+import com.bics.jira.mail.web.CreateOrCommentWebModel;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import java.util.Collection;
 import java.util.Formatter;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -34,28 +31,26 @@ import java.util.regex.PatternSyntaxException;
  * @author Victor Polischuk
  * @since 03.02.13 12:57
  */
-public class ModelValidatorImpl implements ModelValidator {
+public class CreateOrCommentModelValidator implements ModelValidator<CreateOrCommentModel> {
     private final ProjectManager projectManager;
     private final IssueTypeManager issueTypeManager;
     private final ProjectComponentManager projectComponentManager;
-    private final StatusManager statusManager;
     private final UserManager userManager;
     private final PermissionManager permissionManager;
     private final WorkflowManager workflowManager;
-    private final WorkflowSchemeManager workflowSchemeManager;
 
-    public ModelValidatorImpl(ProjectManager projectManager, IssueTypeManager issueTypeManager, ProjectComponentManager projectComponentManager, StatusManager statusManager, UserManager userManager, PermissionManager permissionManager, WorkflowManager workflowManager, WorkflowSchemeManager workflowSchemeManager) {
+    public CreateOrCommentModelValidator(ProjectManager projectManager, IssueTypeManager issueTypeManager, ProjectComponentManager projectComponentManager, UserManager userManager, PermissionManager permissionManager, WorkflowManager workflowManager) {
         this.projectManager = projectManager;
         this.issueTypeManager = issueTypeManager;
         this.projectComponentManager = projectComponentManager;
-        this.statusManager = statusManager;
         this.userManager = userManager;
         this.permissionManager = permissionManager;
         this.workflowManager = workflowManager;
-        this.workflowSchemeManager = workflowSchemeManager;
     }
 
-    public boolean populateHandlerModel(HandlerModel handlerModel, ServiceModel serviceModel, MessageHandlerErrorCollector monitor) {
+    @Override
+    public boolean populateHandlerModel(CreateOrCommentModel model, Map<String, String> params, MessageHandlerErrorCollector monitor) {
+        CreateOrCommentWebModel serviceModel = new CreateOrCommentWebModel().fromServiceParams(params);
         Validator validator = new Validator(monitor);
 
         Project project = validator.validateProject(serviceModel.getProjectKey());
@@ -63,7 +58,6 @@ public class ModelValidatorImpl implements ModelValidator {
         IssueType issueType = validator.validateIssueType(serviceModel.getIssueTypeId(), project);
         ProjectComponent projectComponent = validator.validateProjectComponent(serviceModel.getComponentId(), project);
         int[] transitions = validator.validateStatusTransitions(serviceModel.getTransitions(), project, issueType);
-        InternetAddress catchAddress = validator.validateCatchEmail(serviceModel.getCatchEmail());
         User reporterUser = validator.validateReporterUser(serviceModel.getReporterUsername(), project);
         Pattern splitRegex = validator.validateSplitRegex(serviceModel.getSplitRegex());
 
@@ -73,18 +67,17 @@ public class ModelValidatorImpl implements ModelValidator {
             return false;
         }
 
-        handlerModel.setProject(project);
-        handlerModel.setIssueType(issueType);
-        handlerModel.setProjectComponent(projectComponent);
-        handlerModel.setTransitions(transitions);
-        handlerModel.setCatchEmail(catchAddress);
-        handlerModel.setReporterUser(reporterUser);
-        handlerModel.setSplitRegex(splitRegex);
-        handlerModel.setCreateUsers(serviceModel.isCreateUsers());
-        handlerModel.setNotifyUsers(serviceModel.isNotifyUsers());
-        handlerModel.setCcAssignee(serviceModel.isCcAssignee());
-        handlerModel.setCcWatcher(serviceModel.isCcWatcher());
-        handlerModel.setStripQuotes(serviceModel.isStripQuotes());
+        model.setProject(project);
+        model.setIssueType(issueType);
+        model.setProjectComponent(projectComponent);
+        model.setTransitions(transitions);
+        model.setReporterUser(reporterUser);
+        model.setSplitRegex(splitRegex);
+        model.setCreateUsers(serviceModel.isCreateUsers());
+        model.setNotifyUsers(serviceModel.isNotifyUsers());
+        model.setCcAssignee(serviceModel.isCcAssignee());
+        model.setCcWatcher(serviceModel.isCcWatcher());
+        model.setStripQuotes(serviceModel.isStripQuotes());
 
         return true;
     }
@@ -178,6 +171,7 @@ public class ModelValidatorImpl implements ModelValidator {
             return codes;
         }
 
+/*
         public InternetAddress validateCatchEmail(String catchEmail) {
             if (catchEmail == null) {
                 monitor.info("Catch email is not set.");
@@ -191,6 +185,7 @@ public class ModelValidatorImpl implements ModelValidator {
                 return null;
             }
         }
+*/
 
         public User validateReporterUser(String reporterUsername, Project project) {
             if (reporterUsername == null) {

@@ -1,4 +1,4 @@
-#* @vtlvariable name="action" type="com.bics.jira.mail.web.ServiceDeskMailHandlerDetailsWebAction" *#
+#* @vtlvariable name="action" type="com.bics.jira.mail.web.CreateOrCommentMailHandlerDetailsWebAction" *#
 <html>
 <head>
     <title>$action.handlerName</title>

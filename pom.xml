@@ -37,26 +37,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!-- Add dependency on jira-core if you want access to JIRA implementation classes as well as the sanctioned API. -->
-        <!-- This is not normally recommended, but may be required eg when migrating a plugin originally developed against JIRA 4.x -->
-        <!--
-                <dependency>
-                    <groupId>com.atlassian.jira</groupId>
-                    <artifactId>jira-core</artifactId>
-                    <version>${jira.version}</version>
-                    <scope>provided</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>jndi</groupId>
-                            <artifactId>jndi</artifactId>
-                        </exclusion>
-                        <exclusion>
-                            <groupId>jta</groupId>
-                            <artifactId>jta</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-        -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -154,10 +134,8 @@
         </pluginRepository>
     </pluginRepositories>
 
-
     <properties>
         <jira.version>5.2.5</jira.version>
         <amps.version>4.1.4</amps.version>
     </properties>
-
 </project>
