@@ -1,8 +1,7 @@
 package com.bics.jira.mail;
 
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
-import com.bics.jira.mail.model.CreateOrCommentModel;
-import com.bics.jira.mail.model.ServiceDeskModel;
+import com.bics.jira.mail.model.service.ServiceDeskModel;
 
 import java.util.Map;
 

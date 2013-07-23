@@ -2,7 +2,7 @@ package com.bics.jira.mail.web;
 
 import com.atlassian.plugin.PluginAccessor;
 import com.atlassian.sal.api.websudo.WebSudoRequired;
-import com.bics.jira.mail.model.web.CreateOrCommentWebModel;
+import com.bics.jira.mail.model.web.CommentOnlyWebModel;
 
 /**
  * JavaDoc here
@@ -11,36 +11,20 @@ import com.bics.jira.mail.model.web.CreateOrCommentWebModel;
  * @since 03.02.13 12:59
  */
 @WebSudoRequired
-public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailHandlerDetailsWebAction<CreateOrCommentWebModel> {
-    private final CreateOrCommentWebModel model = new CreateOrCommentWebModel();
+public class CommentOnlyMailHandlerDetailsWebAction extends ServiceDeskMailHandlerDetailsWebAction<CommentOnlyWebModel> {
+    private final CommentOnlyWebModel model = new CommentOnlyWebModel();
 
-    public CreateOrCommentMailHandlerDetailsWebAction(PluginAccessor pluginAccessor) {
+    public CommentOnlyMailHandlerDetailsWebAction(PluginAccessor pluginAccessor) {
         super(pluginAccessor);
     }
 
     @Override
-    public CreateOrCommentWebModel getModel() {
+    public CommentOnlyWebModel getModel() {
         return model;
-    }
-
-    public String getProjectKey() {
-        return model.getProjectKey();
-    }
-
-    public String getIssueTypeId() {
-        return model.getIssueTypeId();
     }
 
     public void setCcAssignee(boolean ccAssignee) {
         model.setCcAssignee(ccAssignee);
-    }
-
-    public Long getComponentKey() {
-        return model.getComponentId();
-    }
-
-    public void setComponentKey(Long componentKey) {
-        model.setComponentId(componentKey);
     }
 
     public void setStripQuotes(boolean stripQuotes) {
@@ -67,10 +51,6 @@ public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailH
         return model.isStripQuotes();
     }
 
-    public void setIssueTypeId(String issueTypeId) {
-        model.setIssueTypeId(issueTypeId);
-    }
-
     public void setCreateUsers(boolean createUsers) {
         model.setCreateUsers(createUsers);
     }
@@ -81,18 +61,6 @@ public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailH
 
     public void setReporterUsername(String reporterUsername) {
         model.setReporterUsername(reporterUsername);
-    }
-
-    public void setProjectKey(String projectKey) {
-        model.setProjectKey(projectKey);
-    }
-
-    public void setCatchEmail(String catchEmail) {
-        model.setCatchEmail(catchEmail);
-    }
-
-    public String getCatchEmail() {
-        return model.getCatchEmail();
     }
 
     public boolean isCcAssignee() {

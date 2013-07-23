@@ -5,12 +5,14 @@ import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.event.user.UserEventType;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.PermissionException;
+import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.project.DefaultAssigneeException;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
+import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.user.util.UserUtil;
 import com.atlassian.jira.util.Consumer;
 import com.atlassian.jira.util.Function;
@@ -39,20 +41,26 @@ import java.util.TreeSet;
  */
 public class UserHelperImpl implements UserHelper {
     private final UserUtil userUtil;
+    private final UserManager userManager;
     private final PermissionManager permissionManager;
     private final ProjectManager projectManager;
 
-    public UserHelperImpl(UserUtil userUtil, PermissionManager permissionManager, ProjectManager projectManager) {
+    public UserHelperImpl(UserUtil userUtil, UserManager userManager, PermissionManager permissionManager, ProjectManager projectManager) {
         this.userUtil = userUtil;
+        this.userManager = userManager;
         this.permissionManager = permissionManager;
         this.projectManager = projectManager;
+    }
+
+    @Override
+    public User find(String userName) {
+        return userUtil.getUser(userName);
     }
 
     @Override
     public User find(InternetAddress address) {
         return CollectionUtil.first(find(new InternetAddress[]{address}));
     }
-
 
     @Override
     public Collection<User> find(InternetAddress[] addresses) {
@@ -131,6 +139,11 @@ public class UserHelperImpl implements UserHelper {
     }
 
     @Override
+    public boolean canCommentIssue(User user, Issue issue) {
+        return permissionManager.hasPermission(Permissions.COMMENT_ISSUE, issue, user);
+    }
+
+    @Override
     public boolean canCreateAttachment(User user, Project project) {
         return permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
     }
@@ -138,6 +151,11 @@ public class UserHelperImpl implements UserHelper {
     @Override
     public boolean canManageWatchList(User user, Project project) {
         return permissionManager.hasPermission(Permissions.MANAGE_WATCHER_LIST, project, user);
+    }
+
+    @Override
+    public boolean canAddUsers() {
+        return userManager.hasWritableDirectory() && !userUtil.hasExceededUserLimit();
     }
 
     @Override

@@ -1,12 +1,9 @@
-package com.bics.jira.mail.model;
+package com.bics.jira.mail.model.service;
 
 import com.atlassian.crowd.embedded.api.User;
-import com.atlassian.jira.bc.project.component.ProjectComponent;
-import com.atlassian.jira.issue.issuetype.IssueType;
-import com.atlassian.jira.project.Project;
+import com.atlassian.jira.issue.status.Status;
 
-import javax.mail.internet.InternetAddress;
-import java.util.regex.Pattern;
+import java.util.Map;
 
 /**
  * JavaDoc here
@@ -16,7 +13,8 @@ import java.util.regex.Pattern;
  */
 public class ServiceDeskModel {
     private User reporterUser;
-    private int[] transitions;
+    private int resolvedBefore;
+    private Map<Status, Status> transitions;
     private boolean createUsers;
     private boolean notifyUsers;
     private boolean ccWatcher;
@@ -31,11 +29,19 @@ public class ServiceDeskModel {
         this.reporterUser = reporterUser;
     }
 
-    public int[] getTransitions() {
+    public int getResolvedBefore() {
+        return resolvedBefore;
+    }
+
+    public void setResolvedBefore(int resolvedBefore) {
+        this.resolvedBefore = resolvedBefore;
+    }
+
+    public Map<Status, Status> getTransitions() {
         return transitions;
     }
 
-    public void setTransitions(int[] transitions) {
+    public void setTransitions(Map<Status, Status> transitions) {
         this.transitions = transitions;
     }
 

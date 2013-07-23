@@ -3,6 +3,9 @@ package com.bics.jira.mail.handler;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.PermissionException;
+import com.atlassian.jira.issue.AttachmentManager;
+import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.service.util.handler.MessageHandler;
 import com.atlassian.jira.service.util.handler.MessageHandlerContext;
@@ -13,10 +16,11 @@ import com.atlassian.jira.util.collect.CollectionUtil;
 import com.atlassian.jira.web.util.AttachmentException;
 import com.atlassian.mail.MailUtils;
 import com.bics.jira.mail.IssueHelper;
+import com.bics.jira.mail.IssueLookupHelper;
 import com.bics.jira.mail.ModelValidator;
 import com.bics.jira.mail.UserHelper;
 import com.bics.jira.mail.model.mail.MessageAdapter;
-import com.bics.jira.mail.model.ServiceDeskModel;
+import com.bics.jira.mail.model.service.ServiceDeskModel;
 import org.apache.commons.lang.StringUtils;
 
 import javax.mail.Message;
@@ -34,25 +38,36 @@ import java.util.Map;
  */
 public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> implements MessageHandler {
     protected final JiraAuthenticationContext jiraAuthenticationContext;
+    protected final AttachmentManager attachmentManager;
     protected final ModelValidator<M> modelValidator;
-    protected final IssueHelper<M> issueHelper;
+    protected final IssueHelper issueHelper;
     protected final UserHelper userHelper;
+    protected final IssueLookupHelper issueLookupHelper;
     protected final M model;
 
     private final Map<String, String> params = new HashMap<String, String>();
     private boolean valid;
 
-    public ServiceDeskMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, ModelValidator<M> modelValidator, IssueHelper<M> issueHelper, UserHelper userHelper) {
+    public ServiceDeskMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, AttachmentManager attachmentManager, ModelValidator<M> modelValidator, IssueHelper issueHelper, UserHelper userHelper, IssueLookupHelper issueLookupHelper) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
+        this.attachmentManager = attachmentManager;
         this.modelValidator = modelValidator;
         this.issueHelper = issueHelper;
         this.userHelper = userHelper;
+        this.issueLookupHelper = issueLookupHelper;
+
         this.model = createModel();
     }
 
     protected abstract M createModel();
 
-    protected abstract Predicate<User> searchPredicate(MessageAdapter adapter);
+    protected abstract Predicate<User> searchPredicate(MessageAdapter adapter, MessageHandlerErrorCollector monitor);
+
+    protected abstract MutableIssue findIssue(MessageAdapter adapter, MessageHandlerErrorCollector monitor);
+
+    protected abstract User chooseAssignee(Collection<User> users);
+
+    protected abstract MutableIssue create(User author, User assignee, MessageAdapter adapter, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException;
 
     @Override
     public void init(Map<String, String> params, MessageHandlerErrorCollector monitor) {
@@ -67,7 +82,7 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
         MessageHandlerExecutionMonitor monitor = context.getMonitor();
 
         if (!valid && !validateModel(monitor)) {
-            monitor.warning("CreateOrCommentWebModel did not pass the validation. Emergency exit.");
+            monitor.warning("ServiceDeskWebModel did not pass the validation. Emergency exit.");
             return false;
         }
 
@@ -77,7 +92,7 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
 
         Collection<User> authors = userHelper.ensure(addresses, model.isCreateUsers(), model.isNotifyUsers(), monitor);
 
-        User author = CollectionUtil.findFirstMatch(authors, searchPredicate(adapter));
+        User author = CollectionUtil.findFirstMatch(authors, searchPredicate(adapter, monitor));
 
         if (author == null && model.getReporterUser() != null) {
             monitor.warning("Message sender(s) '" + StringUtils.join(MailUtils.getSenders(message), ",")
@@ -94,7 +109,34 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
         jiraAuthenticationContext.setLoggedInUser(author);
 
         try {
-            issueHelper.process(author, model, adapter, monitor);
+            MutableIssue issue = findIssue(adapter, monitor);
+            Collection<User> users = userHelper.ensure(adapter.getAllRecipients(), model.isCreateUsers(), model.isNotifyUsers(), monitor);
+
+            User assignee = chooseAssignee(users);
+
+            if (issue == null) {
+                issue = create(author, assignee, adapter, monitor);
+            } else {
+                if (!userHelper.canCommentIssue(author, issue)) {
+                    throw new PermissionException("User " + author.getName() + " cannot comment issue " + issue.getKey() + ".");
+                }
+
+                issueHelper.comment(issue, assignee, model.getTransitions(), adapter, model.isStripQuotes(), monitor);
+            }
+
+            Project project = issue.getProjectObject();
+
+            if (attachmentManager.attachmentsEnabled() && userHelper.canCreateAttachment(author, project)) {
+                issueHelper.attach(issue, adapter.getAttachments());
+            } else {
+                monitor.warning("User " + author.getName() + " cannot create attachments in the project " + project.getKey() + ". Ignoring.");
+            }
+
+            if (userHelper.canManageWatchList(author, project)) {
+                issueHelper.watch(issue, users);
+            } else {
+                monitor.warning("User " + author.getName() + " cannot manage watch list in the project " + project.getKey() + ". Ignoring.");
+            }
         } catch (CreateException e) {
             monitor.error(e.getMessage());
             return false;

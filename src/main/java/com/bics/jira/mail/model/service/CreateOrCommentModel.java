@@ -1,11 +1,9 @@
-package com.bics.jira.mail.model;
+package com.bics.jira.mail.model.service;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 
-import javax.mail.internet.InternetAddress;
 import java.util.regex.Pattern;
 
 /**

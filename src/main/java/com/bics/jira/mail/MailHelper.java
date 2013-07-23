@@ -1,6 +1,5 @@
 package com.bics.jira.mail;
 
-import com.bics.jira.mail.model.ServiceDeskModel;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 
 import javax.mail.MessagingException;
@@ -12,7 +11,5 @@ import javax.mail.MessagingException;
  * @since 04.02.13 21:57
  */
 public interface MailHelper {
-    String extractComment(ServiceDeskModel model, MessageAdapter message) throws MessagingException;
-
-    String extractBody(ServiceDeskModel model, MessageAdapter message) throws MessagingException;
+    String extract(MessageAdapter message, boolean stripQuotes) throws MessagingException;
 }

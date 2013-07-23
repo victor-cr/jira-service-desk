@@ -3,8 +3,6 @@ package com.bics.jira.mail.converter;
 import com.bics.jira.mail.converter.html.NodeFormatter;
 import com.bics.jira.mail.converter.html.Tag;
 import com.bics.jira.mail.converter.html.TreeContext;
-import com.bics.jira.mail.model.CreateOrCommentModel;
-import com.bics.jira.mail.model.ServiceDeskModel;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 import org.jsoup.nodes.Node;
 
@@ -29,8 +27,8 @@ public class StripQuotesOutlookHtmlConverter extends OutlookHtmlConverter implem
     }
 
     @Override
-    public boolean isSupported(ServiceDeskModel model, MessageAdapter message, boolean stripQuotes) {
-        return stripQuotes && super.isSupported(model, message, stripQuotes);
+    public boolean isSupported(MessageAdapter message, boolean stripQuotes) {
+        return stripQuotes && super.isSupported(message, stripQuotes);
     }
 
     @Override

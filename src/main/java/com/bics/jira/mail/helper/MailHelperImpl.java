@@ -7,8 +7,6 @@ import com.bics.jira.mail.converter.DefaultTextConverter;
 import com.bics.jira.mail.converter.OutlookHtmlConverter;
 import com.bics.jira.mail.converter.StripQuotesOutlookHtmlConverter;
 import com.bics.jira.mail.converter.StripQuotesTextConverter;
-import com.bics.jira.mail.model.CreateOrCommentModel;
-import com.bics.jira.mail.model.ServiceDeskModel;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 import org.apache.commons.lang.StringUtils;
 
@@ -40,30 +38,21 @@ public class MailHelperImpl implements MailHelper {
     }
 
     @Override
-    public String extractComment(ServiceDeskModel model, MessageAdapter message) throws MessagingException {
-        return extract(model, message, model.isStripQuotes());
-    }
-
-    @Override
-    public String extractBody(ServiceDeskModel model, MessageAdapter message) throws MessagingException {
-        return extract(model, message, false);
-    }
-
-    private String extract(ServiceDeskModel model, MessageAdapter message, boolean stripQuotes) throws MessagingException {
+    public String extract(MessageAdapter message, boolean stripQuotes) throws MessagingException {
         String text = message.getHtmlTextBody();
 
         if (StringUtils.isBlank(text)) {
             text = message.getPlainTextBody();
 
-            return StringUtils.isBlank(text) ? "" : get(model, message, stripQuotes, textConverters).convert(text);
+            return StringUtils.isBlank(text) ? "" : get(message, stripQuotes, textConverters).convert(text);
         }
 
-        return get(model, message, stripQuotes, htmlConverters).convert(text);
+        return get(message, stripQuotes, htmlConverters).convert(text);
     }
 
-    private BodyConverter get(ServiceDeskModel model, MessageAdapter message, boolean stripQuotes, Collection<? extends BodyConverter> converters) {
+    private BodyConverter get(MessageAdapter message, boolean stripQuotes, Collection<? extends BodyConverter> converters) {
         for (BodyConverter converter : converters) {
-            if (converter.isSupported(model, message, stripQuotes)) {
+            if (converter.isSupported(message, stripQuotes)) {
                 return converter;
             }
         }

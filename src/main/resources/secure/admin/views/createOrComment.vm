@@ -5,7 +5,7 @@
     $webResourceManager.requireResource($action.pluginKey.concat(":edit-handler-details-page"))
 </head>
 <body>
-<form class="aui" action="ServiceDeskMailDetails.jspa" method="POST" name="mailHandlerForm" id="mailHandlerForm">
+<form class="aui" action="CreateOrComment.jspa" method="POST" name="mailHandlerForm" id="mailHandlerForm">
     <div class="form-body">
         <h2>$action.handlerName</h2>
 
@@ -29,8 +29,8 @@
         #set ($auiparams = $map.build("name", "stripQuotes", "label", "jmp.editHandlerDetails.stripquotes", "description", "jmp.editHandlerDetails.stripquotes.desc"))
         #parse("/templates/formfields/checkbox.vm")
 
-        #set ($auiparams = $map.build("name", "splitRegex", "label", "jmp.editHandlerDetails.splitregex", "description", "msd.editHandlerDetails.splitregex.desc"))
-        #parse("/templates/formfields/textfield.vm")
+##        #set ($auiparams = $map.build("name", "splitRegex", "label", "jmp.editHandlerDetails.splitregex", "description", "msd.editHandlerDetails.splitregex.desc"))
+##        #parse("/templates/formfields/textfield.vm")
 
         #set ($auiparams = $map.build("name", "catchEmail", "label", "jmp.editHandlerDetails.catchemail", "description", "jmp.editHandlerDetails.catchemail.desc"))
         #parse("/templates/formfields/textfield.vm")

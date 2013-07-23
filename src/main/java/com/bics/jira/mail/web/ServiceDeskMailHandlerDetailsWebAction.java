@@ -1,8 +1,6 @@
 package com.bics.jira.mail.web;
 
 import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.config.IssueTypeManager;
-import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.service.JiraServiceContainer;
 import com.atlassian.jira.service.ServiceManager;
 import com.atlassian.jira.service.services.file.AbstractMessageHandlingService;
@@ -11,6 +9,7 @@ import com.atlassian.jira.util.collect.MapBuilder;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.plugin.PluginAccessor;
 import com.bics.jira.mail.model.ServiceConfigurationAdapter;
+import com.bics.jira.mail.model.web.ServiceDeskWebModel;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import org.apache.log4j.Logger;
@@ -23,7 +22,7 @@ import java.util.Map;
  * @author Victor Polischuk
  * @since 03.02.13 12:59
  */
-public abstract class ServiceDeskMailHandlerDetailsWebAction extends JiraWebActionSupport {
+public abstract class ServiceDeskMailHandlerDetailsWebAction<W extends ServiceDeskWebModel> extends JiraWebActionSupport {
     private static final Logger LOG = Logger.getLogger(ServiceDeskMailHandlerDetailsWebAction.class);
     private static final String TO_HOME_PAGE = "IncomingMailServers.jspa";
     private static final String TO_WIZARD_FIRST_PAGE = "EditServerDetails!default.jspa";
@@ -32,8 +31,6 @@ public abstract class ServiceDeskMailHandlerDetailsWebAction extends JiraWebActi
 
     private final ServiceConfigurationAdapter configuration;
     private final PluginAccessor pluginAccessor;
-
-    protected final CreateOrCommentWebModel model = new CreateOrCommentWebModel();
 
     public ServiceDeskMailHandlerDetailsWebAction(PluginAccessor pluginAccessor) {
         this.pluginAccessor = pluginAccessor;
@@ -45,9 +42,7 @@ public abstract class ServiceDeskMailHandlerDetailsWebAction extends JiraWebActi
         return !configuration.isNull() && configuration.getServiceId() != null;
     }
 
-    public CreateOrCommentWebModel getModel() {
-        return model;
-    }
+    public abstract W getModel();
 
     public String getPluginKey() {
         if (configuration.isNull()) {
@@ -90,7 +85,7 @@ public abstract class ServiceDeskMailHandlerDetailsWebAction extends JiraWebActi
 
             Map<String, String> params = ServiceUtils.getParameterMap(handlerParams);
 
-            model.fromServiceParams(params);
+            getModel().fromServiceParams(params);
         }
 
         return result;
@@ -138,7 +133,7 @@ public abstract class ServiceDeskMailHandlerDetailsWebAction extends JiraWebActi
     private Map<String, String[]> getServiceParams() throws Exception {
         return MapBuilder.<String, String[]>newBuilder()
                 .addAll(configuration.toServiceParams())
-                .addAll(model.toServiceParams())
+                .add(AbstractMessageHandlingService.KEY_HANDLER_PARAMS, new String[]{ServiceUtils.toParameterString(getModel().toServiceParams())})
                 .toMutableMap();
     }
 

@@ -7,25 +7,37 @@
 
     <resource type="i18n" name="i18n" location="com.bics.jira.mail.messages"/>
 
-    <component key="model-validator" i18n-name-key="msd.validator.name" class="com.bics.jira.mail.model.validator.CreateOrCommentModelValidator">
-        <interface>com.bics.jira.mail.ModelValidator</interface>
+    <component key="create-comment-model-validator" i18n-name-key="msd.validator.name.createOrComment" class="com.bics.jira.mail.validator.CreateOrCommentModelValidatorImpl">
+        <interface>com.bics.jira.mail.CreateOrCommentModelValidator</interface>
+    </component>
+
+    <component key="comment-model-validator" i18n-name-key="msd.validator.name.commentOnly" class="com.bics.jira.mail.validator.CommentOnlyModelValidatorImpl">
+        <interface>com.bics.jira.mail.CommentOnlyModelValidator</interface>
     </component>
 
     <component key="user-helper" i18n-name-key="msd.helper.user.name" class="com.bics.jira.mail.helper.UserHelperImpl">
         <interface>com.bics.jira.mail.UserHelper</interface>
     </component>
 
-    <component key="issue-builder" i18n-name-key="msd.helper.issue.name" class="com.bics.jira.mail.helper.CreateOrCommentIssueHelper">
+    <component key="issue-helper" i18n-name-key="msd.helper.issue.name" class="com.bics.jira.mail.helper.IssueHelperImpl">
         <interface>com.bics.jira.mail.IssueHelper</interface>
     </component>
 
-    <component key="comment-extractor" i18n-name-key="msd.helper.mail.name" class="com.bics.jira.mail.helper.MailHelperImpl">
+    <component key="issue-locator" i18n-name-key="msd.helper.locator.name" class="com.bics.jira.mail.helper.IssueLookupHelperImpl">
+        <interface>com.bics.jira.mail.IssueLookupHelper</interface>
+    </component>
+
+    <component key="mail-helper" i18n-name-key="msd.helper.mail.name" class="com.bics.jira.mail.helper.MailHelperImpl">
         <interface>com.bics.jira.mail.MailHelper</interface>
     </component>
 
-    <message-handler key="message-handler" i18n-name-key="msd.handler.name"
+    <message-handler key="create-comment-message-handler" i18n-name-key="msd.handler.name.createOrComment"
                      class="com.bics.jira.mail.handler.CreateOrCommentMessageHandler"
-                     add-edit-url="/secure/admin/ServiceDeskMailDetails!default.jspa" weight="0"/>
+                     add-edit-url="/secure/admin/CreateOrComment!default.jspa" weight="0"/>
+
+    <message-handler key="comment-message-handler" i18n-name-key="msd.handler.name.commentOnly"
+                     class="com.bics.jira.mail.handler.CommentOnlyMessageHandler"
+                     add-edit-url="/secure/admin/CommentOnly!default.jspa" weight="0"/>
 
     <web-resource i18n-name-key="msd.webwork.name" key="edit-handler-details-page">
         <transformation extension="js">
@@ -50,9 +62,15 @@
 
     <webwork1 key="actions" name="Actions" class="java.lang.Object">
         <actions>
-            <action name="com.bics.jira.mail.web.CreateOrCommentMailHandlerDetailsWebAction"
-                    alias="ServiceDeskMailDetails" roles-required="admin">
-                <view name="input">/secure/admin/views/serviceDeskDetails.vm</view>
+            <action name="com.bics.jira.mail.web.CreateOrCommentMailHandlerDetailsWebAction" alias="CreateOrComment"
+                    roles-required="admin">
+                <view name="input">/secure/admin/views/createOrComment.vm</view>
+                <view name="securitybreach">/secure/views/securitybreach.jsp</view>
+            </action>
+
+            <action name="com.bics.jira.mail.web.CreateOrCommentMailHandlerDetailsWebAction" alias="CommentOnly"
+                    roles-required="admin">
+                <view name="input">/secure/admin/views/commentOnly.vm</view>
                 <view name="securitybreach">/secure/views/securitybreach.jsp</view>
             </action>
         </actions>

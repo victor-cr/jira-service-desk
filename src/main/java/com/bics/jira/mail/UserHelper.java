@@ -2,6 +2,7 @@ package com.bics.jira.mail;
 
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
+import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 
@@ -15,6 +16,8 @@ import java.util.Collection;
  * @since 04.02.13 21:57
  */
 public interface UserHelper {
+    User find(String userName);
+
     User find(InternetAddress address);
 
     Collection<User> find(InternetAddress[] addresses);
@@ -31,9 +34,13 @@ public interface UserHelper {
 
     boolean canCommentIssue(User user, Project project);
 
+    boolean canCommentIssue(User user, Issue issue);
+
     boolean canCreateAttachment(User user, Project project);
 
     boolean canManageWatchList(User user, Project project);
 
     User getDefaultAssignee(Project project, ProjectComponent... components);
+
+    boolean canAddUsers();
 }

@@ -1,8 +1,6 @@
 package com.bics.jira.mail.converter;
 
 import com.atlassian.mail.HtmlToTextConverter;
-import com.bics.jira.mail.model.CreateOrCommentModel;
-import com.bics.jira.mail.model.ServiceDeskModel;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 
 import java.io.IOException;
@@ -17,7 +15,7 @@ public class DefaultHtmlConverter implements BodyConverter {
     private final HtmlToTextConverter htmlToTextConverter = new HtmlToTextConverter();
 
     @Override
-    public boolean isSupported(ServiceDeskModel model, MessageAdapter message, boolean stripQuotes) {
+    public boolean isSupported(MessageAdapter message, boolean stripQuotes) {
         return true;
     }
 

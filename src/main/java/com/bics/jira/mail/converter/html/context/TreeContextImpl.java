@@ -70,7 +70,7 @@ public class TreeContextImpl implements TreeContext {
 
     @Override
     public TreeContext newLine() {
-        if (!isNewLine()) {
+        if (active && !isNewLine()) {
             out.append('\n');
         }
 
@@ -108,58 +108,24 @@ public class TreeContextImpl implements TreeContext {
 
     @Override
     public TreeContext content() {
-        appendInner(this);
-
-        return this;
-    }
-
-    @Override
-    public TreeContext trimContent() {
-        if (pendingWhitespace) {
-            out.append(' ');
-        }
-
-        int len = out.length();
-
-        pendingWhitespace = false;
-        appendInner(this);
-        pendingWhitespace = false;
-
-        String content = out.substring(len);
-        String trimmed = StringUtils.trimToEmpty(content);
-
-        if (!content.equals(trimmed)) {
-            out.setLength(len);
-            out.append(trimmed);
-        }
-
-        return this;
-    }
-
-    @Override
-    public String toString() {
-        return out.toString();
-    }
-
-    protected TreeContext appendInner(TreeContext context) {
         Node root = current;
 
-        if (current.childNodeSize() != 0) {
+        if (active && current.childNodeSize() != 0) {
             current = current.childNode(0);
 
             while (active && current != null) {
                 for (NodeFormatter formatter : formatters) {
-                    if (formatter.isSupported(context, current)) {
+                    if (formatter.isSupported(this, current)) {
                         accepted.offerFirst(current);
 //                        cleanupSpaces();
-                        formatter.format(context, current);
+                        formatter.format(this, current);
 //                        cleanupSpaces();
                         break;
                     }
                 }
 
                 if (accepted.peekFirst() != current) {
-                    context.content();
+                    this.content();
                 } else {
                     accepted.removeFirst();
                 }
@@ -171,6 +137,36 @@ public class TreeContextImpl implements TreeContext {
         }
 
         return this;
+    }
+
+    @Override
+    public TreeContext trimContent() {
+        if (active) {
+            if (pendingWhitespace) {
+                out.append(' ');
+            }
+
+            int len = out.length();
+
+            pendingWhitespace = false;
+            content();
+            pendingWhitespace = false;
+
+            String content = out.substring(len);
+            String trimmed = StringUtils.trimToEmpty(content);
+
+            if (!content.equals(trimmed)) {
+                out.setLength(len);
+                out.append(trimmed);
+            }
+        }
+
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        return out.toString();
     }
 
     private boolean isNewLine() {
