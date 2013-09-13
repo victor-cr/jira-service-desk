@@ -27,12 +27,16 @@ public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailH
         return model.getProjectKey();
     }
 
+    public void setProjectKey(String projectKey) {
+        model.setProjectKey(projectKey);
+    }
+
     public String getIssueTypeId() {
         return model.getIssueTypeId();
     }
 
-    public void setCcAssignee(boolean ccAssignee) {
-        model.setCcAssignee(ccAssignee);
+    public void setIssueTypeId(String issueTypeId) {
+        model.setIssueTypeId(issueTypeId);
     }
 
     public Long getComponentKey() {
@@ -43,16 +47,28 @@ public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailH
         model.setComponentId(componentKey);
     }
 
+    public boolean isStripQuotes() {
+        return model.isStripQuotes();
+    }
+
     public void setStripQuotes(boolean stripQuotes) {
         model.setStripQuotes(stripQuotes);
     }
 
-    public void setNotifyUsers(boolean notifyUsers) {
-        model.setNotifyUsers(notifyUsers);
+    public Long getResolvedBefore() {
+        return model.getResolvedBefore();
+    }
+
+    public void setResolvedBefore(Long resolvedBefore) {
+        model.setResolvedBefore(resolvedBefore);
     }
 
     public boolean isCreateUsers() {
         return model.isCreateUsers();
+    }
+
+    public void setCreateUsers(boolean createUsers) {
+        model.setCreateUsers(createUsers);
     }
 
     public void setTransitions(String[] transitions) {
@@ -63,18 +79,6 @@ public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailH
         return model.getTransitions();
     }
 
-    public boolean isStripQuotes() {
-        return model.isStripQuotes();
-    }
-
-    public void setIssueTypeId(String issueTypeId) {
-        model.setIssueTypeId(issueTypeId);
-    }
-
-    public void setCreateUsers(boolean createUsers) {
-        model.setCreateUsers(createUsers);
-    }
-
     public String getReporterUsername() {
         return model.getReporterUsername();
     }
@@ -83,31 +87,35 @@ public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailH
         model.setReporterUsername(reporterUsername);
     }
 
-    public void setProjectKey(String projectKey) {
-        model.setProjectKey(projectKey);
+    public String getCatchEmail() {
+        return model.getCatchEmail();
     }
 
     public void setCatchEmail(String catchEmail) {
         model.setCatchEmail(catchEmail);
     }
 
-    public String getCatchEmail() {
-        return model.getCatchEmail();
-    }
-
     public boolean isCcAssignee() {
         return model.isCcAssignee();
+    }
+
+    public void setCcAssignee(boolean ccAssignee) {
+        model.setCcAssignee(ccAssignee);
     }
 
     public boolean isCcWatcher() {
         return model.isCcWatcher();
     }
 
+    public void setCcWatcher(boolean ccWatcher) {
+        model.setCcWatcher(ccWatcher);
+    }
+
     public boolean isNotifyUsers() {
         return model.isNotifyUsers();
     }
 
-    public void setCcWatcher(boolean ccWatcher) {
-        model.setCcWatcher(ccWatcher);
+    public void setNotifyUsers(boolean notifyUsers) {
+        model.setNotifyUsers(notifyUsers);
     }
 }

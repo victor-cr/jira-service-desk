@@ -31,6 +31,14 @@ public class CommentOnlyMailHandlerDetailsWebAction extends ServiceDeskMailHandl
         model.setStripQuotes(stripQuotes);
     }
 
+    public Long getResolvedBefore() {
+        return model.getResolvedBefore();
+    }
+
+    public void setResolvedBefore(Long resolvedBefore) {
+        model.setResolvedBefore(resolvedBefore);
+    }
+
     public void setNotifyUsers(boolean notifyUsers) {
         model.setNotifyUsers(notifyUsers);
     }
