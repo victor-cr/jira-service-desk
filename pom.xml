@@ -7,12 +7,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bics.jira.mail</groupId>
     <artifactId>service-desk</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 
     <name>JIRA Mail Service Desk</name>
     <packaging>atlassian-plugin</packaging>
 
-    <description>Test description</description>
+    <description>Plug-in to provide mail integration with JIRA</description>
 
     <organization>
         <name>BICS</name>

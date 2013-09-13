@@ -30,7 +30,7 @@
         #parse("/templates/formfields/checkbox.vm")
 
         #set ($auiparams = $map.build("name", "resolvedBefore", "label", "msd.editHandlerDetails.resolvedBefore", "description", "msd.editHandlerDetails.resolvedBefore.desc"))
-        #parse("/templates/formfields/checkbox.vm")
+        #parse("/templates/formfields/textfield.vm")
 
 ##        #set ($auiparams = $map.build("name", "splitRegex", "label", "jmp.editHandlerDetails.splitregex", "description", "msd.editHandlerDetails.splitregex.desc"))
 ##        #parse("/templates/formfields/textfield.vm")

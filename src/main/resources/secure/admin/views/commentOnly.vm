@@ -18,7 +18,7 @@
         #parse("/templates/formfields/checkbox.vm")
 
         #set ($auiparams = $map.build("name", "resolvedBefore", "label", "msd.editHandlerDetails.resolvedBefore", "description", "msd.editHandlerDetails.resolvedBefore.desc"))
-        #parse("/templates/formfields/checkbox.vm")
+        #parse("/templates/formfields/textfield.vm")
 
         #set ($auiparams = $map.build("name", "createUsers", "label", "jmp.editHandlerDetails.createusers", "description", "jmp.editHandlerDetails.createusers.desc"))
         #parse("/templates/formfields/checkbox.vm")
