@@ -13,6 +13,7 @@ import com.bics.jira.mail.validator.rule.IssueReporterValidationRule;
 import com.bics.jira.mail.validator.rule.IssueTypeValidationRule;
 import com.bics.jira.mail.validator.rule.ProjectComponentValidationRule;
 import com.bics.jira.mail.validator.rule.ProjectValidationRule;
+import com.bics.jira.mail.validator.rule.ResolvedBeforeValidationRule;
 import com.bics.jira.mail.validator.rule.TransitionValidationRule;
 import com.bics.jira.mail.validator.rule.UserAttributeValidationRule;
 import com.bics.jira.mail.validator.rule.ValidationRule;
@@ -51,6 +52,7 @@ public class CreateOrCommentModelValidatorImpl extends ServiceDeskModelValidator
     protected Collection<ValidationRule<CreateOrCommentModel, CreateOrCommentWebModel>> createRuleSet(MessageHandlerErrorCollector monitor) {
         Collection<ValidationRule<CreateOrCommentModel, CreateOrCommentWebModel>> rules = new ArrayList<ValidationRule<CreateOrCommentModel, CreateOrCommentWebModel>>(6);
 
+        rules.add(new ResolvedBeforeValidationRule<CreateOrCommentModel, CreateOrCommentWebModel>(monitor));
         rules.add(new ProjectValidationRule(monitor, projectManager));
         rules.add(new IssueTypeValidationRule(monitor, issueTypeManager));
         rules.add(new ProjectComponentValidationRule(monitor, projectComponentManager));

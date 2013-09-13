@@ -13,6 +13,7 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimePart;
 import javax.mail.internet.MimeUtility;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -58,7 +59,7 @@ public class MessageAdapter {
     private final Message message;
     private final Part textBody;
     private final Part htmlBody;
-    private final List<Part> attachments;
+    private final List<MimePart> attachments;
 
     public MessageAdapter(Message message) throws MessagingException {
         this.message = message;
@@ -154,20 +155,12 @@ public class MessageAdapter {
         try {
             Collection<Attachment> list = new LinkedList<Attachment>();
 
-            for (Part part : attachments) {
-                File storedFile = File.createTempFile("attachment", "jira");
-                String[] fileNames = part.getHeader("Content-ID");
+            for (MimePart part : attachments) {
+                File storedFile = File.createTempFile("attachment", "jira.tmp");
+                String contentId = part.getContentID();
+                String fileName = part.getFileName();
                 ContentType contentType = new ContentType(part.getContentType());
                 InputStream content = part.getInputStream();
-                String fileName = null;
-
-                if (fileNames != null && fileNames.length > 0) {
-                    fileName = StringUtils.strip(StringUtils.substringBeforeLast(StringUtils.substringBetween(fileNames[0], "<", ">"), "@"));
-                }
-
-                if (StringUtils.isEmpty(fileName)) {
-                    fileName = part.getFileName();
-                }
 
                 try {
                     OutputStream out = new BufferedOutputStream(new FileOutputStream(storedFile));
@@ -188,7 +181,7 @@ public class MessageAdapter {
                     fileName = MailUtils.fixMimeEncodedFilename(fileName);
                 }
 
-                list.add(new Attachment(storedFile, contentType, fileName));
+                list.add(new Attachment(storedFile, contentType, fileName, contentId, MailUtils.isPartInline(part)));
             }
 
             return list;
@@ -290,13 +283,13 @@ public class MessageAdapter {
     }
 
     private static class AttachmentPredicate implements Predicate<Part> {
-        private List<Part> attachments = new ArrayList<Part>();
+        private List<MimePart> attachments = new ArrayList<MimePart>();
 
         @Override
         public boolean evaluate(Part input) {
             try {
-                if (MailUtils.isPartAttachment(input) || MailUtils.isPartInline(input) || MimeType.valueOf(input) == MimeType.OTHER) {
-                    attachments.add(input);
+                if (input instanceof MimePart && (MailUtils.isPartAttachment(input) || MailUtils.isPartInline(input) || MimeType.valueOf(input) == MimeType.OTHER)) {
+                    attachments.add((MimePart) input);
                 }
 
                 return true;

@@ -1,15 +1,23 @@
 package com.bics.jira.mail.helper;
 
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.jql.builder.JqlClauseBuilderFactory;
+import com.atlassian.jira.jql.builder.JqlClauseBuilderFactoryImpl;
+import com.atlassian.jira.jql.util.JqlDateSupportImpl;
 import com.atlassian.jira.mock.MockApplicationProperties;
+import com.atlassian.jira.mock.component.MockComponentWorker;
 import com.atlassian.jira.mock.issue.MockIssue;
 import com.atlassian.jira.mock.security.MockSimpleAuthenticationContext;
 import com.atlassian.jira.plugins.mail.DryRunMessageHandlerExecutionMonitor;
+import com.atlassian.jira.project.MockProject;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
+import com.atlassian.jira.timezone.TimeZoneManagerImpl;
 import com.atlassian.jira.user.MockUser;
 import com.bics.jira.mail.mock.MockIssueManager;
 import com.bics.jira.mail.mock.MockSearchService;
+import com.bics.jira.mail.mock.MockUserPreferencesManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +29,9 @@ import org.junit.Test;
  * @since 14/07/13 19:34
  */
 public class IssueLookupHelperTest extends Assert {
+    private static final long RESOLVED_BEFORE = 30L * 24 * 60 * 60 * 1000;
+
+    private final MockComponentWorker worker = new MockComponentWorker();
     private final MockSimpleAuthenticationContext jiraAuthenticationContext = new MockSimpleAuthenticationContext(new MockUser("test"));
     private final MockApplicationProperties applicationProperties = new MockApplicationProperties();
     private final MockIssueManager issueManager = new MockIssueManager();
@@ -28,15 +39,25 @@ public class IssueLookupHelperTest extends Assert {
     private final MessageHandlerErrorCollector monitor = new DryRunMessageHandlerExecutionMonitor();
 
     private final IssueLookupHelperImpl issueLookupHelper = new IssueLookupHelperImpl(jiraAuthenticationContext, applicationProperties, issueManager, searchService);
-    private final MockIssue issue1 = new MockIssue(110);
-    private final MockIssue issue2 = new MockIssue(111);
+    private final MockProject project = new MockProject(1000L);
+    private final MockIssue issue1 = new MockIssue(110L);
+    private final MockIssue issue2 = new MockIssue(111L);
 
     @Before
     public void before() {
+        worker.addMock(JqlClauseBuilderFactory.class, new JqlClauseBuilderFactoryImpl(new JqlDateSupportImpl(new TimeZoneManagerImpl(jiraAuthenticationContext, new MockUserPreferencesManager(), applicationProperties))));
+
+        ComponentAccessor.initialiseWorker(worker);
+
         applicationProperties.setString(APKeys.JIRA_PROJECTKEY_PATTERN, "([A-Z][A-Z]+)");
+
+        issue1.setSummary("aaa");
+        issue2.setSummary("HHH problem advanced search specific filter");
 
         issueManager.set("TEST-110", issue1);
         issueManager.set("TEST-111", issue2);
+        searchService.set(issue1);
+        searchService.set(issue2);
     }
 
     @Test
@@ -117,5 +138,28 @@ public class IssueLookupHelperTest extends Assert {
         MutableIssue actualResult = issueLookupHelper.lookupByKey("eTEST-111 TEST-111 JS-21 JAM-1323 TEST-110", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
+    }
+
+    @Test
+    public void testLookupBySubject_SimpleFound() {
+        MutableIssue expectedResult = issue1;
+        MutableIssue actualResult = issueLookupHelper.lookupBySubject(project, "aaa", RESOLVED_BEFORE, monitor);
+
+        assertEquals(expectedResult, actualResult);
+    }
+
+    @Test
+    public void testLookupBySubject_Complex() {
+        MutableIssue expectedResult = issue2;
+        MutableIssue actualResult = issueLookupHelper.lookupBySubject(project, "HHH problem advanced search specific filter", RESOLVED_BEFORE, monitor);
+
+        assertEquals(expectedResult, actualResult);
+    }
+
+    @Test
+    public void testLookupBySubject_NotFound() {
+        MutableIssue actualResult = issueLookupHelper.lookupBySubject(project, "bbb", RESOLVED_BEFORE, monitor);
+
+        assertNull(actualResult);
     }
 }

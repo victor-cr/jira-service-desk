@@ -158,6 +158,8 @@ public class IssueHelperImpl implements IssueHelper {
             if (!exists) {
                 attachmentManager.createAttachment(attachment.getStoredFile(), attachment.getFileName(), attachment.getContentType().toString(), author, issue);
             }
+
+            attachment.getStoredFile().delete();
         }
     }
 

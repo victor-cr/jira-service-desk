@@ -43,7 +43,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
     }
 
     @Override
-    public MutableIssue lookupByKey(String text, int resolvedBefore, MessageHandlerErrorCollector monitor) {
+    public MutableIssue lookupByKey(String text, long resolvedBefore, MessageHandlerErrorCollector monitor) {
         String pattern = applicationProperties.getString(APKeys.JIRA_PROJECTKEY_PATTERN);
         Timestamp bound = new Timestamp(System.currentTimeMillis() - resolvedBefore);
 
@@ -80,7 +80,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
     }
 
     @Override
-    public MutableIssue lookupBySubject(Project project, String subject, int resolvedBefore, MessageHandlerErrorCollector monitor) {
+    public MutableIssue lookupBySubject(Project project, String subject, long resolvedBefore, MessageHandlerErrorCollector monitor) {
         User author = jiraAuthenticationContext.getLoggedInUser();
         subject = prepareSummary(subject);
 

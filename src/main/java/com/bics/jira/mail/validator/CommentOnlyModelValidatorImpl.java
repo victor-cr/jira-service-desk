@@ -7,6 +7,7 @@ import com.bics.jira.mail.UserHelper;
 import com.bics.jira.mail.model.service.CommentOnlyModel;
 import com.bics.jira.mail.model.web.CommentOnlyWebModel;
 import com.bics.jira.mail.validator.rule.CommentReporterValidationRule;
+import com.bics.jira.mail.validator.rule.ResolvedBeforeValidationRule;
 import com.bics.jira.mail.validator.rule.TransitionValidationRule;
 import com.bics.jira.mail.validator.rule.UserAttributeValidationRule;
 import com.bics.jira.mail.validator.rule.ValidationRule;
@@ -39,6 +40,7 @@ public class CommentOnlyModelValidatorImpl extends ServiceDeskModelValidator<Com
     protected Collection<ValidationRule<CommentOnlyModel, CommentOnlyWebModel>> createRuleSet(MessageHandlerErrorCollector monitor) {
         Collection<ValidationRule<CommentOnlyModel, CommentOnlyWebModel>> rules = new ArrayList<ValidationRule<CommentOnlyModel, CommentOnlyWebModel>>(6);
 
+        rules.add(new ResolvedBeforeValidationRule<CommentOnlyModel, CommentOnlyWebModel>(monitor));
         rules.add(new TransitionValidationRule<CommentOnlyModel, CommentOnlyWebModel>(monitor, statusManager));
         rules.add(new CommentReporterValidationRule(monitor, userHelper));
         rules.add(new UserAttributeValidationRule<CommentOnlyModel, CommentOnlyWebModel>(monitor, userHelper));

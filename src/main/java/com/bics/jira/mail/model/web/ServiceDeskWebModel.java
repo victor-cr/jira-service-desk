@@ -24,8 +24,10 @@ public class ServiceDeskWebModel {
     protected static final String KEY_CC_WATCHER = "ccwatcher";
     protected static final String KEY_CC_ASSIGNEE = "ccassignee";
     protected static final String KEY_STRIP_QUOTES = "stripquotes";
+    protected static final String KEY_RESOLVED_BEFORE = "resolvedbefore";
 
     private String reporterUsername;
+    private Long resolvedBefore;
     private String[] transitions;
     private boolean stripQuotes;
     private boolean createUsers;
@@ -39,6 +41,14 @@ public class ServiceDeskWebModel {
 
     public void setTransitions(String[] transitions) {
         this.transitions = transitions;
+    }
+
+    public Long getResolvedBefore() {
+        return resolvedBefore;
+    }
+
+    public void setResolvedBefore(Long resolvedBefore) {
+        this.resolvedBefore = resolvedBefore;
     }
 
     public boolean isStripQuotes() {
@@ -99,6 +109,7 @@ public class ServiceDeskWebModel {
         safePut(map, KEY_CC_WATCHER, valueOf(ccWatcher));
         safePut(map, KEY_CC_ASSIGNEE, valueOf(ccAssignee));
         safePut(map, KEY_STRIP_QUOTES, valueOf(stripQuotes));
+        safePut(map, KEY_RESOLVED_BEFORE, valueOf(resolvedBefore));
 
         return map;
     }
@@ -111,6 +122,7 @@ public class ServiceDeskWebModel {
         this.ccWatcher = safeGetB(params, KEY_CC_WATCHER);
         this.ccAssignee = safeGetB(params, KEY_CC_ASSIGNEE);
         this.stripQuotes = safeGetB(params, KEY_STRIP_QUOTES);
+        this.resolvedBefore = safeGetL(params, KEY_RESOLVED_BEFORE);
 
         return this;
     }

@@ -52,7 +52,13 @@ public class MockIssueManager implements IssueManager {
 
     @Override
     public MutableIssue getIssueObject(Long aLong) throws DataAccessException {
-        throw new UnsupportedOperationException("Not implemented");
+        for (Issue issue : issuesByKey.values()) {
+            if (issue.getId().equals(aLong)) {
+                return (MutableIssue) issue;
+            }
+        }
+
+        return null;
     }
 
     @Override

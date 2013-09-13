@@ -13,11 +13,15 @@ public class Attachment {
     private final File storedFile;
     private final ContentType contentType;
     private final String fileName;
+    private final String contentId;
+    private final boolean inline;
 
-    public Attachment(File storedFile, ContentType contentType, String fileName) {
+    public Attachment(File storedFile, ContentType contentType, String fileName, String contentId, boolean inline) {
         this.storedFile = storedFile;
         this.contentType = contentType;
         this.fileName = fileName;
+        this.contentId = contentId;
+        this.inline = inline;
     }
 
     public long getSize() {
@@ -34,5 +38,13 @@ public class Attachment {
 
     public String getFileName() {
         return fileName;
+    }
+
+    public String getContentId() {
+        return contentId;
+    }
+
+    public boolean isInline() {
+        return inline;
     }
 }

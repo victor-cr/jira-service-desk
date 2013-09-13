@@ -72,6 +72,31 @@
             <version>1.4.4</version>
             <scope>provided</scope>
         </dependency>
+        <!-- TEST -->
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-core</artifactId>
+            <version>3.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.unitils</groupId>
+            <artifactId>unitils-inject</artifactId>
+            <version>3.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymockclassextension</artifactId>
+            <version>3.2</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -112,14 +137,14 @@
             <version>2.13.0-m8</version>
             <scope>provided</scope>
         </dependency>
-<!--
-        <dependency>
-            <groupId>com.atlassian.jira</groupId>
-            <artifactId>jira-func-tests</artifactId>
-            <version>${jira.version}</version>
-            <scope>test</scope>
-        </dependency>
--->
+        <!--
+                <dependency>
+                    <groupId>com.atlassian.jira</groupId>
+                    <artifactId>jira-func-tests</artifactId>
+                    <version>${jira.version}</version>
+                    <scope>test</scope>
+                </dependency>
+        -->
     </dependencies>
 
 

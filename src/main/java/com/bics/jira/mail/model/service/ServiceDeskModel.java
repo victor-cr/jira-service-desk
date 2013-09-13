@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class ServiceDeskModel {
     private User reporterUser;
-    private int resolvedBefore;
+    private long resolvedBefore;
     private Map<Status, Status> transitions;
     private boolean createUsers;
     private boolean notifyUsers;
@@ -29,11 +29,11 @@ public class ServiceDeskModel {
         this.reporterUser = reporterUser;
     }
 
-    public int getResolvedBefore() {
+    public long getResolvedBefore() {
         return resolvedBefore;
     }
 
-    public void setResolvedBefore(int resolvedBefore) {
+    public void setResolvedBefore(long resolvedBefore) {
         this.resolvedBefore = resolvedBefore;
     }
 
