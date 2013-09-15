@@ -231,7 +231,7 @@ public class IssueHelperImpl implements IssueHelper {
         }
 
         for (ActionDescriptor action : actions) {
-            if (required.getId().equals(action.getUnconditionalResult().getStatus())) {
+            if (required.getName().equals(action.getUnconditionalResult().getStatus())) {
                 return action;
             }
         }
