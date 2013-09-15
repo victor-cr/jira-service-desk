@@ -82,18 +82,18 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
     @Override
     public MutableIssue lookupBySubject(Project project, String subject, long resolvedBefore, MessageHandlerErrorCollector monitor) {
         User author = jiraAuthenticationContext.getLoggedInUser();
-        subject = prepareSummary(subject);
+        String preparedSubject = prepareSummary(subject);
 
         try {
             Query unresolvedQuery = JqlQueryBuilder.newClauseBuilder()
-                    .project(project.getId()).and().summary(subject).and()
+                    .project(project.getId()).and().summary(preparedSubject).and()
                     .unresolved().buildQuery();
 
             Issue issue = findIssue(author, unresolvedQuery, subject);
 
             if (issue == null) {
                 Query recentlyResolvedQuery = JqlQueryBuilder.newClauseBuilder()
-                        .project(project.getId()).and().summary(subject).and()
+                        .project(project.getId()).and().summary(preparedSubject).and()
                         .resolutionDateBetween(new Date(System.currentTimeMillis() - resolvedBefore), new Date())
                         .buildQuery();
 
@@ -110,7 +110,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         return null;
     }
 
-    private Issue findIssue(User user, Query query, String subjectMatch) throws SearchException {
+    private Issue findIssue(User user, Query query, String fullSubject) throws SearchException {
         List<Issue> issues = searchService.search(user, query, PagerFilter.getUnlimitedFilter()).getIssues();
 
         if (issues == null || issues.isEmpty()) {
@@ -118,9 +118,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         }
 
         for (Issue issue : issues) {
-            String summary = prepareSummary(issue.getSummary());
-
-            if (subjectMatch.equals(summary)) {
+            if (fullSubject.equals(issue.getSummary())) {
                 return issue;
             }
         }
@@ -147,9 +145,12 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
             } else if (ch == '-') {
                 int j = i + 1;
 
-                if (whitespace || j == a.length || isWhitespace(a[j])) {
+                whitespace = whitespace || i == 0 || j == a.length || isWhitespace(a[j]);
+
+                if (whitespace) {
                     out.append(' ');
-                    whitespace = true;
+                } else {
+                    out.append('-');
                 }
             } else {
                 whitespace = isWhitespace(ch);
