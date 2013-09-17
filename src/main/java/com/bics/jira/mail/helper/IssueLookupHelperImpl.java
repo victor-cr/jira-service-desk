@@ -134,6 +134,8 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         boolean whitespace = true;
         StringBuilder out = new StringBuilder(subject.length());
 
+        out.append('"');
+
         char[] a = subject.toCharArray();
 
         for (int i = 0; i < a.length; i++) {
@@ -158,7 +160,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
             }
         }
 
-        return out.toString();
+        return out.append('"').toString();
     }
 
     private static boolean isSpecial(char c) {

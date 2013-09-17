@@ -37,6 +37,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import com.opensymphony.workflow.loader.StepDescriptor;
+import com.opensymphony.workflow.loader.WorkflowDescriptor;
 
 import javax.annotation.Nullable;
 import javax.mail.MessagingException;
@@ -230,8 +231,14 @@ public class IssueHelperImpl implements IssueHelper {
             return null;
         }
 
+        WorkflowDescriptor descriptor = workflow.getDescriptor();
+
         for (ActionDescriptor action : actions) {
-            if (required.getName().equals(action.getUnconditionalResult().getStatus())) {
+            int stepId = action.getUnconditionalResult().getStep();
+
+            String statusId = String.valueOf(descriptor.getStep(stepId).getMetaAttributes().get(JiraWorkflow.STEP_STATUS_KEY));
+
+            if (statusId != null && required.getId().equals(statusId)) {
                 return action;
             }
         }

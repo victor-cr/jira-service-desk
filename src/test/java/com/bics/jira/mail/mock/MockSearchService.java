@@ -136,7 +136,9 @@ public class MockSearchService implements SearchService {
 
         @Override
         public String visit(SingleValueOperand singleValueOperand) {
-            return singleValueOperand.getStringValue();
+            String value = singleValueOperand.getStringValue();
+
+            return value == null || value.length() < 2 ? "" : value.substring(1, value.length() - 1);
         }
     }
 }
