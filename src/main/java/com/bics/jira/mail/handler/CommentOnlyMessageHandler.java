@@ -56,7 +56,7 @@ public class CommentOnlyMessageHandler extends ServiceDeskMessageHandler<Comment
     }
 
     @Override
-    protected MutableIssue create(User author, User assignee, MessageAdapter adapter, MessageHandlerErrorCollector monitor) throws CreateException {
+    protected MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws CreateException {
         throw new CreateException("Cannot find an issue for mail with subject: " + adapter.getSubject());
     }
 }

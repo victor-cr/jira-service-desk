@@ -67,13 +67,13 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
     }
 
     @Override
-    protected MutableIssue create(User author, User assignee, MessageAdapter adapter, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException {
+    protected MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException {
         Project project = model.getProject();
 
         if (!userHelper.canCreateIssue(author, project)) {
             throw new PermissionException("User " + author.getName() + " cannot create issues in the project " + project.getKey() + ".");
         }
 
-        return issueHelper.create(author, assignee, project, model.getIssueType(), model.getProjectComponent(), adapter, monitor);
+        return issueHelper.create(author, assignee, project, model.getIssueType(), model.getProjectComponent(), adapter, watchers, monitor);
     }
 }

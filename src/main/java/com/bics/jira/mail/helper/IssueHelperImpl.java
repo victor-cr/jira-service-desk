@@ -21,6 +21,7 @@ import com.atlassian.jira.issue.priority.Priority;
 import com.atlassian.jira.issue.security.IssueSecurityLevelManager;
 import com.atlassian.jira.issue.status.Status;
 import com.atlassian.jira.issue.watchers.WatcherManager;
+import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
@@ -31,6 +32,7 @@ import com.atlassian.jira.workflow.JiraWorkflow;
 import com.atlassian.jira.workflow.WorkflowManager;
 import com.bics.jira.mail.IssueHelper;
 import com.bics.jira.mail.MailHelper;
+import com.bics.jira.mail.UserHelper;
 import com.bics.jira.mail.model.mail.Attachment;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 import com.google.common.base.Predicate;
@@ -67,8 +69,11 @@ public class IssueHelperImpl implements IssueHelper {
     private final ConstantsManager constantsManager;
     private final MailHelper mailHelper;
     private final FieldVisibilityManager fieldVisibilityManager;
+    private final UserHelper userHelper;
+    private final OfBizDelegator ofBizDelegator;
 
-    public IssueHelperImpl(JiraAuthenticationContext jiraAuthenticationContext, IssueService issueService, IssueFactory issueFactory, IssueManager issueManager, AttachmentManager attachmentManager, WorkflowManager workflowManager, WatcherManager watcherManager, CommentManager commentManager, IssueSecurityLevelManager issueSecurityLevelManager, CustomFieldManager customFieldManager, ConstantsManager constantsManager, MailHelper mailHelper, FieldVisibilityManager fieldVisibilityManager) {
+
+    public IssueHelperImpl(JiraAuthenticationContext jiraAuthenticationContext, IssueService issueService, IssueFactory issueFactory, IssueManager issueManager, AttachmentManager attachmentManager, WorkflowManager workflowManager, WatcherManager watcherManager, CommentManager commentManager, IssueSecurityLevelManager issueSecurityLevelManager, CustomFieldManager customFieldManager, ConstantsManager constantsManager, MailHelper mailHelper, FieldVisibilityManager fieldVisibilityManager, UserHelper userHelper, OfBizDelegator ofBizDelegator) {
         this.jiraAuthenticationContext = jiraAuthenticationContext;
         this.issueService = issueService;
         this.issueFactory = issueFactory;
@@ -82,13 +87,20 @@ public class IssueHelperImpl implements IssueHelper {
         this.constantsManager = constantsManager;
         this.mailHelper = mailHelper;
         this.fieldVisibilityManager = fieldVisibilityManager;
+        this.userHelper = userHelper;
+        this.ofBizDelegator = ofBizDelegator;
     }
 
     @Override
-    public MutableIssue create(User author, User assignee, Project project, IssueType issueType, ProjectComponent component, MessageAdapter message, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
+    public MutableIssue create(User author, User assignee, Project project, IssueType issueType, ProjectComponent component, MessageAdapter message, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
         monitor.info("Creating new issue for an author: " + author.getName());
 
         Long levelId = issueSecurityLevelManager.getDefaultSecurityLevel(project);
+
+        /*GenericValue value = ofBizDelegator.makeValue("Issue");
+
+        MutableIssue issue = issueFactory.getIssue(value);
+        */
         MutableIssue issue = issueFactory.getIssue();
 
         issue.setProjectObject(project);
@@ -124,18 +136,31 @@ public class IssueHelperImpl implements IssueHelper {
 
         Issue issueObject = issueManager.createIssueObject(author, issue);
 
+        if (userHelper.canManageWatchList(author, project)) {
+            watch(issue, watchers);
+        } else {
+            monitor.warning("User " + author.getName() + " cannot manage watch list in the project " + project.getKey() + ". Ignoring.");
+        }
+
         monitor.info("New issue " + issueObject.getKey() + " has been successfully created");
 
         return issueManager.getIssueObject(issueObject.getId());
     }
 
     @Override
-    public void comment(MutableIssue issue, User assignee, Map<Status, Status> transitions, MessageAdapter message, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
+    public void comment(MutableIssue issue, Map<Status, Status> transitions, MessageAdapter message, Collection<User> watchers, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
+        Project project = issue.getProjectObject();
         User author = jiraAuthenticationContext.getLoggedInUser();
+
+        if (userHelper.canManageWatchList(author, project)) {
+            watch(issue, watchers);
+        } else {
+            monitor.warning("User " + author.getName() + " cannot manage watch list in the project " + project.getKey() + ". Ignoring.");
+        }
 
         String body = mailHelper.extract(message, stripQuotes);
 
-        if (!transit(issue, assignee, transitions, body, monitor)) {
+        if (!transit(issue, transitions, body, monitor)) {
             commentManager.create(issue, author.getName(), body, true);
         }
     }
@@ -164,16 +189,15 @@ public class IssueHelperImpl implements IssueHelper {
         }
     }
 
-    @Override
-    public void watch(Issue issue, Collection<User> users) {
-        for (User user : users) {
+    private void watch(Issue issue, Collection<User> watchers) {
+        for (User user : watchers) {
             if (!watcherManager.isWatching(user, issue)) {
                 watcherManager.startWatching(user, issue);
             }
         }
     }
 
-    private boolean transit(MutableIssue issue, User assignee, Map<Status, Status> transitions, String comment, MessageHandlerErrorCollector monitor) throws CreateException {
+    private boolean transit(MutableIssue issue, Map<Status, Status> transitions, String comment, MessageHandlerErrorCollector monitor) throws CreateException {
         User author = jiraAuthenticationContext.getLoggedInUser();
         ActionDescriptor action = lookupAction(issue, transitions, monitor);
 
@@ -181,7 +205,7 @@ public class IssueHelperImpl implements IssueHelper {
             IssueInputParameters params = issueService.newIssueInputParameters();
 
             params.setComment(comment);
-            params.setAssigneeId(assignee == null ? issue.getAssigneeId() : assignee.getName());
+            params.setAssigneeId(issue.getAssigneeId());
             params.setApplyDefaultValuesWhenParameterNotProvided(true);
 
             IssueService.TransitionValidationResult validationResult = issueService.validateTransition(author, issue.getId(), action.getId(), params);

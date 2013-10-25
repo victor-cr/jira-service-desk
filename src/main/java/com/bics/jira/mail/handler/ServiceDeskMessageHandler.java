@@ -67,7 +67,7 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
 
     protected abstract User chooseAssignee(Collection<User> users);
 
-    protected abstract MutableIssue create(User author, User assignee, MessageAdapter adapter, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException;
+    protected abstract MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException;
 
     @Override
     public void init(Map<String, String> params, MessageHandlerErrorCollector monitor) {
@@ -115,13 +115,13 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
             User assignee = chooseAssignee(users);
 
             if (issue == null) {
-                issue = create(author, assignee, adapter, monitor);
+                issue = create(author, assignee, adapter, users, monitor);
             } else {
                 if (!userHelper.canCommentIssue(author, issue)) {
                     throw new PermissionException("User " + author.getName() + " cannot comment issue " + issue.getKey() + ".");
                 }
 
-                issueHelper.comment(issue, assignee, model.getTransitions(), adapter, model.isStripQuotes(), monitor);
+                issueHelper.comment(issue, model.getTransitions(), adapter, users, model.isStripQuotes(), monitor);
             }
 
             Project project = issue.getProjectObject();
@@ -130,12 +130,6 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
                 issueHelper.attach(issue, adapter.getAttachments());
             } else {
                 monitor.warning("User " + author.getName() + " cannot create attachments in the project " + project.getKey() + ". Ignoring.");
-            }
-
-            if (userHelper.canManageWatchList(author, project)) {
-                issueHelper.watch(issue, users);
-            } else {
-                monitor.warning("User " + author.getName() + " cannot manage watch list in the project " + project.getKey() + ". Ignoring.");
             }
         } catch (CreateException e) {
             monitor.error(e.getMessage());
