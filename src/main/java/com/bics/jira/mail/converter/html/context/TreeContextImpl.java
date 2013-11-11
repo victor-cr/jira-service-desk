@@ -3,16 +3,25 @@ package com.bics.jira.mail.converter.html.context;
 import com.bics.jira.mail.converter.html.NodeFormatter;
 import com.bics.jira.mail.converter.html.Tag;
 import com.bics.jira.mail.converter.html.TreeContext;
+import com.bics.jira.mail.helper.AttachmentPredicate;
+import com.bics.jira.mail.model.mail.Attachment;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Java Doc here
@@ -24,13 +33,26 @@ public class TreeContextImpl implements TreeContext {
     final StringBuilder out = new StringBuilder();
     private final Iterable<NodeFormatter> formatters;
     private final Deque<Node> accepted = new LinkedList<Node>();
+    private final Map<String, Attachment> inlineAttachments;
+    private final Set<Attachment> attachments;
     private Node current;
     private boolean pendingWhitespace;
     private boolean active = true;
 
-    public TreeContextImpl(Iterable<NodeFormatter> formatters, Document document) {
+    public TreeContextImpl(Iterable<NodeFormatter> formatters, Iterable<Attachment> attachments, Document document) {
         this.formatters = formatters;
         this.current = document;
+        this.attachments = Sets.newHashSet(Iterables.filter(attachments, new AttachmentPredicate(false)));
+        this.inlineAttachments = Maps.uniqueIndex(Iterables.filter(attachments, new AttachmentPredicate(true)), new Function<Attachment, String>() {
+            @Override
+            public String apply(@Nullable Attachment input) {
+                return input != null && input.isInline() ? input.getContentId() : null;
+            }
+        });
+    }
+
+    public Collection<Attachment> getAttachments() {
+        return Lists.newArrayList(attachments);
     }
 
     @Override
@@ -66,6 +88,19 @@ public class TreeContextImpl implements TreeContext {
     @Override
     public Checkpoint checkpoint() {
         return new SimpleCheckpoint(out.length(), pendingWhitespace);
+    }
+
+    @Override
+    public String getInlineName(String cid) {
+        Attachment attachment = inlineAttachments.get(cid);
+
+        if (attachment == null) {
+            return null;
+        }
+
+        attachments.add(attachment);
+
+        return attachment.getFileName();
     }
 
     @Override

@@ -7,7 +7,10 @@ import com.bics.jira.mail.converter.DefaultTextConverter;
 import com.bics.jira.mail.converter.OutlookHtmlConverter;
 import com.bics.jira.mail.converter.StripQuotesOutlookHtmlConverter;
 import com.bics.jira.mail.converter.StripQuotesTextConverter;
+import com.bics.jira.mail.model.mail.Attachment;
 import com.bics.jira.mail.model.mail.MessageAdapter;
+import com.bics.jira.mail.model.mail.Body;
+import com.google.common.collect.Collections2;
 import org.apache.commons.lang.StringUtils;
 
 import javax.mail.MessagingException;
@@ -38,16 +41,20 @@ public class MailHelperImpl implements MailHelper {
     }
 
     @Override
-    public String extract(MessageAdapter message, boolean stripQuotes) throws MessagingException {
+    public Body extract(MessageAdapter message, boolean stripQuotes) throws MessagingException {
+        Collection<Attachment> attachments = message.getAttachments();
         String text = message.getHtmlTextBody();
 
         if (StringUtils.isBlank(text)) {
             text = message.getPlainTextBody();
 
-            return StringUtils.isBlank(text) ? "" : get(message, stripQuotes, textConverters).convert(text);
+            Collection<Attachment> used = Collections2.filter(attachments, new AttachmentPredicate(false));
+
+            return StringUtils.isBlank(text) ? new Body("", used) :
+                    get(message, stripQuotes, textConverters).convert(text, attachments);
         }
 
-        return get(message, stripQuotes, htmlConverters).convert(text);
+        return get(message, stripQuotes, htmlConverters).convert(text, attachments);
     }
 
     private BodyConverter get(MessageAdapter message, boolean stripQuotes, Collection<? extends BodyConverter> converters) {

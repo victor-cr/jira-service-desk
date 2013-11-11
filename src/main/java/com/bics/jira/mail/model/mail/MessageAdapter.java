@@ -60,6 +60,7 @@ public class MessageAdapter {
     private final Part textBody;
     private final Part htmlBody;
     private final List<MimePart> attachments;
+    private Collection<Attachment> cacheAttachments;
 
     public MessageAdapter(Message message) throws MessagingException {
         this.message = message;
@@ -148,6 +149,10 @@ public class MessageAdapter {
     }
 
     public Collection<Attachment> getAttachments() throws MessagingException {
+        if (cacheAttachments != null) {
+            return cacheAttachments;
+        }
+
         if (attachments == null || attachments.isEmpty()) {
             return Collections.emptyList();
         }
@@ -157,7 +162,7 @@ public class MessageAdapter {
 
             for (MimePart part : attachments) {
                 File storedFile = File.createTempFile("attachment", "jira.tmp");
-                String contentId = part.getContentID();
+                String contentId = StringUtils.strip(part.getContentID(), "<>");
                 String fileName = part.getFileName();
                 ContentType contentType = new ContentType(part.getContentType());
                 InputStream content = part.getInputStream();
@@ -184,7 +189,9 @@ public class MessageAdapter {
                 list.add(new Attachment(storedFile, contentType, fileName, contentId, MailUtils.isPartInline(part)));
             }
 
-            return list;
+            cacheAttachments = Collections.unmodifiableCollection(list);
+
+            return cacheAttachments;
         } catch (IOException e) {
             throw new MessagingException(e.getMessage(), e);
         }
@@ -288,7 +295,7 @@ public class MessageAdapter {
         @Override
         public boolean evaluate(Part input) {
             try {
-                if (input instanceof MimePart && (MailUtils.isPartAttachment(input) || MailUtils.isPartInline(input) || MimeType.valueOf(input) == MimeType.OTHER)) {
+                if (input instanceof MimePart && (MailUtils.isPartAttachment(input) || input.getDisposition() != null && MailUtils.isPartInline(input) || MimeType.valueOf(input) == MimeType.OTHER)) {
                     attachments.add((MimePart) input);
                 }
 

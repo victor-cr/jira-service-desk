@@ -34,6 +34,7 @@ import com.bics.jira.mail.IssueHelper;
 import com.bics.jira.mail.MailHelper;
 import com.bics.jira.mail.UserHelper;
 import com.bics.jira.mail.model.mail.Attachment;
+import com.bics.jira.mail.model.mail.Body;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -92,7 +93,7 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     @Override
-    public MutableIssue create(User author, User assignee, Project project, IssueType issueType, ProjectComponent component, MessageAdapter message, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
+    public MutableIssue create(User author, User assignee, Project project, IssueType issueType, ProjectComponent component, MessageAdapter message, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException {
         monitor.info("Creating new issue for an author: " + author.getName());
 
         Long levelId = issueSecurityLevelManager.getDefaultSecurityLevel(project);
@@ -125,9 +126,10 @@ public class IssueHelperImpl implements IssueHelper {
         }
 
         if (isVisibleField(project, IssueFieldConstants.DESCRIPTION, issueType)) {
-            String body = mailHelper.extract(message, false);
+            Body body = mailHelper.extract(message, false);
 
-            issue.setDescription(body);
+            issue.setDescription(body.getBody());
+            attach(issue, author, message.getAttachments(), body.getUsed(), monitor);
         }
 
         for (CustomField customField : customFieldManager.getCustomFieldObjects(issue)) {
@@ -148,7 +150,7 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     @Override
-    public void comment(MutableIssue issue, Map<Status, Status> transitions, MessageAdapter message, Collection<User> watchers, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException {
+    public void comment(MutableIssue issue, Map<Status, Status> transitions, MessageAdapter message, Collection<User> watchers, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException {
         Project project = issue.getProjectObject();
         User author = jiraAuthenticationContext.getLoggedInUser();
 
@@ -158,20 +160,26 @@ public class IssueHelperImpl implements IssueHelper {
             monitor.warning("User " + author.getName() + " cannot manage watch list in the project " + project.getKey() + ". Ignoring.");
         }
 
-        String body = mailHelper.extract(message, stripQuotes);
+        Body body = mailHelper.extract(message, stripQuotes);
 
-        if (!transit(issue, transitions, body, monitor)) {
-            commentManager.create(issue, author.getName(), body, true);
+        if (!transit(issue, transitions, body.getBody(), monitor)) {
+            commentManager.create(issue, author.getName(), body.getBody(), true);
         }
+
+        attach(issue, author, message.getAttachments(), body.getUsed(), monitor);
     }
 
-    @Override
-    public void attach(MutableIssue issue, Collection<Attachment> attachments) throws AttachmentException {
-        User author = jiraAuthenticationContext.getLoggedInUser();
+    private void attach(MutableIssue issue, User author, Collection<Attachment> attachments, Collection<Attachment> used, MessageHandlerErrorCollector monitor) throws AttachmentException {
         List<com.atlassian.jira.issue.attachment.Attachment> existentAttachments = attachmentManager.getAttachments(issue);
+        Project project = issue.getProjectObject();
+
+        if (!attachmentManager.attachmentsEnabled() || !userHelper.canCreateAttachment(author, project)) {
+            monitor.warning("User " + author.getName() + " cannot create attachments in the project " + project.getKey() + ". Ignoring.");
+            return;
+        }
 
         for (final Attachment attachment : attachments) {
-            boolean exists = Iterables.any(existentAttachments, new Predicate<com.atlassian.jira.issue.attachment.Attachment>() {
+            boolean required = used.contains(attachment) && !Iterables.any(existentAttachments, new Predicate<com.atlassian.jira.issue.attachment.Attachment>() {
                 @Override
                 public boolean apply(@Nullable com.atlassian.jira.issue.attachment.Attachment input) {
                     return input != null &&
@@ -181,7 +189,7 @@ public class IssueHelperImpl implements IssueHelper {
                 }
             });
 
-            if (!exists) {
+            if (required) {
                 attachmentManager.createAttachment(attachment.getStoredFile(), attachment.getFileName(), attachment.getContentType().toString(), author, issue);
             }
 

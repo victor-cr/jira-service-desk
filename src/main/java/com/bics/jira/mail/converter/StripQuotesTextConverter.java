@@ -1,6 +1,8 @@
 package com.bics.jira.mail.converter;
 
 import com.atlassian.core.util.ClassLoaderUtils;
+import com.bics.jira.mail.model.mail.Attachment;
+import com.bics.jira.mail.model.mail.Body;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
@@ -32,7 +34,7 @@ public class StripQuotesTextConverter implements BodyConverter {
     }
 
     @Override
-    public String convert(String body) {
+    public Body convert(String body, Collection<Attachment> attachments) {
         int min = body.length() - 1;
 
         for (String separator : separators) {
@@ -43,6 +45,6 @@ public class StripQuotesTextConverter implements BodyConverter {
             }
         }
 
-        return body.substring(0, min);
+        return new Body(body.substring(0, min), attachments);
     }
 }

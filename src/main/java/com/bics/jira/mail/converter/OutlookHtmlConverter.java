@@ -2,6 +2,7 @@ package com.bics.jira.mail.converter;
 
 import com.bics.jira.mail.converter.html.NodeFormatter;
 import com.bics.jira.mail.converter.html.Tag;
+import com.bics.jira.mail.converter.html.TreeContext;
 import com.bics.jira.mail.converter.html.WikiBasic;
 import com.bics.jira.mail.converter.html.WikiCell;
 import com.bics.jira.mail.converter.html.WikiHeaderCell;
@@ -13,6 +14,8 @@ import com.bics.jira.mail.converter.html.WikiTable;
 import com.bics.jira.mail.converter.html.WikiTableRow;
 import com.bics.jira.mail.converter.html.WikiText;
 import com.bics.jira.mail.converter.html.context.TreeContextImpl;
+import com.bics.jira.mail.model.mail.Attachment;
+import com.bics.jira.mail.model.mail.Body;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -52,14 +55,14 @@ public class OutlookHtmlConverter implements BodyConverter {
     }
 
     @Override
-    public String convert(String body) {
+    public Body convert(String body, Collection<Attachment> attachments) {
         Document document = Jsoup.parse(body);
 
-        TreeContextImpl context = new TreeContextImpl(getFormatters(), document);
+        TreeContextImpl context = new TreeContextImpl(getFormatters(), attachments, document);
 
         context.content();
 
-        return context.toString();
+        return new Body(context.toString(), context.getAttachments());
     }
 
     protected Collection<NodeFormatter> getFormatters() {

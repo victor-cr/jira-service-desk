@@ -21,7 +21,6 @@ public class WikiInlineImage implements NodeFormatter {
     private static final String WIKI_HEIGHT = "height";
     private static final String HTML_SRC = "src";
     private static final String INLINE_PREFIX_SRC = "cid:";
-    private static final String INLINE_SUFFIX_SRC = "@";
 
     @Override
     public boolean isSupported(TreeContext context, Node node) {
@@ -34,7 +33,11 @@ public class WikiInlineImage implements NodeFormatter {
         String width = node.attr(HTML_WIDTH);
         String height = node.attr(HTML_HEIGHT);
 
-        String imageName = StringUtils.substringBeforeLast(src.substring(4), INLINE_SUFFIX_SRC);
+        String imageName = context.getInlineName(StringUtils.substringAfter(src, INLINE_PREFIX_SRC));
+
+        if (imageName == null) {
+            return;
+        }
 
         context.whitespace().symbol(IMAGE_START).symbol(imageName);
 

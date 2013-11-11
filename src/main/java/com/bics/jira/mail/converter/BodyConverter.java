@@ -1,6 +1,10 @@
 package com.bics.jira.mail.converter;
 
+import com.bics.jira.mail.model.mail.Attachment;
+import com.bics.jira.mail.model.mail.Body;
 import com.bics.jira.mail.model.mail.MessageAdapter;
+
+import java.util.Collection;
 
 /**
  * JavaDoc here
@@ -11,5 +15,5 @@ import com.bics.jira.mail.model.mail.MessageAdapter;
 public interface BodyConverter {
     boolean isSupported(MessageAdapter message, boolean stripQuotes);
 
-    String convert(String body);
+    Body convert(String body, Collection<Attachment> attachments);
 }

@@ -9,6 +9,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.util.Predicate;
+import com.atlassian.jira.web.util.AttachmentException;
 import com.bics.jira.mail.CreateOrCommentModelValidator;
 import com.bics.jira.mail.IssueHelper;
 import com.bics.jira.mail.IssueLookupHelper;
@@ -67,7 +68,7 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
     }
 
     @Override
-    protected MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException {
+    protected MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException, AttachmentException {
         Project project = model.getProject();
 
         if (!userHelper.canCreateIssue(author, project)) {

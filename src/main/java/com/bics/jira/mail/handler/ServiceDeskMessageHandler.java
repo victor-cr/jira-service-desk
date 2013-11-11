@@ -67,7 +67,7 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
 
     protected abstract User chooseAssignee(Collection<User> users);
 
-    protected abstract MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException;
+    protected abstract MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException, AttachmentException;
 
     @Override
     public void init(Map<String, String> params, MessageHandlerErrorCollector monitor) {
@@ -115,21 +115,13 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
             User assignee = chooseAssignee(users);
 
             if (issue == null) {
-                issue = create(author, assignee, adapter, users, monitor);
+                create(author, assignee, adapter, users, monitor);
             } else {
                 if (!userHelper.canCommentIssue(author, issue)) {
                     throw new PermissionException("User " + author.getName() + " cannot comment issue " + issue.getKey() + ".");
                 }
 
                 issueHelper.comment(issue, model.getTransitions(), adapter, users, model.isStripQuotes(), monitor);
-            }
-
-            Project project = issue.getProjectObject();
-
-            if (attachmentManager.attachmentsEnabled() && userHelper.canCreateAttachment(author, project)) {
-                issueHelper.attach(issue, adapter.getAttachments());
-            } else {
-                monitor.warning("User " + author.getName() + " cannot create attachments in the project " + project.getKey() + ". Ignoring.");
             }
         } catch (CreateException e) {
             monitor.error(e.getMessage());

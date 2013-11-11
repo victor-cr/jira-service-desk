@@ -1,6 +1,10 @@
 package com.bics.jira.mail.converter;
 
+import com.bics.jira.mail.model.mail.Attachment;
+import com.bics.jira.mail.model.mail.Body;
 import com.bics.jira.mail.model.mail.MessageAdapter;
+
+import java.util.Collection;
 
 /**
  * JavaDoc here
@@ -15,7 +19,7 @@ public class DefaultTextConverter implements BodyConverter {
     }
 
     @Override
-    public String convert(String body) {
-        return body;
+    public Body convert(String body, Collection<Attachment> attachments) {
+        return new Body(body, attachments);
     }
 }

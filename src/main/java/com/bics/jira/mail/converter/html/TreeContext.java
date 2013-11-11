@@ -17,6 +17,8 @@ public interface TreeContext {
 
     Checkpoint checkpoint();
 
+    String getInlineName(String cid);
+
     TreeContext newLine();
 
     TreeContext whitespace();

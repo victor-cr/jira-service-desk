@@ -1,9 +1,14 @@
 package com.bics.jira.mail.converter;
 
 import com.atlassian.mail.HtmlToTextConverter;
+import com.bics.jira.mail.helper.AttachmentPredicate;
+import com.bics.jira.mail.model.mail.Attachment;
+import com.bics.jira.mail.model.mail.Body;
 import com.bics.jira.mail.model.mail.MessageAdapter;
+import com.google.common.collect.Collections2;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * JavaDoc here
@@ -20,11 +25,13 @@ public class DefaultHtmlConverter implements BodyConverter {
     }
 
     @Override
-    public String convert(String body) {
+    public Body convert(String body, Collection<Attachment> attachments) {
         try {
-            return htmlToTextConverter.convert(body);
+            body = htmlToTextConverter.convert(body);
+
+            return new Body(body, attachments);
         } catch (IOException e) {
-            return "*Cannot render description*"; //Nothing should be here.
+            return new Body("*Cannot render description*", attachments); //Nothing should be here.
         }
     }
 }
