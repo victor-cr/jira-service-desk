@@ -37,6 +37,7 @@ public class TreeContextImpl implements TreeContext {
     private final Set<Attachment> attachments;
     private Node current;
     private boolean pendingWhitespace;
+    private boolean ignore;
     private boolean active = true;
 
     public TreeContextImpl(Iterable<NodeFormatter> formatters, Iterable<Attachment> attachments, Document document) {
@@ -104,6 +105,13 @@ public class TreeContextImpl implements TreeContext {
     }
 
     @Override
+    public TreeContext ignore(boolean ignore) {
+        this.ignore = ignore;
+
+        return this;
+    }
+
+    @Override
     public TreeContext newLine() {
         if (active && !isNewLine()) {
             out.append('\n');
@@ -126,7 +134,7 @@ public class TreeContextImpl implements TreeContext {
 
     @Override
     public TreeContext text(String sequence) {
-        if (active && !StringUtils.isEmpty(sequence)) {
+        if (active && !ignore && !StringUtils.isEmpty(sequence)) {
             sequence = StringUtils.replaceChars(sequence, "\n\r\u00A0\u2007\u202F", "     ");
             sequence = StringUtils.trimToEmpty(sequence);
 
@@ -152,9 +160,7 @@ public class TreeContextImpl implements TreeContext {
                 for (NodeFormatter formatter : formatters) {
                     if (formatter.isSupported(this, current)) {
                         accepted.offerFirst(current);
-//                        cleanupSpaces();
                         formatter.format(this, current);
-//                        cleanupSpaces();
                         break;
                     }
                 }
@@ -190,7 +196,7 @@ public class TreeContextImpl implements TreeContext {
             String content = out.substring(len);
             String trimmed = StringUtils.trimToEmpty(content);
 
-            if (!content.equals(trimmed)) {
+            if (!ignore && !content.equals(trimmed)) {
                 out.setLength(len);
                 out.append(trimmed);
             }

@@ -19,6 +19,8 @@ public interface TreeContext {
 
     String getInlineName(String cid);
 
+    TreeContext ignore(boolean ignore);
+
     TreeContext newLine();
 
     TreeContext whitespace();

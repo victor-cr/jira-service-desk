@@ -25,6 +25,7 @@ public class OutlookHtmlConverterTest extends Assert {
     private static final String FILE_UNKNOWN_INLINE_MESSAGE = "UnknownInlineImage";
     private static final String FILE_TABLE_LAYOUT = "TableLayout";
     private static final String FILE_DATA_TABLE = "DataTable";
+    private static final String FILE_OUTLOOK_LIST = "OutlookList";
     private static final String FILE_MULTILINE_TABLE = "MultilineTable";
     private static final String FILE_BOLD_TEXT = "Text";
     private static final String FILE_ESCAPABLE_TEXT = "EscapableText";
@@ -62,6 +63,11 @@ public class OutlookHtmlConverterTest extends Assert {
     @Test
     public void testConvert_DataTable() throws Exception {
         assertFiles(FILE_DATA_TABLE);
+    }
+
+    @Test
+    public void testConvert_OutlookList() throws Exception {
+        assertFiles(FILE_OUTLOOK_LIST);
     }
 
     @Test
