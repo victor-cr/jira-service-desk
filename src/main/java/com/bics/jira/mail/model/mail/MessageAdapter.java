@@ -14,6 +14,7 @@ import javax.mail.Part;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimePart;
 import javax.mail.internet.MimeUtility;
@@ -174,6 +175,16 @@ public class MessageAdapter {
                 String fileName = part.getFileName();
                 ContentType contentType = new ContentType(part.getContentType());
                 InputStream content = part.getInputStream();
+
+                if (fileName == null && MimeType.valueOf(part) == MimeType.MESSAGE) {
+                    fileName = ((MimeMessage) part.getContent()).getSubject();
+
+                    if (fileName == null) {
+                        fileName = UUID.randomUUID().toString();
+                    }
+
+                    fileName = MailUtils.fixMimeEncodedFilename(fileName) + ".eml";
+                }
 
                 try {
                     OutputStream out = new BufferedOutputStream(new FileOutputStream(storedFile));
@@ -341,7 +352,8 @@ public class MessageAdapter {
         @Override
         public boolean evaluate(Part input) {
             try {
-                if (input instanceof MimePart && (MailUtils.isPartAttachment(input) || input.getDisposition() != null && MailUtils.isPartInline(input) || MimeType.valueOf(input) == MimeType.OTHER)) {
+                if (input instanceof MimePart && (MailUtils.isPartAttachment(input) || input.getDisposition() != null && MailUtils.isPartInline(input)
+                        || MimeType.valueOf(input) != MimeType.HTML && MimeType.valueOf(input) != MimeType.TEXT)) {
                     attachments.add((MimePart) input);
                 }
 

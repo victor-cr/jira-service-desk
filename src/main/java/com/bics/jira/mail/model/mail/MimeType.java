@@ -13,6 +13,7 @@ import java.util.Arrays;
  */
 public enum MimeType {
     MULTIPART(new ContentType("multipart", "*", null)),
+    MESSAGE(new ContentType("message", "rfc822", null)),
     HTML(new ContentType("text", "html", null)),
     TEXT(new ContentType("text", "plain", null)),
     OTHER(null);
