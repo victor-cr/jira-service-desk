@@ -23,6 +23,7 @@ import java.util.Set;
 public class OutlookHtmlConverterTest extends Assert {
     private static final String FILE_INLINE_MESSAGE = "InlineImage";
     private static final String FILE_UNKNOWN_INLINE_MESSAGE = "UnknownInlineImage";
+    private static final String FILE_EMPTY_TABLE = "EmptyTable";
     private static final String FILE_TABLE_LAYOUT = "TableLayout";
     private static final String FILE_DATA_TABLE = "DataTable";
     private static final String FILE_OUTLOOK_LIST = "OutlookList";
@@ -63,6 +64,11 @@ public class OutlookHtmlConverterTest extends Assert {
     @Test
     public void testConvert_DataTable() throws Exception {
         assertFiles(FILE_DATA_TABLE);
+    }
+
+    @Test
+    public void testConvert_EmptyTable() throws Exception {
+        assertFiles(FILE_EMPTY_TABLE);
     }
 
     @Test
