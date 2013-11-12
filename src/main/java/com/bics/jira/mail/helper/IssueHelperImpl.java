@@ -125,18 +125,19 @@ public class IssueHelperImpl implements IssueHelper {
             setPriority(issue, message);
         }
 
-        if (isVisibleField(project, IssueFieldConstants.DESCRIPTION, issueType)) {
+//        if (isVisibleField(project, IssueFieldConstants.DESCRIPTION, issueType)) {
             Body body = mailHelper.extract(message, false);
 
             issue.setDescription(body.getBody());
-            attach(issue, author, message.getAttachments(), body.getUsed(), monitor);
-        }
+//        }
 
         for (CustomField customField : customFieldManager.getCustomFieldObjects(issue)) {
             issue.setCustomFieldValue(customField, customField.getDefaultValue(issue));
         }
 
         Issue issueObject = issueManager.createIssueObject(author, issue);
+
+        attach(issue, author, message.getAttachments(), body.getUsed(), monitor);
 
         if (userHelper.canManageWatchList(author, project)) {
             watch(issue, watchers);

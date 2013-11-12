@@ -11,8 +11,10 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimePart;
 import javax.mail.internet.MimeUtility;
 import java.io.BufferedOutputStream;
@@ -125,7 +127,13 @@ public class MessageAdapter {
     }
 
     public InternetAddress[] getAllRecipients() throws MessagingException {
-        Address[] allRecipients = message.getAllRecipients();
+        Address[] allRecipients;
+
+        try {
+            allRecipients = message.getAllRecipients();
+        } catch (MessagingException e) {
+            allRecipients = getSafeRecipients();
+        }
 
         return Arrays.copyOf(allRecipients, allRecipients.length, EMPTY.getClass());
     }
@@ -197,11 +205,49 @@ public class MessageAdapter {
         }
     }
 
+    private Address[] getSafeRecipients() {
+        String[] addrs = {
+                getHeader(MimeMessage.RecipientType.TO.toString()),
+                getHeader(MimeMessage.RecipientType.CC.toString()),
+                getHeader(MimeMessage.RecipientType.BCC.toString())
+        };
+
+        List<Address> addresses = new LinkedList<Address>();
+
+        for (String addr : addrs) {
+            String[] emails = StringUtils.split(addr, ",");
+
+            if (emails != null && emails.length != 0) {
+                for (String email : emails) {
+                    try {
+                        addresses.add(new InternetAddress(email, false));
+                    } catch (AddressException e) {
+                        LOG.error("Cannot parse the address: " + email);
+                    }
+                }
+            }
+        }
+
+        return addresses.toArray(new Address[addresses.size()]);
+    }
+
     private String getHeader(String key) {
         String[] headers = getHeaders(key);
 
+        if (headers == null || headers.length == 0) {
+            return null;
+        }
+
         try {
-            return headers == null ? null : MimeUtility.decodeText(MimeUtility.unfold(headers[0]));
+            StringBuilder out = new StringBuilder();
+
+            for (String header : headers) {
+                out.append(MimeUtility.decodeText(MimeUtility.unfold(header))).append(',');
+            }
+
+            out.setLength(out.length() - 1);
+
+            return out.toString();
         } catch (UnsupportedEncodingException e) {
             LOG.warn(e.getMessage(), e);
             return null;
