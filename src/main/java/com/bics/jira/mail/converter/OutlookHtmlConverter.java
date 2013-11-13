@@ -5,6 +5,7 @@ import com.bics.jira.mail.converter.html.Tag;
 import com.bics.jira.mail.converter.html.TreeContext;
 import com.bics.jira.mail.converter.html.WikiBasic;
 import com.bics.jira.mail.converter.html.WikiCell;
+import com.bics.jira.mail.converter.html.WikiColorSpan;
 import com.bics.jira.mail.converter.html.WikiDirective;
 import com.bics.jira.mail.converter.html.WikiHeaderCell;
 import com.bics.jira.mail.converter.html.WikiIgnore;
@@ -52,7 +53,8 @@ public class OutlookHtmlConverter implements BodyConverter {
             new WikiTableRow(),
             new WikiTable(),
             new WikiInlineImage(),
-            new WikiLink()
+            new WikiLink(),
+            new WikiColorSpan()
     ));
 
     @Override

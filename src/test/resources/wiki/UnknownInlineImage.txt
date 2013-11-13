@@ -1,11 +1,11 @@
-Hi,
+{color:#1F497D}Hi,{color}
 
-Could you crosscheck?
+{color:#1F497D}Could you crosscheck? {color}
 
-I tried a new browser session but it doesn’t appear in the My Elections menu option.
+{color:#1F497D}I tried a new browser session but it doesn’t appear in the My Elections menu option.{color}
 
-Have only this:
+{color:#1F497D}Have only this:{color}
 
-Kr
+{color:#1F497D}Kr{color}
 
-Peter
+{color:#1F497D}Peter{color}
