@@ -181,9 +181,11 @@ public class MessageAdapter {
 
                     if (fileName == null) {
                         fileName = UUID.randomUUID().toString();
+                    } else {
+                        fileName = MailUtils.fixMimeEncodedFilename(fileName);
                     }
 
-                    fileName = MailUtils.fixMimeEncodedFilename(fileName) + ".eml";
+                    fileName = fileName + ".eml";
                 }
 
                 try {
