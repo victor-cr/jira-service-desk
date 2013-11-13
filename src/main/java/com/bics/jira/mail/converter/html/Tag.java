@@ -10,6 +10,7 @@ import org.jsoup.nodes.Node;
  */
 public enum Tag {
     A,
+    BLOCKQUOTE,
     DIV,
     SPAN,
     HEAD,
@@ -30,7 +31,8 @@ public enum Tag {
     UL,
     IMG,
     OL,
-    LI;
+    LI,
+    HR;
 
     public boolean is(Node node) {
         return node != null && this.name().equalsIgnoreCase(node.nodeName());

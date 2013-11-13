@@ -5,7 +5,7 @@ import com.bics.jira.mail.converter.BodyConverter;
 import com.bics.jira.mail.converter.DefaultHtmlConverter;
 import com.bics.jira.mail.converter.DefaultTextConverter;
 import com.bics.jira.mail.converter.OutlookHtmlConverter;
-import com.bics.jira.mail.converter.StripQuotesOutlookHtmlConverter;
+import com.bics.jira.mail.converter.StripQuotesHtmlConverter;
 import com.bics.jira.mail.converter.StripQuotesTextConverter;
 import com.bics.jira.mail.model.mail.Attachment;
 import com.bics.jira.mail.model.mail.MessageAdapter;
@@ -30,7 +30,7 @@ public class MailHelperImpl implements MailHelper {
 
     public MailHelperImpl() throws IOException {
         htmlConverters = Arrays.asList(
-                new StripQuotesOutlookHtmlConverter(),
+                new StripQuotesHtmlConverter(),
                 new OutlookHtmlConverter(),
                 new DefaultHtmlConverter()
         );
