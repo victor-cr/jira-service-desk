@@ -207,7 +207,7 @@ public class MessageAdapter {
                     fileName = MailUtils.fixMimeEncodedFilename(fileName);
                 }
 
-                list.add(new Attachment(storedFile, contentType, fileName, contentId, MailUtils.isPartInline(part)));
+                list.add(new Attachment(storedFile, contentType, fileName, contentId, !MailUtils.isPartAttachment(part) && MailUtils.isPartInline(part)));
             }
 
             cacheAttachments = Collections.unmodifiableCollection(list);

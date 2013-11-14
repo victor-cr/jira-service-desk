@@ -49,7 +49,7 @@ public class StripQuotesHtmlConverter extends OutlookHtmlConverter implements Bo
     }
 
     private static class OutlookAnswerIgnore extends AnswerIgnore {
-        private static final String HTML_STYLE_ATTR = "attr";
+        private static final String HTML_STYLE_ATTR = "style";
         private static final String STYLE_VALUE = "border:none;border-top:solid #B5C4DF 1.0pt;padding:3.0pt 0cm 0cm 0cm";
 
         @Override

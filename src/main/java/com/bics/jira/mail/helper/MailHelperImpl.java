@@ -51,7 +51,7 @@ public class MailHelperImpl implements MailHelper {
             Collection<Attachment> used = Collections2.filter(attachments, new AttachmentPredicate(false));
 
             return StringUtils.isBlank(text) ? new Body("", used) :
-                    get(message, stripQuotes, textConverters).convert(text, attachments);
+                    get(message, stripQuotes, textConverters).convert(text, used);
         }
 
         return get(message, stripQuotes, htmlConverters).convert(text, attachments);

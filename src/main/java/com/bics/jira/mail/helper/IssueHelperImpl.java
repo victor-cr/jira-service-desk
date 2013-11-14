@@ -37,6 +37,7 @@ import com.bics.jira.mail.model.mail.Attachment;
 import com.bics.jira.mail.model.mail.Body;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import com.opensymphony.workflow.loader.StepDescriptor;
@@ -125,11 +126,10 @@ public class IssueHelperImpl implements IssueHelper {
             setPriority(issue, message);
         }
 
-//        if (isVisibleField(project, IssueFieldConstants.DESCRIPTION, issueType)) {
-            Body body = mailHelper.extract(message, false);
+        Body body = mailHelper.extract(message, false);
+        String bodyText = getBodyText(body);
 
-            issue.setDescription(body.getBody());
-//        }
+        issue.setDescription(bodyText);
 
         for (CustomField customField : customFieldManager.getCustomFieldObjects(issue)) {
             issue.setCustomFieldValue(customField, customField.getDefaultValue(issue));
@@ -162,9 +162,10 @@ public class IssueHelperImpl implements IssueHelper {
         }
 
         Body body = mailHelper.extract(message, stripQuotes);
+        String bodyText = getBodyText(body);
 
-        if (!transit(issue, transitions, body.getBody(), monitor)) {
-            commentManager.create(issue, author.getName(), body.getBody(), true);
+        if (!transit(issue, transitions, bodyText, monitor)) {
+            commentManager.create(issue, author.getName(), bodyText, true);
         }
 
         attach(issue, author, message.getAttachments(), body.getUsed(), monitor);
@@ -303,5 +304,29 @@ public class IssueHelperImpl implements IssueHelper {
 
     private boolean isVisibleField(Project project, String fieldName, IssueType issueType) {
         return !fieldVisibilityManager.isFieldHiddenInAllSchemes(project.getId(), fieldName, Collections.singletonList(issueType.getId()));
+    }
+
+    private String getBodyText(Body body) {
+        Collection<Attachment> attachments = body.getUsed();
+
+        if (attachments == null) {
+            return body.getBody();
+        }
+
+        attachments = Collections2.filter(attachments, new AttachmentPredicate(false));
+
+        if (attachments.isEmpty()) {
+            return body.getBody();
+        }
+
+        StringBuilder out = new StringBuilder("*Attached:* ");
+
+        for (Attachment attachment : attachments) {
+            if (!attachment.isInline()) {
+                out.append("\\[[^").append(attachment.getFileName()).append("]\\] ");
+            }
+        }
+
+        return out.append("\n\n").append(body.getBody()).toString();
     }
 }

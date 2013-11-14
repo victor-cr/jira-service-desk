@@ -13,8 +13,8 @@ import java.util.Arrays;
  * @since 13/04/13 11:41
  */
 public class WikiList implements NodeFormatter {
-    private static final String UL = "#";
-    private static final String OL = "*";
+    private static final String UL = "*";
+    private static final String OL = "#";
 
     @Override
     public boolean isSupported(TreeContext context, Node node) {
@@ -29,10 +29,10 @@ public class WikiList implements NodeFormatter {
         for (Tag tag : tags) {
             switch (tag) {
                 case UL:
-                    context.symbol(UL);
+                    prefix.append(UL);
                     break;
                 case OL:
-                    context.symbol(OL);
+                    prefix.append(OL);
                     break;
             }
         }
