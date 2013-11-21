@@ -19,16 +19,17 @@ public class WikiText implements NodeFormatter {
             Pattern.compile("(?<=\\w)([\\-*+_~!}\\|\\]\\^])(?!\\w)"),
             Pattern.compile("(?<!\\w)([?]{2})(?=\\w)"),
             Pattern.compile("(?<=\\w)([?]{2})(?!\\w)"),
-            Pattern.compile("^(bq\\.\\s)"),
-            Pattern.compile("^(h1\\.\\s)"),
-            Pattern.compile("^(h2\\.\\s)"),
-            Pattern.compile("^(h3\\.\\s)"),
-            Pattern.compile("^(h4\\.\\s)"),
-            Pattern.compile("^(h5\\.\\s)"),
-            Pattern.compile("^(h6\\.\\s)"),
+            Pattern.compile("(?<=\\()([+])(?=\\))"),
+            Pattern.compile("^(bq\\.\\s)", Pattern.MULTILINE),
+            Pattern.compile("^(h1\\.\\s)", Pattern.MULTILINE),
+            Pattern.compile("^(h2\\.\\s)", Pattern.MULTILINE),
+            Pattern.compile("^(h3\\.\\s)", Pattern.MULTILINE),
+            Pattern.compile("^(h4\\.\\s)", Pattern.MULTILINE),
+            Pattern.compile("^(h5\\.\\s)", Pattern.MULTILINE),
+            Pattern.compile("^(h6\\.\\s)", Pattern.MULTILINE),
             Pattern.compile("(\\\\{2})"),
-            Pattern.compile("^(----\\s)"),
-            Pattern.compile("^([-*#]\\s)")
+            Pattern.compile("^(----\\s*)$", Pattern.MULTILINE),
+            Pattern.compile("^([-*#]\\s)", Pattern.MULTILINE)
     };
 
     @Override
@@ -38,13 +39,11 @@ public class WikiText implements NodeFormatter {
 
     @Override
     public void format(TreeContext context, Node node) {
-        String text = ((TextNode) node).text();
+        String text = getText(node);
 
-        text = StringUtils.replaceChars(text, '\u00A0', ' ');
-        text = StringUtils.replaceChars(text, '\u2007', ' ');
-        text = StringUtils.replaceChars(text, '\u202F', ' ');
+        boolean notBlank = StringUtils.isNotBlank(text);
 
-        if (StringUtils.isNotBlank(text)) {
+        if (notBlank) {
             for (Pattern check : CHECKS) {
                 Matcher matcher = check.matcher(text);
 
@@ -54,12 +53,18 @@ public class WikiText implements NodeFormatter {
             if (Character.isWhitespace(text.charAt(0))) {
                 context.whitespace();
             }
-
-            context.text(StringUtils.stripToEmpty(text));
-
-            if (Character.isWhitespace(text.charAt(text.length() - 1))) {
-                context.whitespace();
-            }
         }
+
+        context.text(text);
+
+        if (notBlank && Character.isWhitespace(text.charAt(text.length() - 1))) {
+            context.whitespace();
+        }
+    }
+
+    protected static String getText(Node node) {
+        String text = ((TextNode) node).getWholeText();
+
+        return StringUtils.replaceChars(text, "\u00A0\u2007\u202F", "   ");
     }
 }

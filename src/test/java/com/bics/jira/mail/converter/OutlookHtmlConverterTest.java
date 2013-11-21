@@ -31,6 +31,7 @@ public class OutlookHtmlConverterTest extends Assert {
     private static final String FILE_BOLD_TEXT = "Text";
     private static final String FILE_ESCAPABLE_TEXT = "EscapableText";
     private static final String FILE_LINK = "Link";
+    private static final String FILE_PRE = "Pre";
 
     private final OutlookHtmlConverter converter = new OutlookHtmlConverter();
 
@@ -94,6 +95,11 @@ public class OutlookHtmlConverterTest extends Assert {
     @Test
     public void testConvert_Link() throws Exception {
         assertFiles(FILE_LINK);
+    }
+
+    @Test
+    public void testConvert_Pre() throws Exception {
+        assertFiles(FILE_PRE);
     }
 
     private void assertFiles(String testName, Attachment... expectedAttachments) {

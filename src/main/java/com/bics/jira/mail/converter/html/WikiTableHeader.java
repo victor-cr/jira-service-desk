@@ -9,7 +9,7 @@ import org.jsoup.nodes.Node;
  * @author Victor Polischuk
  * @since 13/04/13 11:41
  */
-public class WikiHeaderCell extends WikiCell implements NodeFormatter {
+public class WikiTableHeader extends WikiTableCell implements NodeFormatter {
     private static final String CELL_START = "|";
     private static final Node EMPTY = new Element(Tag.TH.toTag(), "");
 

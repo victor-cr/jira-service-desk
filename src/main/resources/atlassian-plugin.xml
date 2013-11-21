@@ -31,6 +31,11 @@
         <interface>com.bics.jira.mail.MailHelper</interface>
     </component>
 
+    <component-import key="eventPublisher" interface="com.atlassian.event.api.EventPublisher"/>
+    <component key="ldap-user-auto-registrar" i18n-name-key="msd.helper.user.registrar" class="com.bics.jira.user.DefaultGroupAssignUserHandler">
+        <description>Class that processes the incoming JIRA issue events.</description>
+    </component>
+
     <message-handler key="create-comment-message-handler" i18n-name-key="msd.handler.name.createOrComment"
                      class="com.bics.jira.mail.handler.CreateOrCommentMessageHandler"
                      add-edit-url="/secure/admin/CreateOrComment!default.jspa" weight="0"/>

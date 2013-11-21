@@ -1,16 +1,26 @@
 package com.bics.jira.mail.converter;
 
+import com.atlassian.core.util.ClassLoaderUtils;
+import com.bics.jira.mail.converter.html.IgnoreOutlookQuote;
+import com.bics.jira.mail.converter.html.IgnoreQuote;
 import com.bics.jira.mail.converter.html.NodeFormatter;
 import com.bics.jira.mail.converter.html.Tag;
 import com.bics.jira.mail.converter.html.TreeContext;
+import com.bics.jira.mail.converter.html.WikiText;
 import com.bics.jira.mail.model.mail.MessageAdapter;
-import org.jsoup.nodes.Comment;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
-import org.jsoup.nodes.TextNode;
 
+import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * JavaDoc here
@@ -22,9 +32,17 @@ public class StripQuotesHtmlConverter extends OutlookHtmlConverter implements Bo
     private final Collection<NodeFormatter> formatters;
 
     public StripQuotesHtmlConverter() {
-        ArrayList<NodeFormatter> formatters = new ArrayList<NodeFormatter>(super.getFormatters());
+        List<NodeFormatter> formatters = new LinkedList<NodeFormatter>(super.getFormatters());
 
-        formatters.add(new OutlookAnswerIgnore());
+        Iterables.removeIf(formatters, new Predicate<NodeFormatter>() {
+            @Override
+            public boolean apply(@Nullable NodeFormatter input) {
+                return input instanceof WikiText;
+            }
+        });
+
+        formatters.add(new PlainAnswerIgnore());
+        formatters.add(new IgnoreOutlookQuote());
         formatters.add(new IPhoneAnswerIgnore());
         formatters.add(new WindowsPhoneAnswerIgnore());
 
@@ -41,24 +59,7 @@ public class StripQuotesHtmlConverter extends OutlookHtmlConverter implements Bo
         return formatters;
     }
 
-    private abstract static class AnswerIgnore implements NodeFormatter {
-        @Override
-        public void format(TreeContext context, Node node) {
-            context.stop();
-        }
-    }
-
-    private static class OutlookAnswerIgnore extends AnswerIgnore {
-        private static final String HTML_STYLE_ATTR = "style";
-        private static final String STYLE_VALUE = "border:none;border-top:solid #B5C4DF 1.0pt;padding:3.0pt 0cm 0cm 0cm";
-
-        @Override
-        public boolean isSupported(TreeContext context, Node node) {
-            return Tag.DIV.is(node) && node.hasAttr(HTML_STYLE_ATTR) && STYLE_VALUE.equalsIgnoreCase(node.attr(HTML_STYLE_ATTR));
-        }
-    }
-
-    private static class IPhoneAnswerIgnore extends AnswerIgnore {
+    private static class IPhoneAnswerIgnore extends IgnoreQuote {
         private static final String HTML_TYPE_ATTR = "type";
         private static final String TYPE_VALUE = "cite";
 
@@ -68,7 +69,7 @@ public class StripQuotesHtmlConverter extends OutlookHtmlConverter implements Bo
         }
     }
 
-    private static class WindowsPhoneAnswerIgnore extends AnswerIgnore {
+    private static class WindowsPhoneAnswerIgnore extends IgnoreQuote {
         private static final String HTML_DIR_ATTR = "dir";
         private static final String DIR_VALUE = "ltr";
 
@@ -85,6 +86,39 @@ public class StripQuotesHtmlConverter extends OutlookHtmlConverter implements Bo
             }
 
             return false;
+        }
+    }
+
+    private static class PlainAnswerIgnore extends WikiText {
+        private final Collection<String> separators = new ArrayList<String>();
+
+        public PlainAnswerIgnore() {
+            try {
+                LineIterator i = IOUtils.lineIterator(ClassLoaderUtils.getResourceAsStream("outlook-email.translations", getClass()), "UTF-8");
+
+                while (i.hasNext()) {
+                    separators.add(i.nextLine());
+                }
+            } catch (IOException e) {
+                // ignore
+            }
+        }
+
+        @Override
+        public void format(TreeContext context, Node node) {
+            if (!separators.isEmpty()) {
+                String text = getText(node);
+
+                for (String separator : separators) {
+                    int i = text.indexOf(separator);
+
+                    if (i != -1) {
+                        context.text(text.substring(0, i));
+                        context.stop();
+                    }
+                }
+            }
+            super.format(context, node);
         }
     }
 }

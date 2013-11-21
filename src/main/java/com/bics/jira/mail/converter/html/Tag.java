@@ -24,6 +24,7 @@ public enum Tag {
     STRIKE,
     BR,
     P,
+    PRE,
     TABLE,
     TR,
     TH,

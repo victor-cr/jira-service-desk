@@ -42,6 +42,7 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
         return new Predicate<User>() {
             @Override
             public boolean evaluate(User user) {
+
                 return userHelper.canCreateIssue(user, model.getProject());
             }
         };

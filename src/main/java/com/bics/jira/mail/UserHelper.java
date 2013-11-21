@@ -1,6 +1,10 @@
 package com.bics.jira.mail;
 
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.crowd.exception.GroupNotFoundException;
+import com.atlassian.crowd.exception.OperationFailedException;
+import com.atlassian.crowd.exception.OperationNotPermittedException;
+import com.atlassian.crowd.exception.UserNotFoundException;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.project.Project;

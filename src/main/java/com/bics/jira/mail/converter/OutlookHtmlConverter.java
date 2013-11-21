@@ -2,12 +2,11 @@ package com.bics.jira.mail.converter;
 
 import com.bics.jira.mail.converter.html.NodeFormatter;
 import com.bics.jira.mail.converter.html.Tag;
-import com.bics.jira.mail.converter.html.TreeContext;
 import com.bics.jira.mail.converter.html.WikiBasic;
-import com.bics.jira.mail.converter.html.WikiCell;
+import com.bics.jira.mail.converter.html.WikiTableHeader;
+import com.bics.jira.mail.converter.html.WikiTableCell;
 import com.bics.jira.mail.converter.html.WikiColorSpan;
 import com.bics.jira.mail.converter.html.WikiDirective;
-import com.bics.jira.mail.converter.html.WikiHeaderCell;
 import com.bics.jira.mail.converter.html.WikiIgnore;
 import com.bics.jira.mail.converter.html.WikiInlineImage;
 import com.bics.jira.mail.converter.html.WikiLink;
@@ -15,6 +14,7 @@ import com.bics.jira.mail.converter.html.WikiList;
 import com.bics.jira.mail.converter.html.WikiListContainer;
 import com.bics.jira.mail.converter.html.WikiOutlookList;
 import com.bics.jira.mail.converter.html.WikiParagraph;
+import com.bics.jira.mail.converter.html.WikiPre;
 import com.bics.jira.mail.converter.html.WikiTable;
 import com.bics.jira.mail.converter.html.WikiTableRow;
 import com.bics.jira.mail.converter.html.WikiText;
@@ -42,14 +42,15 @@ public class OutlookHtmlConverter implements BodyConverter {
             new WikiText(),
             new WikiOutlookList(),
             new WikiParagraph(),
+            new WikiPre(),
             new WikiBasic("*", Tag.STRONG, Tag.B),
             new WikiBasic("_", Tag.EM, Tag.I),
             new WikiBasic("-", Tag.STRIKE),
             new WikiBasic("+", Tag.U),
             new WikiListContainer(), // TODO<victor>: need to test
             new WikiList(),          // TODO<victor>: Outlook has its own lists
-            new WikiCell(),
-            new WikiHeaderCell(),
+            new WikiTableCell(),
+            new WikiTableHeader(),
             new WikiTableRow(),
             new WikiTable(),
             new WikiInlineImage(),

@@ -1,6 +1,13 @@
 package com.bics.jira.mail.helper;
 
+import com.atlassian.crowd.embedded.api.Directory;
+import com.atlassian.crowd.embedded.api.DirectoryType;
+import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.crowd.exception.GroupNotFoundException;
+import com.atlassian.crowd.exception.OperationFailedException;
+import com.atlassian.crowd.exception.OperationNotPermittedException;
+import com.atlassian.crowd.exception.UserNotFoundException;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.event.user.UserEventType;
 import com.atlassian.jira.exception.CreateException;
@@ -11,6 +18,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.Permissions;
+import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.user.util.UserManager;
 import com.atlassian.jira.user.util.UserUtil;

@@ -47,7 +47,7 @@ public class WikiBasic implements NodeFormatter {
 
         context.whitespace().symbol(symbol).trimContent().symbol(symbol).whitespace();
 
-        if (StringUtils.trimToEmpty(checkpoint.diff()).equals(symbol + symbol)) {
+        if (StringUtils.stripToEmpty(checkpoint.diff()).equals(symbol + symbol)) {
             checkpoint.rollback();
         }
     }

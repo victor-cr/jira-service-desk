@@ -14,13 +14,12 @@ import javax.annotation.Nullable;
  * @author Victor Polischuk
  * @since 13/04/13 11:41
  */
-public class WikiCell implements NodeFormatter {
+public class WikiTableCell implements NodeFormatter {
     private static final String HTML_ATTR_COLSPAN = "colspan";
     private static final String HTML_ATTR_ROWSPAN = "rowspan";
     private static final String CELL_STOP = "|";
     private static final Node EMPTY = new Element(Tag.TD.toTag(), "");
     private static final Filter FILTER = new Filter();
-
 
     @Override
     public boolean isSupported(TreeContext context, Node node) {

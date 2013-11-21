@@ -7,7 +7,6 @@ import com.bics.jira.mail.helper.AttachmentPredicate;
 import com.bics.jira.mail.model.mail.Attachment;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -31,13 +30,15 @@ import java.util.Set;
  */
 public class TreeContextImpl implements TreeContext {
     final StringBuilder out = new StringBuilder();
+
     private final Iterable<NodeFormatter> formatters;
     private final Deque<Node> accepted = new LinkedList<Node>();
     private final Map<String, Attachment> inlineAttachments;
     private final Set<Attachment> attachments;
     private Node current;
-    private boolean pendingWhitespace;
-    private boolean ignore;
+    private boolean pendingWhitespace = false;
+    private boolean ignore = false;
+    private boolean formatted = false;
     private boolean active = true;
 
     public TreeContextImpl(Iterable<NodeFormatter> formatters, Iterable<Attachment> attachments, Document document) {
@@ -112,6 +113,13 @@ public class TreeContextImpl implements TreeContext {
     }
 
     @Override
+    public TreeContext formatted(boolean formatted) {
+        this.formatted = formatted;
+
+        return this;
+    }
+
+    @Override
     public TreeContext newLine() {
         if (active && !isNewLine()) {
             out.append('\n');
@@ -134,11 +142,17 @@ public class TreeContextImpl implements TreeContext {
 
     @Override
     public TreeContext text(String sequence) {
-        if (active && !ignore && !StringUtils.isEmpty(sequence)) {
-            sequence = StringUtils.replaceChars(sequence, "\n\r\u00A0\u2007\u202F", "     ");
-            sequence = StringUtils.trimToEmpty(sequence);
+        if (active && !ignore && StringUtils.isNotEmpty(sequence)) {
+            sequence = StringUtils.replaceChars(sequence, "\u00A0\u2007\u202F", "   ");
+            sequence = StringUtils.replaceChars(sequence, "\u0085\u2028\u2029", "\n\n\n");
+            sequence = StringUtils.replace(sequence, "\r\n", "\n");
 
-            if (pendingWhitespace && !isWhitespace() && !Character.isWhitespace(sequence.charAt(0))) {
+            if (!formatted) {
+                sequence = StringUtils.replaceChars(sequence, "\n\r", "  ");
+                sequence = StringUtils.stripToEmpty(sequence);
+            }
+
+            if (pendingWhitespace && !isWhitespace() && StringUtils.isNotEmpty(sequence) && !Character.isWhitespace(sequence.charAt(0))) {
                 out.append(" ");
             }
 
@@ -194,7 +208,7 @@ public class TreeContextImpl implements TreeContext {
             pendingWhitespace = false;
 
             String content = out.substring(len);
-            String trimmed = StringUtils.trimToEmpty(content);
+            String trimmed = StringUtils.stripToEmpty(content);
 
             if (!ignore && !content.equals(trimmed)) {
                 out.setLength(len);

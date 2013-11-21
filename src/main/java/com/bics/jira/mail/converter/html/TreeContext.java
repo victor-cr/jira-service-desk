@@ -21,6 +21,8 @@ public interface TreeContext {
 
     TreeContext ignore(boolean ignore);
 
+    TreeContext formatted(boolean keepLineBreaks);
+
     TreeContext newLine();
 
     TreeContext whitespace();
