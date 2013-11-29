@@ -120,7 +120,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         }
 
         for (Issue issue : issues) {
-            if (fullSubject.equals(issue.getSummary())) {
+            if (fullSubject.equals(StringUtils.strip(issue.getSummary()))) {
                 return issue;
             }
         }
