@@ -81,6 +81,8 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
 
     @Override
     public MutableIssue lookupBySubject(Project project, String subject, long resolvedBefore, MessageHandlerErrorCollector monitor) {
+        subject = StringUtils.strip(subject);
+
         User author = jiraAuthenticationContext.getLoggedInUser();
         String preparedSubject = prepareSummary(subject);
 
