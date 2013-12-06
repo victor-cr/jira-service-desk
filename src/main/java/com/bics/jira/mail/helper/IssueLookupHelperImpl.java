@@ -128,7 +128,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         return null;
     }
 
-    private static String prepareSummary(String subject) {
+    protected static String prepareSummary(String subject) {
         if (StringUtils.isBlank(subject)) {
             return "";
         }
@@ -146,7 +146,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
             if (isSpecial(ch)) {
                 out.append(' ');
                 whitespace = true;
-            } else if (ch == '-') {
+            } else if (isVerySpecial(ch)) {
                 int j = i + 1;
 
                 whitespace = whitespace || i == 0 || j == a.length || isWhitespace(a[j]);
@@ -154,7 +154,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
                 if (whitespace) {
                     out.append(' ');
                 } else {
-                    out.append('-');
+                    out.append(ch);
                 }
             } else {
                 whitespace = isWhitespace(ch);
@@ -165,10 +165,19 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         return out.append('"').toString();
     }
 
+    private static boolean isVerySpecial(char c) {
+        switch (c) {
+            case '-':
+            case '&':
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private static boolean isSpecial(char c) {
         switch (c) {
             case '+':
-            case '&':
             case '|':
             case '!':
             case '(':
