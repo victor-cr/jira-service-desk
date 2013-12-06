@@ -9,6 +9,7 @@ import com.atlassian.crowd.exception.OperationFailedException;
 import com.atlassian.crowd.exception.OperationNotPermittedException;
 import com.atlassian.crowd.exception.UserNotFoundException;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
+import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.event.user.UserEventType;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.PermissionException;
@@ -50,12 +51,14 @@ import java.util.TreeSet;
 public class UserHelperImpl implements UserHelper {
     private final UserUtil userUtil;
     private final UserManager userManager;
+    private final GroupManager groupManager;
     private final PermissionManager permissionManager;
     private final ProjectManager projectManager;
 
-    public UserHelperImpl(UserUtil userUtil, UserManager userManager, PermissionManager permissionManager, ProjectManager projectManager) {
+    public UserHelperImpl(UserUtil userUtil, UserManager userManager, GroupManager groupManager, PermissionManager permissionManager, ProjectManager projectManager) {
         this.userUtil = userUtil;
         this.userManager = userManager;
+        this.groupManager = groupManager;
         this.permissionManager = permissionManager;
         this.projectManager = projectManager;
     }
@@ -112,6 +115,32 @@ public class UserHelperImpl implements UserHelper {
     @Override
     public Collection<User> ensure(InternetAddress[] addresses, boolean createUsers, boolean notifyNewUsers, MessageHandlerErrorCollector monitor) {
         Collection<User> users = find(addresses);
+
+        for (User user : users) {
+            try {
+                if (userManager.hasWritableDirectory()) {
+                    Directory directory = userManager.getDirectory(user.getDirectoryId());
+
+                    if (directory.isActive() && directory.getType() != DirectoryType.INTERNAL) {
+                        Group group = groupManager.getGroup("jira-users");
+
+                        if (group != null && !groupManager.isUserInGroup(user, group)) {
+                            groupManager.addUserToGroup(user, group);
+                        }
+
+                        userManager.updateUser(user);
+                    }
+                }
+            } catch (GroupNotFoundException e) {
+                monitor.error(e.getMessage(), e);
+            } catch (UserNotFoundException e) {
+                monitor.error(e.getMessage(), e);
+            } catch (OperationNotPermittedException e) {
+                monitor.error(e.getMessage(), e);
+            } catch (OperationFailedException e) {
+                monitor.error(e.getMessage(), e);
+            }
+        }
 
         if (!createUsers || users.size() == addresses.length) {
             return users;
