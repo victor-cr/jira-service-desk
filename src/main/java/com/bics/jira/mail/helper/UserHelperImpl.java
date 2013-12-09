@@ -115,19 +115,16 @@ public class UserHelperImpl implements UserHelper {
     public Collection<User> ensure(InternetAddress[] addresses, boolean createUsers, boolean notifyNewUsers, MessageHandlerErrorCollector monitor) {
         Collection<User> users = find(addresses);
 
+        Group group = groupManager.getGroup("jira-users");
+
         for (User user : users) {
             try {
                 if (userManager.hasWritableDirectory()) {
                     Directory directory = userManager.getDirectory(user.getDirectoryId());
 
-                    if (directory.isActive() && directory.getType() != DirectoryType.INTERNAL) {
-                        Group group = groupManager.getGroup("jira-users");
-
-                        if (group != null && !groupManager.isUserInGroup(user, group)) {
-                            groupManager.addUserToGroup(user, group);
-                        }
-
-                        userManager.updateUser(user);
+                    if (directory.isActive() && directory.getType() != DirectoryType.INTERNAL
+                            && group != null && !groupManager.isUserInGroup(user, group)) {
+                        groupManager.addUserToGroup(user, group);
                     }
                 }
             } catch (GroupNotFoundException e) {
