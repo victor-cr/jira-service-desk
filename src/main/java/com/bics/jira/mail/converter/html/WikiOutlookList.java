@@ -40,6 +40,6 @@ public class WikiOutlookList implements NodeFormatter {
             }
         }
 
-        context.newLine().symbol(prefix).whitespace().content();
+        context.newLine().symbol(prefix).whitespace().trimContent();
     }
 }
