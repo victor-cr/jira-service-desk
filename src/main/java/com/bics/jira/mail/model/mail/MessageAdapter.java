@@ -207,7 +207,7 @@ public class MessageAdapter {
                     fileName = MailUtils.fixMimeEncodedFilename(fileName);
                 }
 
-                fileName = StringUtils.replaceChars(fileName, " /:", "_-_");
+                fileName = StringUtils.replaceChars(fileName, " /:[]()", "_-_____");
 
                 list.add(new Attachment(storedFile, contentType, fileName, contentId, !MailUtils.isPartAttachment(part) && MailUtils.isPartInline(part)));
             }
