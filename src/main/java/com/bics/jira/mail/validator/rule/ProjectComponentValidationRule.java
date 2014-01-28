@@ -37,7 +37,7 @@ public class ProjectComponentValidationRule extends ValidationRule<CreateOrComme
             ProjectComponent projectComponent = projectComponentManager.find(componentId);
 
             if (project != null) {
-                assertError(project.getId().equals(projectComponent.getProjectId()), "Project component %s is not applicable to project %s.", projectComponent.getName(), project.getName());
+                assertError(!project.getId().equals(projectComponent.getProjectId()), "Project component %s is not applicable to project %s.", projectComponent.getName(), project.getName());
             }
 
             serviceModel.setProjectComponent(projectComponent);
