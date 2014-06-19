@@ -9,6 +9,7 @@ import com.bics.jira.mail.CreateOrCommentModelValidator;
 import com.bics.jira.mail.UserHelper;
 import com.bics.jira.mail.model.service.CreateOrCommentModel;
 import com.bics.jira.mail.model.web.CreateOrCommentWebModel;
+import com.bics.jira.mail.validator.rule.ComponentRegexValidationRule;
 import com.bics.jira.mail.validator.rule.IssueReporterValidationRule;
 import com.bics.jira.mail.validator.rule.IssueTypeValidationRule;
 import com.bics.jira.mail.validator.rule.ProjectComponentValidationRule;
@@ -56,6 +57,7 @@ public class CreateOrCommentModelValidatorImpl extends ServiceDeskModelValidator
         rules.add(new ProjectValidationRule(monitor, projectManager));
         rules.add(new IssueTypeValidationRule(monitor, issueTypeManager));
         rules.add(new ProjectComponentValidationRule(monitor, projectComponentManager));
+        rules.add(new ComponentRegexValidationRule(monitor));
         rules.add(new TransitionValidationRule<CreateOrCommentModel, CreateOrCommentWebModel>(monitor, statusManager));
         rules.add(new IssueReporterValidationRule(monitor, userHelper));
         rules.add(new UserAttributeValidationRule<CreateOrCommentModel, CreateOrCommentWebModel>(monitor, userHelper));

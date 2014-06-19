@@ -51,7 +51,7 @@ public class CommentOnlyMessageHandler extends ServiceDeskMessageHandler<Comment
     }
 
     @Override
-    protected User chooseAssignee(Collection<User> users) {
+    protected User chooseAssignee(Collection<User> users, String subject) {
         return null;
     }
 

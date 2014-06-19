@@ -1,6 +1,8 @@
 package com.bics.jira.mail.handler;
 
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.bc.project.component.ProjectComponent;
+import com.atlassian.jira.bc.project.component.ProjectComponentManager;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.PermissionException;
 import com.atlassian.jira.issue.AttachmentManager;
@@ -16,9 +18,12 @@ import com.bics.jira.mail.IssueLookupHelper;
 import com.bics.jira.mail.UserHelper;
 import com.bics.jira.mail.model.mail.MessageAdapter;
 import com.bics.jira.mail.model.service.CreateOrCommentModel;
+import org.apache.commons.lang.StringUtils;
 
 import javax.mail.MessagingException;
 import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * JavaDoc here
@@ -27,9 +32,12 @@ import java.util.Collection;
  * @since 03.02.13 12:29
  */
 public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<CreateOrCommentModel> {
+    private final ProjectComponentManager projectComponentManager;
 
-    public CreateOrCommentMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, AttachmentManager attachmentManager, CreateOrCommentModelValidator modelValidator, IssueHelper issueHelper, UserHelper userHelper, IssueLookupHelper issueLookupHelper) {
+    public CreateOrCommentMessageHandler(JiraAuthenticationContext jiraAuthenticationContext, AttachmentManager attachmentManager, CreateOrCommentModelValidator modelValidator, IssueHelper issueHelper, UserHelper userHelper, IssueLookupHelper issueLookupHelper, ProjectComponentManager projectComponentManager) {
         super(jiraAuthenticationContext, attachmentManager, modelValidator, issueHelper, userHelper, issueLookupHelper);
+
+        this.projectComponentManager = projectComponentManager;
     }
 
     @Override
@@ -55,7 +63,7 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
     }
 
     @Override
-    protected User chooseAssignee(Collection<User> users) {
+    protected User chooseAssignee(Collection<User> users, String subject) {
         if (users != null && !users.isEmpty() && model.isCcAssignee()) {
             for (User user : users) {
                 if (userHelper.canAssignTo(user, model.getProject())) {
@@ -64,7 +72,9 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
             }
         }
 
-        return userHelper.getDefaultAssignee(model.getProject(), model.getProjectComponent());
+        ProjectComponent component = getProjectComponent(subject);
+
+        return userHelper.getDefaultAssignee(model.getProject(), component);
     }
 
     @Override
@@ -75,6 +85,34 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
             throw new PermissionException("User " + author.getName() + " cannot create issues in the project " + project.getKey() + ".");
         }
 
-        return issueHelper.create(author, assignee, project, model.getIssueType(), model.getProjectComponent(), adapter, watchers, monitor);
+        ProjectComponent component = getProjectComponent(adapter.getSubject());
+
+        return issueHelper.create(author, assignee, project, model.getIssueType(), component, adapter, watchers, monitor);
+    }
+
+    private ProjectComponent getProjectComponent(String subject) {
+        ProjectComponent component = getProjectComponentByName(model.getComponentName());
+
+        if (component == null && model.getComponentRegex() != null && StringUtils.isNotBlank(subject)) {
+            Pattern pattern = model.getComponentRegex();
+            Matcher matcher = pattern.matcher(subject);
+
+            if (matcher.find() && matcher.groupCount() > 0) {
+                String componentName = matcher.group(1);
+
+                component = getProjectComponentByName(componentName);
+            }
+        }
+
+        return component;
+    }
+
+    private ProjectComponent getProjectComponentByName(String componentName) {
+        if (StringUtils.isBlank(componentName)) {
+            return null;
+        }
+
+        return projectComponentManager.findByComponentName(model.getProject().getId(), componentName);
+
     }
 }

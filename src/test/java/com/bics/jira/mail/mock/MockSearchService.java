@@ -18,6 +18,7 @@ import com.atlassian.query.operand.MultiValueOperand;
 import com.atlassian.query.operand.OperandVisitor;
 import com.atlassian.query.operand.SingleValueOperand;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -103,6 +104,12 @@ public class MockSearchService implements SearchService {
     @Override
     public Query sanitiseSearchQuery(User user, Query query) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Nonnull
+    @Override
+    public MessageSet validateQuery(User user, @Nonnull Query query, Long aLong) {
+        return null;
     }
 
     private static class SummaryClauseVisitor extends RecursiveClauseVisitor {

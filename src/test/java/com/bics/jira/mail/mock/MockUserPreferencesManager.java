@@ -2,11 +2,11 @@ package com.bics.jira.mail.mock;
 
 import com.atlassian.core.AtlassianCoreException;
 import com.atlassian.core.user.preferences.Preferences;
-import com.atlassian.core.user.preferences.UserPreferences;
 import com.atlassian.crowd.embedded.api.User;
+import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.user.preferences.ExtendedPreferences;
 import com.atlassian.jira.user.preferences.PreferenceKeys;
 import com.atlassian.jira.user.preferences.UserPreferencesManager;
-import com.opensymphony.module.propertyset.map.MapPropertySet;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,14 +32,30 @@ public class MockUserPreferencesManager implements UserPreferencesManager {
     }
 
     @Override
-    public void clearCache(String s) {
+    public ExtendedPreferences getExtendedPreferences(ApplicationUser applicationUser) {
+        return (ExtendedPreferences) getPreferences((User) applicationUser);
+    }
+
+    @Override
+    public Preferences getPreferences(ApplicationUser applicationUser) {
+        return getPreferences((User) applicationUser);
+    }
+
+    @Override
+    public void clearCache(ApplicationUser applicationUser) {
+
+    }
+
+    @Override
+    public void clearCacheByKey(String s) {
+
     }
 
     @Override
     public void clearCache() {
     }
 
-    private static class MockPreferences implements Preferences {
+    private static class MockPreferences implements Preferences, ExtendedPreferences {
         private final Map<String, Object> map = new HashMap<String, Object>();
 
         @Override
@@ -75,6 +91,21 @@ public class MockUserPreferencesManager implements UserPreferencesManager {
         @Override
         public void remove(String key) throws AtlassianCoreException {
             map.remove(key);
+        }
+
+        @Override
+        public String getText(String s) {
+            return getString(s);
+        }
+
+        @Override
+        public void setText(String s, String s2) throws AtlassianCoreException {
+            setString(s, s2);
+        }
+
+        @Override
+        public boolean containsValue(String s) {
+            return map.containsKey(s);
         }
     }
 }

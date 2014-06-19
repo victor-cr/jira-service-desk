@@ -22,9 +22,12 @@
         #parse("/templates/formfields/textfield.vm")
 ##        #parse("/templates/formfields/select.vm")
 
-        #set ($auiparams = $map.build("name", "componentId", "label", "common.concepts.component", "description", "msd.editHandlerDetails.component.desc"))
+        #set ($auiparams = $map.build("name", "componentName", "label", "common.concepts.component", "description", "msd.editHandlerDetails.component.desc"))
         #parse("/templates/formfields/textfield.vm")
 ##        #parse("/templates/formfields/select.vm")
+
+        #set ($auiparams = $map.build("name", "componentRegex", "label", "msd.editHandlerDetails.componentRegex", "description", "msd.editHandlerDetails.componentRegex.desc"))
+        #parse("/templates/formfields/textfield.vm")
 
         #set ($auiparams = $map.build("name", "stripQuotes", "label", "jmp.editHandlerDetails.stripquotes", "description", "jmp.editHandlerDetails.stripquotes.desc"))
         #parse("/templates/formfields/checkbox.vm")

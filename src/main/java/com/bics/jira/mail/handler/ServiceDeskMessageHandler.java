@@ -64,7 +64,7 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
 
     protected abstract MutableIssue findIssue(MessageAdapter adapter, MessageHandlerErrorCollector monitor);
 
-    protected abstract User chooseAssignee(Collection<User> users);
+    protected abstract User chooseAssignee(Collection<User> users, String subject);
 
     protected abstract MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException, AttachmentException;
 
@@ -111,7 +111,7 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
             MutableIssue issue = findIssue(adapter, monitor);
             Collection<User> users = userHelper.ensure(adapter.getAllRecipients(), model.isCreateUsers(), model.isNotifyUsers(), monitor);
 
-            User assignee = chooseAssignee(users);
+            User assignee = chooseAssignee(users, adapter.getSubject());
 
             if (issue == null) {
                 create(author, assignee, adapter, users, monitor);

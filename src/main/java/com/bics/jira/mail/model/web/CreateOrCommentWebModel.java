@@ -11,8 +11,9 @@ import java.util.Map;
 public class CreateOrCommentWebModel extends ServiceDeskWebModel {
     private String projectKey;
     private String issueTypeId;
-    private Long componentId;
+    private String componentName;
     private String catchEmail;
+    private String componentRegex;
 
     public String getProjectKey() {
         return projectKey;
@@ -30,12 +31,12 @@ public class CreateOrCommentWebModel extends ServiceDeskWebModel {
         this.issueTypeId = issueTypeId;
     }
 
-    public Long getComponentId() {
-        return componentId;
+    public String getComponentName() {
+        return componentName;
     }
 
-    public void setComponentId(Long componentId) {
-        this.componentId = componentId;
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
     }
 
     public String getCatchEmail() {
@@ -46,12 +47,21 @@ public class CreateOrCommentWebModel extends ServiceDeskWebModel {
         this.catchEmail = catchEmail;
     }
 
+    public String getComponentRegex() {
+        return componentRegex;
+    }
+
+    public void setComponentRegex(String componentRegex) {
+        this.componentRegex = componentRegex;
+    }
+
     public Map<String, String> toServiceParams() {
         Map<String, String> map = super.toServiceParams();
 
         safePut(map, KEY_PROJECT, valueOf(projectKey));
         safePut(map, KEY_ISSUE_TYPE, valueOf(issueTypeId));
-        safePut(map, KEY_COMPONENT, valueOf(componentId));
+        safePut(map, KEY_COMPONENT, valueOf(componentName));
+        safePut(map, KEY_COMPONENT_REGEX, valueOf(componentRegex));
         safePut(map, KEY_CATCH_EMAIL, valueOf(catchEmail));
 
         return map;
@@ -62,7 +72,8 @@ public class CreateOrCommentWebModel extends ServiceDeskWebModel {
 
         this.projectKey = params.get(KEY_PROJECT);
         this.issueTypeId = params.get(KEY_ISSUE_TYPE);
-        this.componentId = safeGetL(params, KEY_COMPONENT);
+        this.componentName = params.get(KEY_COMPONENT);
+        this.componentRegex = params.get(KEY_COMPONENT_REGEX);
         this.catchEmail = params.get(KEY_CATCH_EMAIL);
 
         return this;

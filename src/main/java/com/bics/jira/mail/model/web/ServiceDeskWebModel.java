@@ -16,6 +16,7 @@ public class ServiceDeskWebModel {
     protected static final String KEY_PROJECT = "project";
     protected static final String KEY_ISSUE_TYPE = "issuetype";
     protected static final String KEY_COMPONENT = "component";
+    protected static final String KEY_COMPONENT_REGEX = "componentregex";
     protected static final String KEY_TRANSITIONS = "transitions";
     protected static final String KEY_REPORTER_USERNAME = "reporterusername";
     protected static final String KEY_CATCH_EMAIL = "catchemail";

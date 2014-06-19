@@ -8,7 +8,7 @@ import com.atlassian.jira.exception.RemoveException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
-import com.atlassian.jira.mock.issue.MockIssue;
+import com.atlassian.jira.user.ApplicationUser;
 import org.ofbiz.core.entity.GenericEntityException;
 import org.ofbiz.core.entity.GenericValue;
 
@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Java Doc here
@@ -208,6 +209,61 @@ public class MockIssueManager implements IssueManager {
 
     @Override
     public long getUnassignedIssueCount() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public boolean isExistingIssueKey(String s) throws GenericEntityException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public MutableIssue getIssueByKeyIgnoreCase(String s) throws DataAccessException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public MutableIssue getIssueByCurrentKey(String s) throws DataAccessException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public List<Issue> getVotedIssues(ApplicationUser applicationUser) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public List<Issue> getVotedIssuesOverrideSecurity(ApplicationUser applicationUser) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public List<ApplicationUser> getWatchersFor(Issue issue) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public List<Issue> getWatchedIssues(ApplicationUser applicationUser) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public List<Issue> getWatchedIssuesOverrideSecurity(ApplicationUser applicationUser) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public Set<String> getAllIssueKeys(Long aLong) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public Issue findMovedIssue(String s) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public void recordMovedIssueKey(Issue issue) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }

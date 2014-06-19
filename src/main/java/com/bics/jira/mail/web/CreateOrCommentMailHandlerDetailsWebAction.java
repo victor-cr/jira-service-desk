@@ -39,12 +39,20 @@ public class CreateOrCommentMailHandlerDetailsWebAction extends ServiceDeskMailH
         model.setIssueTypeId(issueTypeId);
     }
 
-    public Long getComponentKey() {
-        return model.getComponentId();
+    public String getComponentName() {
+        return model.getComponentName();
     }
 
-    public void setComponentKey(Long componentKey) {
-        model.setComponentId(componentKey);
+    public void setComponentName(String componentName) {
+        model.setComponentName(componentName);
+    }
+
+    public String getComponentRegex() {
+        return model.getComponentRegex();
+    }
+
+    public void setComponentRegex(String componentRegex) {
+        model.setComponentRegex(componentRegex);
     }
 
     public boolean isStripQuotes() {

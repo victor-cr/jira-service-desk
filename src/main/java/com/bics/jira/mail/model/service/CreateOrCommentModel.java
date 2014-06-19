@@ -1,6 +1,5 @@
 package com.bics.jira.mail.model.service;
 
-import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.project.Project;
 
@@ -15,7 +14,8 @@ import java.util.regex.Pattern;
 public class CreateOrCommentModel extends ServiceDeskModel {
     private Project project;
     private IssueType issueType;
-    private ProjectComponent projectComponent;
+    private String componentName;
+    private Pattern componentRegex;
     private Pattern splitRegex;
 
     public Project getProject() {
@@ -34,12 +34,20 @@ public class CreateOrCommentModel extends ServiceDeskModel {
         this.issueType = issueType;
     }
 
-    public ProjectComponent getProjectComponent() {
-        return projectComponent;
+    public String getComponentName() {
+        return componentName;
     }
 
-    public void setProjectComponent(ProjectComponent projectComponent) {
-        this.projectComponent = projectComponent;
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
+    }
+
+    public Pattern getComponentRegex() {
+        return componentRegex;
+    }
+
+    public void setComponentRegex(Pattern componentRegex) {
+        this.componentRegex = componentRegex;
     }
 
     public Pattern getSplitRegex() {

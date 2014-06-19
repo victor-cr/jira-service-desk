@@ -7,6 +7,7 @@ import com.atlassian.jira.project.Project;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.bics.jira.mail.model.service.CreateOrCommentModel;
 import com.bics.jira.mail.model.web.CreateOrCommentWebModel;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Java Doc here
@@ -24,25 +25,24 @@ public class ProjectComponentValidationRule extends ValidationRule<CreateOrComme
 
     @Override
     public void validate(CreateOrCommentWebModel webModel, CreateOrCommentModel serviceModel) {
-        Long componentId = webModel.getComponentId();
+        String componentName = webModel.getComponentName();
 
-        if (componentId == null) {
-            monitor.info("Project component is not set.");
+        if (StringUtils.isBlank(componentName)) {
+            monitor.info("Project component name is not set.");
             return;
         }
 
         Project project = serviceModel.getProject();
 
-        try {
-            ProjectComponent projectComponent = projectComponentManager.find(componentId);
-
-            if (project != null) {
-                assertError(!project.getId().equals(projectComponent.getProjectId()), "Project component %s is not applicable to project %s.", projectComponent.getName(), project.getName());
-            }
-
-            serviceModel.setProjectComponent(projectComponent);
-        } catch (EntityNotFoundException e) {
-            assertError(true, "Project component id %s was not found.", componentId);
+        if (project == null) {
+            monitor.info("Project is not set.");
+            return;
         }
+
+        ProjectComponent projectComponent = projectComponentManager.findByComponentName(project.getId(), componentName);
+
+        assertError(projectComponent == null, "Project component %s is not applicable to project %s.", componentName, project.getName());
+
+        serviceModel.setComponentName(componentName);
     }
 }
