@@ -97,10 +97,14 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
             Pattern pattern = model.getComponentRegex();
             Matcher matcher = pattern.matcher(subject);
 
-            if (matcher.find() && matcher.groupCount() > 0) {
-                String componentName = matcher.group(1);
+            if (matcher.find()) {
+                int count = matcher.groupCount();
 
-                component = getProjectComponentByName(componentName);
+                for (int i = 1; component == null && i <= count; i++) {
+                    String componentName = matcher.group(i);
+
+                    component = getProjectComponentByName(componentName);
+                }
             }
         }
 
