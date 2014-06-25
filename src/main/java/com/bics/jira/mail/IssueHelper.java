@@ -26,5 +26,5 @@ import java.util.Map;
 public interface IssueHelper {
     MutableIssue create(User author, User assignee, Project project, IssueType issueType, ProjectComponent component, MessageAdapter message, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws MessagingException, AttachmentException, CreateException;
 
-    void comment(MutableIssue issue, Map<Status, Status> transitions, MessageAdapter message, Collection<User> watchers, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, AttachmentException, CreateException;
+    void comment(MutableIssue issue, Map<Status, String> transitions, MessageAdapter message, Collection<User> watchers, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, AttachmentException, CreateException;
 }

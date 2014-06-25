@@ -129,19 +129,11 @@ public class ServiceDeskWebModel {
     }
 
     protected static String arrayEncode(String[] data) {
-        return data == null || data.length == 0 ? null : encode(StringUtils.join(data, ','));
+        return data == null || data.length == 0 ? null : StringUtils.join(data, ',');
     }
 
     protected static String[] arrayDecode(String data) {
-        return StringUtils.isBlank(data) ? null : StringUtils.split(decode(data), ',');
-    }
-
-    protected static String encode(String value) {
-        return StringUtils.isBlank(value) ? null : Base64.encodeBase64String(value.getBytes());
-    }
-
-    protected static String decode(String value) {
-        return StringUtils.isBlank(value) ? null : new String(Base64.decodeBase64(value));
+        return StringUtils.isBlank(data) ? null : StringUtils.split(data, ';');
     }
 
     protected static boolean safeGetB(Map<String, String> map, String key) {

@@ -151,7 +151,7 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     @Override
-    public void comment(MutableIssue issue, Map<Status, Status> transitions, MessageAdapter message, Collection<User> watchers, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException {
+    public void comment(MutableIssue issue, Map<Status, String> transitions, MessageAdapter message, Collection<User> watchers, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException {
         Project project = issue.getProjectObject();
         User author = jiraAuthenticationContext.getLoggedInUser();
 
@@ -207,7 +207,7 @@ public class IssueHelperImpl implements IssueHelper {
         }
     }
 
-    private boolean transit(MutableIssue issue, Map<Status, Status> transitions, String comment, MessageHandlerErrorCollector monitor) throws CreateException {
+    private boolean transit(MutableIssue issue, Map<Status, String> transitions, String comment, MessageHandlerErrorCollector monitor) throws CreateException {
         User author = jiraAuthenticationContext.getLoggedInUser();
         ActionDescriptor action = lookupAction(issue, transitions, monitor);
 
@@ -233,14 +233,14 @@ public class IssueHelperImpl implements IssueHelper {
         return action != null;
     }
 
-    private ActionDescriptor lookupAction(Issue issue, Map<Status, Status> transitions, MessageHandlerErrorCollector monitor) {
+    private ActionDescriptor lookupAction(Issue issue, Map<Status, String> transitions, MessageHandlerErrorCollector monitor) {
         if (transitions == null || transitions.isEmpty()) {
             return null;
         }
 
         Status status = issue.getStatusObject();
 
-        Status required = transitions.get(status);
+        String required = transitions.get(status);
 
         if (required == null) {
             return null;
@@ -265,14 +265,8 @@ public class IssueHelperImpl implements IssueHelper {
             return null;
         }
 
-        WorkflowDescriptor descriptor = workflow.getDescriptor();
-
         for (ActionDescriptor action : actions) {
-            int stepId = action.getUnconditionalResult().getStep();
-
-            String statusId = String.valueOf(descriptor.getStep(stepId).getMetaAttributes().get(JiraWorkflow.STEP_STATUS_KEY));
-
-            if (statusId != null && required.getId().equals(statusId)) {
+            if (required.equalsIgnoreCase(action.getName())) {
                 return action;
             }
         }

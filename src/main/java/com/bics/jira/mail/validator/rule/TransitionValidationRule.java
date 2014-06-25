@@ -36,21 +36,23 @@ public class TransitionValidationRule<M extends ServiceDeskModel, W extends Serv
 
         Collection<Status> statuses = statusManager.getStatuses();
         Map<String, Status> statusMap = new HashMap<String, Status>();
-        Map<Status, Status> statusTransition = new HashMap<Status, Status>();
+        Map<Status, String> statusTransition = new HashMap<Status, String>();
 
         for (Status status : statuses) {
-            statusMap.put(status.getId(), status);
+            statusMap.put(status.getName().toUpperCase(), status);
         }
 
         for (String transition : transitions) {
             String[] parse = StringUtils.split(transition, "->");
 
-            Status left = statusMap.get(StringUtils.strip(parse[0]));
-            Status right = statusMap.get(StringUtils.strip(parse[1]));
+            if (parse != null && parse.length >= 2) {
+                Status left = statusMap.get(StringUtils.strip(parse[0]).toUpperCase());
+                String right = StringUtils.strip(parse[1]);
 
-            assertError(left == null || right == null, "A transition " + transition + " is impossible because there is no such statuses.");
+                assertError(left == null || right == null, "A transition " + transition + " is impossible because there is no such statuses.");
 
-            statusTransition.put(left, right);
+                statusTransition.put(left, right);
+            }
         }
 
         serviceModel.setTransitions(statusTransition);

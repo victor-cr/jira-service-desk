@@ -14,7 +14,7 @@ import java.util.Map;
 public class ServiceDeskModel {
     private User reporterUser;
     private long resolvedBefore;
-    private Map<Status, Status> transitions;
+    private Map<Status, String> transitions;
     private boolean createUsers;
     private boolean notifyUsers;
     private boolean ccWatcher;
@@ -37,11 +37,11 @@ public class ServiceDeskModel {
         this.resolvedBefore = resolvedBefore;
     }
 
-    public Map<Status, Status> getTransitions() {
+    public Map<Status, String> getTransitions() {
         return transitions;
     }
 
-    public void setTransitions(Map<Status, Status> transitions) {
+    public void setTransitions(Map<Status, String> transitions) {
         this.transitions = transitions;
     }
 
