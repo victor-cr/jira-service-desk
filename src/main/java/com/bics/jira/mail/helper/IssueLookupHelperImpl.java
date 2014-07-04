@@ -8,6 +8,7 @@ import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.issue.search.SearchException;
+import com.atlassian.jira.jql.builder.JqlClauseBuilder;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
@@ -94,10 +95,13 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
             Issue issue = findIssue(author, unresolvedQuery, subject);
 
             if (issue == null) {
-                Query recentlyResolvedQuery = JqlQueryBuilder.newClauseBuilder()
-                        .project(project.getId()).and().summary(preparedSubject).and()
-                        .resolutionDateBetween(new Date(System.currentTimeMillis() - resolvedBefore), new Date())
-                        .buildQuery();
+                JqlClauseBuilder builder = JqlQueryBuilder.newClauseBuilder().project(project.getId()).and().summary(preparedSubject);
+
+                if (resolvedBefore > 0) {
+                    builder = builder.and().resolutionDateBetween(new Date(System.currentTimeMillis() - resolvedBefore), new Date());
+                }
+
+                Query recentlyResolvedQuery = builder.buildQuery();
 
                 issue = findIssue(author, recentlyResolvedQuery, subject);
             }

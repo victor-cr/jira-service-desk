@@ -97,7 +97,7 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
             Pattern pattern = model.getComponentRegex();
             Matcher matcher = pattern.matcher(subject);
 
-            if (matcher.find()) {
+            while (component == null && matcher.find()) {
                 int count = matcher.groupCount();
 
                 for (int i = 1; component == null && i <= count; i++) {

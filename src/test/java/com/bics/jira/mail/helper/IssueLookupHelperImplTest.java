@@ -25,4 +25,12 @@ public class IssueLookupHelperImplTest extends Assert {
 
         assertEquals(expectedReturn, actualReturn);
     }
+
+    @Test
+    public void testPreparedSummary_Bracket() {
+        String expectedReturn = "\" tag  subject\"";
+        String actualReturn = IssueLookupHelperImpl.prepareSummary("[tag] subject");
+
+        assertEquals(expectedReturn, actualReturn);
+    }
 }
