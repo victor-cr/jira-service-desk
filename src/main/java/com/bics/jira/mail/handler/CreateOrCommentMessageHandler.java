@@ -87,6 +87,10 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
 
         ProjectComponent component = getProjectComponent(adapter.getSubject());
 
+        if (component == null && (StringUtils.isNotBlank(model.getComponentName()) || model.getComponentRegex() != null)) {
+            monitor.warning("Cannot find a component for a mail: " + adapter.getSubject());
+        }
+
         return issueHelper.create(author, assignee, project, model.getIssueType(), component, adapter, watchers, monitor);
     }
 
