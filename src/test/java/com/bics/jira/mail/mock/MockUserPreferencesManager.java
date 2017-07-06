@@ -2,7 +2,6 @@ package com.bics.jira.mail.mock;
 
 import com.atlassian.core.AtlassianCoreException;
 import com.atlassian.core.user.preferences.Preferences;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.preferences.ExtendedPreferences;
 import com.atlassian.jira.user.preferences.PreferenceKeys;
@@ -18,8 +17,9 @@ import java.util.Map;
  * @since 13/09/13 11:23
  */
 public class MockUserPreferencesManager implements UserPreferencesManager {
+
     @Override
-    public Preferences getPreferences(User user) {
+    public Preferences getPreferences(ApplicationUser user) {
         Preferences preferences = new MockPreferences();
 
         try {
@@ -33,22 +33,7 @@ public class MockUserPreferencesManager implements UserPreferencesManager {
 
     @Override
     public ExtendedPreferences getExtendedPreferences(ApplicationUser applicationUser) {
-        return (ExtendedPreferences) getPreferences((User) applicationUser);
-    }
-
-    @Override
-    public Preferences getPreferences(ApplicationUser applicationUser) {
-        return getPreferences((User) applicationUser);
-    }
-
-    @Override
-    public void clearCache(ApplicationUser applicationUser) {
-
-    }
-
-    @Override
-    public void clearCacheByKey(String s) {
-
+        return (ExtendedPreferences) getPreferences((ApplicationUser) applicationUser);
     }
 
     @Override
@@ -56,7 +41,12 @@ public class MockUserPreferencesManager implements UserPreferencesManager {
     }
 
     private static class MockPreferences implements Preferences, ExtendedPreferences {
-        private final Map<String, Object> map = new HashMap<String, Object>();
+        private final Map<String, Object> map = new HashMap<>();
+
+        @Override
+        public String getUserKey() {
+            throw new UnsupportedOperationException("Not implemented");
+        }
 
         @Override
         public long getLong(String key) {

@@ -1,8 +1,8 @@
 package com.bics.jira.mail.validator.rule;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
+import com.atlassian.jira.user.ApplicationUser;
 import com.bics.jira.mail.UserHelper;
 import com.bics.jira.mail.model.service.CreateOrCommentModel;
 import com.bics.jira.mail.model.web.CreateOrCommentWebModel;
@@ -30,7 +30,7 @@ public class IssueReporterValidationRule extends ValidationRule<CreateOrCommentM
             return;
         }
 
-        User user = userHelper.find(reporterUsername);
+        ApplicationUser user = userHelper.find(reporterUsername);
 
         assertError(user == null, "Default reporter user %s was not found.", reporterUsername);
 

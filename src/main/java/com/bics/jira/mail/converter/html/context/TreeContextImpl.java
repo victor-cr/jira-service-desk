@@ -3,24 +3,20 @@ package com.bics.jira.mail.converter.html.context;
 import com.bics.jira.mail.converter.html.NodeFormatter;
 import com.bics.jira.mail.converter.html.Tag;
 import com.bics.jira.mail.converter.html.TreeContext;
-import com.bics.jira.mail.helper.AttachmentPredicate;
 import com.bics.jira.mail.model.mail.Attachment;
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Java Doc here
@@ -29,10 +25,10 @@ import java.util.Set;
  * @since 17/04/13 13:54
  */
 public class TreeContextImpl implements TreeContext {
-    final StringBuilder out = new StringBuilder();
+    private final StringBuilder out = new StringBuilder();
 
     private final Iterable<NodeFormatter> formatters;
-    private final Deque<Node> accepted = new LinkedList<Node>();
+    private final Deque<Node> accepted = new LinkedList<>();
     private final Map<String, Attachment> inlineAttachments;
     private final Set<Attachment> attachments;
     private Node current;
@@ -44,13 +40,8 @@ public class TreeContextImpl implements TreeContext {
     public TreeContextImpl(Iterable<NodeFormatter> formatters, Iterable<Attachment> attachments, Document document) {
         this.formatters = formatters;
         this.current = document;
-        this.attachments = Sets.newHashSet(Iterables.filter(attachments, new AttachmentPredicate(false)));
-        this.inlineAttachments = Maps.uniqueIndex(Iterables.filter(attachments, new AttachmentPredicate(true)), new Function<Attachment, String>() {
-            @Override
-            public String apply(@Nullable Attachment input) {
-                return input != null && input.isInline() ? input.getContentId() : null;
-            }
-        });
+        this.attachments = StreamSupport.stream(attachments.spliterator(), false).filter(e -> e != null && !e.isInline()).collect(Collectors.toSet());
+        this.inlineAttachments = StreamSupport.stream(attachments.spliterator(), false).filter(e -> e != null && e.isInline()).collect(Collectors.toMap(Attachment::getContentId, e -> e, (x, y) -> x));
     }
 
     public Collection<Attachment> getAttachments() {
@@ -68,23 +59,13 @@ public class TreeContextImpl implements TreeContext {
     }
 
     @Override
-    public boolean hasParent(final Tag tag) {
-        return Iterables.any(accepted, new Predicate<Node>() {
-            @Override
-            public boolean apply(@Nullable Node node) {
-                return current != node && tag.is(node);
-            }
-        });
+    public boolean hasParent(Tag tag) {
+        return accepted.stream().anyMatch(e -> current != e && tag.is(e));
     }
 
     @Override
     public Iterable<Tag> path() {
-        return Iterables.unmodifiableIterable(Iterables.transform(accepted, new Function<Node, Tag>() {
-            @Override
-            public Tag apply(@Nullable Node input) {
-                return Tag.valueOf(input);
-            }
-        }));
+        return Iterables.unmodifiableIterable(accepted.stream().map(Tag::valueOf).collect(Collectors.toList()));
     }
 
     @Override

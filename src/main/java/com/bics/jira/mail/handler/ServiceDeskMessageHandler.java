@@ -1,6 +1,5 @@
 package com.bics.jira.mail.handler;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.PermissionException;
 import com.atlassian.jira.issue.AttachmentManager;
@@ -10,6 +9,7 @@ import com.atlassian.jira.service.util.handler.MessageHandler;
 import com.atlassian.jira.service.util.handler.MessageHandlerContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.service.util.handler.MessageHandlerExecutionMonitor;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.Predicate;
 import com.atlassian.jira.util.collect.CollectionUtil;
 import com.atlassian.jira.web.util.AttachmentException;
@@ -60,13 +60,13 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
 
     protected abstract M createModel();
 
-    protected abstract Predicate<User> searchPredicate(MessageAdapter adapter, MessageHandlerErrorCollector monitor);
+    protected abstract Predicate<ApplicationUser> searchPredicate(MessageAdapter adapter, MessageHandlerErrorCollector monitor);
 
     protected abstract MutableIssue findIssue(MessageAdapter adapter, MessageHandlerErrorCollector monitor);
 
-    protected abstract User chooseAssignee(Collection<User> users, String subject);
+    protected abstract ApplicationUser chooseAssignee(Collection<ApplicationUser> users, String subject);
 
-    protected abstract MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException, AttachmentException;
+    protected abstract MutableIssue create(ApplicationUser author, ApplicationUser assignee, MessageAdapter adapter, Collection<ApplicationUser> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException, AttachmentException;
 
     @Override
     public void init(Map<String, String> params, MessageHandlerErrorCollector monitor) {
@@ -89,9 +89,9 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
 
         InternetAddress[] addresses = adapter.getFrom();
 
-        Collection<User> authors = userHelper.ensure(addresses, model.isCreateUsers(), model.isNotifyUsers(), monitor);
+        Collection<ApplicationUser> authors = userHelper.ensure(addresses, model.isCreateUsers(), model.isNotifyUsers(), monitor);
 
-        User author = CollectionUtil.findFirstMatch(authors, searchPredicate(adapter, monitor));
+        ApplicationUser author = CollectionUtil.findFirstMatch(authors, searchPredicate(adapter, monitor));
 
         if (author == null && model.getReporterUser() != null) {
             monitor.warning("Message sender(s) '" + StringUtils.join(MailUtils.getSenders(message), ",")
@@ -104,14 +104,14 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
             return false;
         }
 
-        User original = jiraAuthenticationContext.getLoggedInUser();
+        ApplicationUser original = jiraAuthenticationContext.getLoggedInUser();
         jiraAuthenticationContext.setLoggedInUser(author);
 
         try {
             MutableIssue issue = findIssue(adapter, monitor);
-            Collection<User> users = userHelper.ensure(adapter.getAllRecipients(), model.isCreateUsers(), model.isNotifyUsers(), monitor);
+            Collection<ApplicationUser> users = userHelper.ensure(adapter.getAllRecipients(), model.isCreateUsers(), model.isNotifyUsers(), monitor);
 
-            User assignee = chooseAssignee(users, adapter.getSubject());
+            ApplicationUser assignee = chooseAssignee(users, adapter.getSubject());
 
             if (issue == null) {
                 create(author, assignee, adapter, users, monitor);
@@ -122,13 +122,7 @@ public abstract class ServiceDeskMessageHandler<M extends ServiceDeskModel> impl
 
                 issueHelper.comment(issue, model.getTransitions(), adapter, users, model.isStripQuotes(), monitor);
             }
-        } catch (CreateException e) {
-            monitor.error(e.getMessage());
-            return false;
-        } catch (AttachmentException e) {
-            monitor.error(e.getMessage());
-            return false;
-        } catch (PermissionException e) {
+        } catch (CreateException | AttachmentException | PermissionException e) {
             monitor.error(e.getMessage());
             return false;
         } finally {

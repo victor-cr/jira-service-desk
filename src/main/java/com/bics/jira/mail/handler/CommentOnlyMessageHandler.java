@@ -1,11 +1,11 @@
 package com.bics.jira.mail.handler;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.AttachmentManager;
 import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.Predicate;
 import com.bics.jira.mail.CommentOnlyModelValidator;
 import com.bics.jira.mail.IssueHelper;
@@ -34,14 +34,11 @@ public class CommentOnlyMessageHandler extends ServiceDeskMessageHandler<Comment
     }
 
     @Override
-    protected Predicate<User> searchPredicate(final MessageAdapter adapter, final MessageHandlerErrorCollector monitor) {
-        return new Predicate<User>() {
-            @Override
-            public boolean evaluate(User user) {
-                MutableIssue issue = findIssue(adapter, monitor);
+    protected Predicate<ApplicationUser> searchPredicate(final MessageAdapter adapter, final MessageHandlerErrorCollector monitor) {
+        return user -> {
+            MutableIssue issue = findIssue(adapter, monitor);
 
-                return issue != null && userHelper.canCommentIssue(user, issue);
-            }
+            return issue != null && userHelper.canCommentIssue(user, issue);
         };
     }
 
@@ -51,12 +48,12 @@ public class CommentOnlyMessageHandler extends ServiceDeskMessageHandler<Comment
     }
 
     @Override
-    protected User chooseAssignee(Collection<User> users, String subject) {
+    protected ApplicationUser chooseAssignee(Collection<ApplicationUser> users, String subject) {
         return null;
     }
 
     @Override
-    protected MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws CreateException {
+    protected MutableIssue create(ApplicationUser author, ApplicationUser assignee, MessageAdapter adapter, Collection<ApplicationUser> watchers, MessageHandlerErrorCollector monitor) throws CreateException {
         throw new CreateException("Cannot find an issue for mail with subject: " + adapter.getSubject());
     }
 }

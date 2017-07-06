@@ -1,6 +1,5 @@
 package com.bics.jira.mail.handler;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
 import com.atlassian.jira.bc.project.component.ProjectComponentManager;
 import com.atlassian.jira.exception.CreateException;
@@ -10,6 +9,7 @@ import com.atlassian.jira.issue.MutableIssue;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.Predicate;
 import com.atlassian.jira.web.util.AttachmentException;
 import com.bics.jira.mail.CreateOrCommentModelValidator;
@@ -46,13 +46,8 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
     }
 
     @Override
-    protected Predicate<User> searchPredicate(MessageAdapter adapter, MessageHandlerErrorCollector monitor) {
-        return new Predicate<User>() {
-            @Override
-            public boolean evaluate(User user) {
-                return userHelper.canCreateIssue(user, model.getProject());
-            }
-        };
+    protected Predicate<ApplicationUser> searchPredicate(MessageAdapter adapter, MessageHandlerErrorCollector monitor) {
+        return user -> userHelper.canCreateIssue(user, model.getProject());
     }
 
     @Override
@@ -63,9 +58,9 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
     }
 
     @Override
-    protected User chooseAssignee(Collection<User> users, String subject) {
+    protected ApplicationUser chooseAssignee(Collection<ApplicationUser> users, String subject) {
         if (users != null && !users.isEmpty() && model.isCcAssignee()) {
-            for (User user : users) {
+            for (ApplicationUser user : users) {
                 if (userHelper.canAssignTo(user, model.getProject())) {
                     return user;
                 }
@@ -78,11 +73,11 @@ public class CreateOrCommentMessageHandler extends ServiceDeskMessageHandler<Cre
     }
 
     @Override
-    protected MutableIssue create(User author, User assignee, MessageAdapter adapter, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException, AttachmentException {
+    protected MutableIssue create(ApplicationUser author, ApplicationUser assignee, MessageAdapter adapter, Collection<ApplicationUser> watchers, MessageHandlerErrorCollector monitor) throws PermissionException, MessagingException, CreateException, AttachmentException {
         Project project = model.getProject();
 
         if (!userHelper.canCreateIssue(author, project)) {
-            throw new PermissionException("User " + author.getName() + " cannot create issues in the project " + project.getKey() + ".");
+            throw new PermissionException("ApplicationUser " + author.getName() + " cannot create issues in the project " + project.getKey() + ".");
         }
 
         ProjectComponent component = getProjectComponent(adapter.getSubject());

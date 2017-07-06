@@ -1,6 +1,5 @@
 package com.bics.jira.mail.helper;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.ServiceResult;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
@@ -25,6 +24,7 @@ import com.atlassian.jira.ofbiz.OfBizDelegator;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.ErrorCollection;
 import com.atlassian.jira.web.FieldVisibilityManager;
 import com.atlassian.jira.web.util.AttachmentException;
@@ -41,7 +41,6 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 import com.opensymphony.workflow.loader.StepDescriptor;
-import com.opensymphony.workflow.loader.WorkflowDescriptor;
 
 import javax.annotation.Nullable;
 import javax.mail.MessagingException;
@@ -94,7 +93,7 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     @Override
-    public MutableIssue create(User author, User assignee, Project project, IssueType issueType, ProjectComponent component, MessageAdapter message, Collection<User> watchers, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException {
+    public MutableIssue create(ApplicationUser author, ApplicationUser assignee, Project project, IssueType issueType, ProjectComponent component, MessageAdapter message, Collection<ApplicationUser> watchers, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException {
         monitor.info("Creating new issue for an author: " + author.getName());
 
         Long levelId = issueSecurityLevelManager.getDefaultSecurityLevel(project);
@@ -119,7 +118,7 @@ public class IssueHelperImpl implements IssueHelper {
         }
 
         if (component != null) {
-            issue.setComponentObjects(Collections.singleton(component));
+            issue.setComponent(Collections.singleton(component));
         }
 
         if (isVisibleField(project, IssueFieldConstants.PRIORITY, issueType)) {
@@ -142,7 +141,7 @@ public class IssueHelperImpl implements IssueHelper {
         if (userHelper.canManageWatchList(author, project)) {
             watch(issue, watchers);
         } else {
-            monitor.warning("User " + author.getName() + " cannot manage watch list in the project " + project.getKey() + ". Ignoring.");
+            monitor.warning("ApplicationUser " + author.getName() + " cannot manage watch list in the project " + project.getKey() + ". Ignoring.");
         }
 
         monitor.info("New issue " + issueObject.getKey() + " has been successfully created");
@@ -151,14 +150,14 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     @Override
-    public void comment(MutableIssue issue, Map<Status, String> transitions, MessageAdapter message, Collection<User> watchers, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException {
+    public void comment(MutableIssue issue, Map<Status, String> transitions, MessageAdapter message, Collection<ApplicationUser> watchers, boolean stripQuotes, MessageHandlerErrorCollector monitor) throws MessagingException, CreateException, AttachmentException {
         Project project = issue.getProjectObject();
-        User author = jiraAuthenticationContext.getLoggedInUser();
+        ApplicationUser author = jiraAuthenticationContext.getLoggedInUser();
 
         if (userHelper.canManageWatchList(author, project)) {
             watch(issue, watchers);
         } else {
-            monitor.warning("User " + author.getName() + " cannot manage watch list in the project " + project.getKey() + ". Ignoring.");
+            monitor.warning("ApplicationUser " + author.getName() + " cannot manage watch list in the project " + project.getKey() + ". Ignoring.");
         }
 
         Body body = mailHelper.extract(message, stripQuotes);
@@ -171,12 +170,12 @@ public class IssueHelperImpl implements IssueHelper {
         attach(issue, author, message.getAttachments(), body.getUsed(), monitor);
     }
 
-    private void attach(MutableIssue issue, User author, Collection<Attachment> attachments, Collection<Attachment> used, MessageHandlerErrorCollector monitor) throws AttachmentException {
+    private void attach(MutableIssue issue, ApplicationUser author, Collection<Attachment> attachments, Collection<Attachment> used, MessageHandlerErrorCollector monitor) throws AttachmentException {
         List<com.atlassian.jira.issue.attachment.Attachment> existentAttachments = attachmentManager.getAttachments(issue);
         Project project = issue.getProjectObject();
 
         if (!attachmentManager.attachmentsEnabled() || !userHelper.canCreateAttachment(author, project)) {
-            monitor.warning("User " + author.getName() + " cannot create attachments in the project " + project.getKey() + ". Ignoring.");
+            monitor.warning("ApplicationUser " + author.getName() + " cannot create attachments in the project " + project.getKey() + ". Ignoring.");
             return;
         }
 
@@ -199,8 +198,8 @@ public class IssueHelperImpl implements IssueHelper {
         }
     }
 
-    private void watch(Issue issue, Collection<User> watchers) {
-        for (User user : watchers) {
+    private void watch(Issue issue, Collection<ApplicationUser> watchers) {
+        for (ApplicationUser user : watchers) {
             if (!watcherManager.isWatching(user, issue)) {
                 watcherManager.startWatching(user, issue);
             }
@@ -208,7 +207,7 @@ public class IssueHelperImpl implements IssueHelper {
     }
 
     private boolean transit(MutableIssue issue, Map<Status, String> transitions, String comment, MessageHandlerErrorCollector monitor) throws CreateException {
-        User author = jiraAuthenticationContext.getLoggedInUser();
+        ApplicationUser author = jiraAuthenticationContext.getLoggedInUser();
         ActionDescriptor action = lookupAction(issue, transitions, monitor);
 
         if (action != null) {

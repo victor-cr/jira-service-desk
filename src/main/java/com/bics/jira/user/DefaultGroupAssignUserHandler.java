@@ -3,7 +3,6 @@ package com.bics.jira.user;
 import com.atlassian.crowd.embedded.api.Directory;
 import com.atlassian.crowd.embedded.api.DirectoryType;
 import com.atlassian.crowd.embedded.api.Group;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.crowd.exception.GroupNotFoundException;
 import com.atlassian.crowd.exception.OperationFailedException;
 import com.atlassian.crowd.exception.OperationNotPermittedException;
@@ -12,7 +11,7 @@ import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.event.user.UserEvent;
 import com.atlassian.jira.event.user.UserEventListener;
 import com.atlassian.jira.security.groups.GroupManager;
-import com.atlassian.jira.user.UserUtils;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ public class DefaultGroupAssignUserHandler implements UserEventListener {
     public void userCreated(UserEvent userEvent) {
         LOG.info("New user has been created");
 
-        User user = userEvent.getUser();
+        ApplicationUser user = userEvent.getUser();
 
         UserManager userManager = ComponentAccessor.getUserManager();
         GroupManager groupManager = ComponentAccessor.getGroupManager();
