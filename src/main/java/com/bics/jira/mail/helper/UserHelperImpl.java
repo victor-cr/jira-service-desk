@@ -13,8 +13,6 @@ import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.PermissionException;
 import com.atlassian.jira.issue.Issue;
-import com.atlassian.jira.license.LicenseCountService;
-import com.atlassian.jira.license.LicenseDetails;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.DefaultAssigneeException;
 import com.atlassian.jira.project.Project;
@@ -45,8 +43,6 @@ import java.util.stream.StreamSupport;
  * @since 28.02.13 21:37
  */
 public class UserHelperImpl implements UserHelper {
-    private final LicenseDetails licenseDetails;
-    private final LicenseCountService licenseCountService;
     private final UserSearchService userSearchService;
     private final UserManager userManager;
     private final UserService userService;
@@ -54,9 +50,7 @@ public class UserHelperImpl implements UserHelper {
     private final PermissionManager permissionManager;
     private final ProjectManager projectManager;
 
-    public UserHelperImpl(LicenseDetails licenseDetails, LicenseCountService licenseCountService, UserSearchService userSearchService, UserManager userManager, UserService userService, GroupManager groupManager, PermissionManager permissionManager, ProjectManager projectManager) {
-        this.licenseDetails = licenseDetails;
-        this.licenseCountService = licenseCountService;
+    public UserHelperImpl(UserSearchService userSearchService, UserManager userManager, UserService userService, GroupManager groupManager, PermissionManager permissionManager, ProjectManager projectManager) {
         this.userSearchService = userSearchService;
         this.userManager = userManager;
         this.userService = userService;
@@ -192,7 +186,7 @@ public class UserHelperImpl implements UserHelper {
 
     @Override
     public boolean canAddUsers() {
-        return userManager.hasWritableDirectory() && licenseCountService.totalBillableUsers() < licenseDetails.getJiraLicense().getMaximumNumberOfUsers();
+        return userManager.hasWritableDirectory();
     }
 
     @Override

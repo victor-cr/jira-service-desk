@@ -306,7 +306,7 @@ public class IssueHelperImpl implements IssueHelper {
             return body.getBody();
         }
 
-        attachments = Collections2.filter(attachments, new AttachmentPredicate(false));
+        attachments = Collections2.filter(attachments, e -> e != null && !e.isInline());
 
         if (attachments.isEmpty()) {
             return body.getBody();

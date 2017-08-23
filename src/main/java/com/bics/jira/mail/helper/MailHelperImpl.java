@@ -48,7 +48,7 @@ public class MailHelperImpl implements MailHelper {
         if (StringUtils.isBlank(text)) {
             text = message.getPlainTextBody();
 
-            Collection<Attachment> used = Collections2.filter(attachments, new AttachmentPredicate(false));
+            Collection<Attachment> used = Collections2.filter(attachments, e -> e != null && !e.isInline());
 
             return StringUtils.isBlank(text) ? new Body("", used) :
                     get(message, stripQuotes, textConverters).convert(text, used);
