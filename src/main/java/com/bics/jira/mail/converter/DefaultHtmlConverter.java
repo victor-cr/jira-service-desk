@@ -1,11 +1,9 @@
 package com.bics.jira.mail.converter;
 
-import com.atlassian.mail.HtmlToTextConverter;
-import com.bics.jira.mail.helper.AttachmentPredicate;
+import com.atlassian.mail.converters.basic.HtmlToTextConverter;
 import com.bics.jira.mail.model.mail.Attachment;
 import com.bics.jira.mail.model.mail.Body;
 import com.bics.jira.mail.model.mail.MessageAdapter;
-import com.google.common.collect.Collections2;
 
 import java.io.IOException;
 import java.util.Collection;

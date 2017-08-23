@@ -1,6 +1,5 @@
 package com.bics.jira.mail.helper;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.config.properties.APKeys;
 import com.atlassian.jira.config.properties.ApplicationProperties;
@@ -13,6 +12,7 @@ import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
 import com.bics.jira.mail.IssueLookupHelper;
@@ -84,7 +84,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
     public MutableIssue lookupBySubject(Project project, String subject, long resolvedBefore, MessageHandlerErrorCollector monitor) {
         subject = StringUtils.strip(subject);
 
-        User author = jiraAuthenticationContext.getLoggedInUser();
+        ApplicationUser author = jiraAuthenticationContext.getLoggedInUser();
         String preparedSubject = prepareSummary(subject);
 
         try {
@@ -116,7 +116,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         return null;
     }
 
-    private Issue findIssue(User user, Query query, String fullSubject) throws SearchException {
+    private Issue findIssue(ApplicationUser user, Query query, String fullSubject) throws SearchException {
         List<Issue> issues = searchService.search(user, query, PagerFilter.getUnlimitedFilter()).getIssues();
 
         if (issues == null || issues.isEmpty()) {

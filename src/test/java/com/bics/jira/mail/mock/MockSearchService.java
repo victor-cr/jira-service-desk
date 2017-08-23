@@ -1,6 +1,5 @@
 package com.bics.jira.mail.mock;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.search.SearchContext;
@@ -8,6 +7,7 @@ import com.atlassian.jira.issue.search.SearchException;
 import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.issue.search.searchers.util.RecursiveClauseVisitor;
 import com.atlassian.jira.jql.context.QueryContext;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.util.MessageSet;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.atlassian.query.Query;
@@ -37,7 +37,7 @@ public class MockSearchService implements SearchService {
     }
 
     @Override
-    public SearchResults search(User user, Query query, PagerFilter pagerFilter) throws SearchException {
+    public SearchResults search(ApplicationUser user, Query query, PagerFilter pagerFilter) throws SearchException {
         SummaryClauseVisitor summaryClauseVisitor = new SummaryClauseVisitor();
 
         for (Issue issue : issues) {
@@ -52,63 +52,81 @@ public class MockSearchService implements SearchService {
     }
 
     @Override
-    public long searchCount(User user, Query query) throws SearchException {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    public SearchResults searchOverrideSecurity(ApplicationUser applicationUser, Query query, PagerFilter pagerFilter) throws SearchException {
+        return null;
     }
 
     @Override
-    public String getQueryString(User user, Query query) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public long searchCount(ApplicationUser applicationUser, Query query) throws SearchException {
+        return 0;
     }
 
     @Override
-    public ParseResult parseQuery(User user, String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public long searchCountOverrideSecurity(ApplicationUser applicationUser, Query query) throws SearchException {
+        return 0;
     }
 
+    @Deprecated
     @Override
-    public MessageSet validateQuery(User user, Query query) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public boolean doesQueryFitFilterForm(User user, Query query) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public QueryContext getQueryContext(User user, Query query) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public QueryContext getSimpleQueryContext(User user, Query query) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public SearchContext getSearchContext(User user, Query query) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public String getJqlString(Query query) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public String getGeneratedJqlString(Query query) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public Query sanitiseSearchQuery(User user, Query query) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public String getQueryString(ApplicationUser applicationUser, Query query) {
+        return null;
     }
 
     @Nonnull
     @Override
-    public MessageSet validateQuery(User user, @Nonnull Query query, Long aLong) {
+    public String getIssueSearchPath(ApplicationUser applicationUser, @Nonnull IssueSearchParameters issueSearchParameters) {
+        return null;
+    }
+
+    @Override
+    public ParseResult parseQuery(ApplicationUser applicationUser, String s) {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public MessageSet validateQuery(ApplicationUser applicationUser, @Nonnull Query query) {
+        return null;
+    }
+
+    @Nonnull
+    @Override
+    public MessageSet validateQuery(ApplicationUser applicationUser, @Nonnull Query query, Long aLong) {
+        return null;
+    }
+
+    @Override
+    public boolean doesQueryFitFilterForm(ApplicationUser applicationUser, Query query) {
+        return false;
+    }
+
+    @Override
+    public QueryContext getQueryContext(ApplicationUser applicationUser, Query query) {
+        return null;
+    }
+
+    @Override
+    public QueryContext getSimpleQueryContext(ApplicationUser applicationUser, Query query) {
+        return null;
+    }
+
+    @Override
+    public SearchContext getSearchContext(ApplicationUser applicationUser, Query query) {
+        return null;
+    }
+
+    @Override
+    public String getJqlString(Query query) {
+        return null;
+    }
+
+    @Override
+    public String getGeneratedJqlString(Query query) {
+        return null;
+    }
+
+    @Override
+    public Query sanitiseSearchQuery(ApplicationUser applicationUser, Query query) {
         return null;
     }
 

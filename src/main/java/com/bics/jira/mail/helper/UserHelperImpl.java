@@ -3,43 +3,40 @@ package com.bics.jira.mail.helper;
 import com.atlassian.crowd.embedded.api.Directory;
 import com.atlassian.crowd.embedded.api.DirectoryType;
 import com.atlassian.crowd.embedded.api.Group;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.crowd.exception.GroupNotFoundException;
 import com.atlassian.crowd.exception.OperationFailedException;
 import com.atlassian.crowd.exception.OperationNotPermittedException;
 import com.atlassian.crowd.exception.UserNotFoundException;
 import com.atlassian.jira.bc.project.component.ProjectComponent;
-import com.atlassian.jira.event.user.UserEventType;
+import com.atlassian.jira.bc.user.UserService;
+import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.PermissionException;
 import com.atlassian.jira.issue.Issue;
+import com.atlassian.jira.license.LicenseCountService;
+import com.atlassian.jira.license.LicenseDetails;
+import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.DefaultAssigneeException;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.PermissionManager;
-import com.atlassian.jira.security.Permissions;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.user.util.UserManager;
-import com.atlassian.jira.user.util.UserUtil;
-import com.atlassian.jira.util.Consumer;
-import com.atlassian.jira.util.Function;
-import com.atlassian.jira.util.NotNull;
-import com.atlassian.jira.util.Predicate;
 import com.atlassian.jira.util.collect.CollectionUtil;
 import com.bics.jira.mail.UserHelper;
 import org.apache.commons.lang.StringUtils;
 
 import javax.mail.internet.InternetAddress;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * JavaDoc here
@@ -48,61 +45,74 @@ import java.util.TreeSet;
  * @since 28.02.13 21:37
  */
 public class UserHelperImpl implements UserHelper {
-    private final UserUtil userUtil;
+    private final LicenseDetails licenseDetails;
+    private final LicenseCountService licenseCountService;
+    private final UserSearchService userSearchService;
     private final UserManager userManager;
+    private final UserService userService;
     private final GroupManager groupManager;
     private final PermissionManager permissionManager;
     private final ProjectManager projectManager;
 
-    public UserHelperImpl(UserUtil userUtil, UserManager userManager, GroupManager groupManager, PermissionManager permissionManager, ProjectManager projectManager) {
-        this.userUtil = userUtil;
+    public UserHelperImpl(LicenseDetails licenseDetails, LicenseCountService licenseCountService, UserSearchService userSearchService, UserManager userManager, UserService userService, GroupManager groupManager, PermissionManager permissionManager, ProjectManager projectManager) {
+        this.licenseDetails = licenseDetails;
+        this.licenseCountService = licenseCountService;
+        this.userSearchService = userSearchService;
         this.userManager = userManager;
+        this.userService = userService;
         this.groupManager = groupManager;
         this.permissionManager = permissionManager;
         this.projectManager = projectManager;
     }
 
     @Override
-    public User find(String userName) {
-        return userUtil.getUser(userName);
+    public ApplicationUser find(String userName) {
+        return userManager.getUserByName(userName);
     }
 
     @Override
-    public User find(InternetAddress address) {
+    public ApplicationUser find(InternetAddress address) {
         return CollectionUtil.first(find(new InternetAddress[]{address}));
     }
 
     @Override
-    public Collection<User> find(InternetAddress[] addresses) {
-        Collection<User> users = userUtil.getUsers();
-        FindUserConsumer consumer = new FindUserConsumer(toSortedSet(addresses));
-
-        CollectionUtil.foreach(users, consumer);
-
-        return new ArrayList<User>(consumer.map.values());
+    public Collection<ApplicationUser> find(InternetAddress[] addresses) {
+        return Arrays.stream(addresses)
+                .map(e -> userSearchService.findUsersByEmail(e.getAddress()))
+                .flatMap(e -> StreamSupport.stream(e.spliterator(), false))
+                .filter(ApplicationUser::isActive)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User create(InternetAddress address, boolean notifyNewUsers, MessageHandlerErrorCollector monitor) {
+    public ApplicationUser create(InternetAddress address, boolean notifyNewUsers, MessageHandlerErrorCollector monitor) {
         String email = address.getAddress();
         String fullName = address.getPersonal();
 
         try {
-            return notifyNewUsers
-                    ? userUtil.createUserWithNotification(email, email, email, fullName, UserEventType.USER_CREATED)
-                    : userUtil.createUserNoNotification(email, email, email, fullName);
+            UserService.CreateUserRequest request = UserService.CreateUserRequest
+                    .withUserDetails(null, email, email, email, fullName)
+                    .sendNotification(notifyNewUsers);
+
+            if (notifyNewUsers) {
+                request = request.sendUserSignupEvent();
+            }
+
+            UserService.CreateUserValidationResult result = userService.validateCreateUser(request);
+
+            return userService.createUser(result);
         } catch (PermissionException e) {
             monitor.error("Permission problem: " + e.getMessage(), e);
         } catch (CreateException e) {
-            monitor.error("User creation problem: " + e.getMessage(), e);
+            monitor.error("ApplicationUser creation problem: " + e.getMessage(), e);
         }
 
         return null;
     }
 
     @Override
-    public User ensure(InternetAddress address, boolean createUsers, boolean notifyNewUsers, MessageHandlerErrorCollector monitor) {
-        User user = find(address);
+    public ApplicationUser ensure(InternetAddress address, boolean createUsers, boolean notifyNewUsers, MessageHandlerErrorCollector monitor) {
+        ApplicationUser user = find(address);
 
         if (!createUsers || user != null) {
             return user;
@@ -112,12 +122,12 @@ public class UserHelperImpl implements UserHelper {
     }
 
     @Override
-    public Collection<User> ensure(InternetAddress[] addresses, boolean createUsers, boolean notifyNewUsers, MessageHandlerErrorCollector monitor) {
-        Collection<User> users = find(addresses);
+    public Collection<ApplicationUser> ensure(InternetAddress[] addresses, boolean createUsers, boolean notifyNewUsers, MessageHandlerErrorCollector monitor) {
+        Collection<ApplicationUser> users = find(addresses);
 
         Group group = groupManager.getGroup("jira-users");
 
-        for (User user : users) {
+        for (ApplicationUser user : users) {
             try {
                 if (userManager.hasWritableDirectory()) {
                     Directory directory = userManager.getDirectory(user.getDirectoryId());
@@ -127,13 +137,7 @@ public class UserHelperImpl implements UserHelper {
                         groupManager.addUserToGroup(user, group);
                     }
                 }
-            } catch (GroupNotFoundException e) {
-                monitor.error(e.getMessage(), e);
-            } catch (UserNotFoundException e) {
-                monitor.error(e.getMessage(), e);
-            } catch (OperationNotPermittedException e) {
-                monitor.error(e.getMessage(), e);
-            } catch (OperationFailedException e) {
+            } catch (GroupNotFoundException | UserNotFoundException | OperationNotPermittedException | OperationFailedException e) {
                 monitor.error(e.getMessage(), e);
             }
         }
@@ -142,12 +146,12 @@ public class UserHelperImpl implements UserHelper {
             return users;
         }
 
-        Collection<String> created = CollectionUtil.transform(users, transformerUser());
+        Collection<String> created = CollectionUtil.transform(users, e -> StringUtils.trimToNull(StringUtils.lowerCase(e.getEmailAddress())));
         Map<String, InternetAddress> all = toSortedMap(addresses);
 
         for (Map.Entry<String, InternetAddress> email : all.entrySet()) {
             if (!created.contains(email.getKey())) {
-                User user = create(email.getValue(), notifyNewUsers, monitor);
+                ApplicationUser user = create(email.getValue(), notifyNewUsers, monitor);
 
                 users.add(user);
             }
@@ -157,46 +161,46 @@ public class UserHelperImpl implements UserHelper {
     }
 
     @Override
-    public boolean canAssignTo(User user, Project project) {
-        return permissionManager.hasPermission(Permissions.ASSIGNABLE_USER, project, user);
+    public boolean canAssignTo(ApplicationUser user, Project project) {
+        return permissionManager.hasPermission(ProjectPermissions.ASSIGNABLE_USER, project, user);
     }
 
     @Override
-    public boolean canCreateIssue(User user, Project project) {
-        return permissionManager.hasPermission(Permissions.CREATE_ISSUE, project, user);
+    public boolean canCreateIssue(ApplicationUser user, Project project) {
+        return permissionManager.hasPermission(ProjectPermissions.CREATE_ISSUES, project, user);
     }
 
     @Override
-    public boolean canCommentIssue(User user, Project project) {
-        return permissionManager.hasPermission(Permissions.COMMENT_ISSUE, project, user);
+    public boolean canCommentIssue(ApplicationUser user, Project project) {
+        return permissionManager.hasPermission(ProjectPermissions.ADD_COMMENTS, project, user);
     }
 
     @Override
-    public boolean canCommentIssue(User user, Issue issue) {
-        return permissionManager.hasPermission(Permissions.COMMENT_ISSUE, issue, user);
+    public boolean canCommentIssue(ApplicationUser user, Issue issue) {
+        return permissionManager.hasPermission(ProjectPermissions.ADD_COMMENTS, issue, user);
     }
 
     @Override
-    public boolean canCreateAttachment(User user, Project project) {
-        return permissionManager.hasPermission(Permissions.CREATE_ATTACHMENT, project, user);
+    public boolean canCreateAttachment(ApplicationUser user, Project project) {
+        return permissionManager.hasPermission(ProjectPermissions.CREATE_ATTACHMENTS, project, user);
     }
 
     @Override
-    public boolean canManageWatchList(User user, Project project) {
-        return permissionManager.hasPermission(Permissions.MANAGE_WATCHER_LIST, project, user);
+    public boolean canManageWatchList(ApplicationUser user, Project project) {
+        return permissionManager.hasPermission(ProjectPermissions.MANAGE_WATCHERS, project, user);
     }
 
     @Override
     public boolean canAddUsers() {
-        return userManager.hasWritableDirectory() && !userUtil.hasExceededUserLimit();
+        return userManager.hasWritableDirectory() && licenseCountService.totalBillableUsers() < licenseDetails.getJiraLicense().getMaximumNumberOfUsers();
     }
 
     @Override
-    public User getDefaultAssignee(Project project, ProjectComponent... components) {
-        Collection<ProjectComponent> projectComponents = CollectionUtil.filter(Arrays.asList(components), onlyExistent());
+    public ApplicationUser getDefaultAssignee(Project project, ProjectComponent... components) {
+        Collection<ProjectComponent> projectComponents = Arrays.stream(components).filter(Objects::nonNull).collect(Collectors.toList());
 
         try {
-            User defaultAssignee = projectManager.getDefaultAssignee(project, projectComponents);
+            ApplicationUser defaultAssignee = projectManager.getDefaultAssignee(project, projectComponents);
 
             return canAssignTo(defaultAssignee, project) ? defaultAssignee : null;
         } catch (DefaultAssigneeException e) {
@@ -204,74 +208,17 @@ public class UserHelperImpl implements UserHelper {
         }
     }
 
-    protected Function<InternetAddress, String> transformerInternetAddress() {
-        return new Function<InternetAddress, String>() {
-            @Override
-            public String get(InternetAddress address) {
-                return StringUtils.trimToNull(StringUtils.lowerCase(address.getAddress()));
-            }
-        };
-    }
-
-    protected Function<User, String> transformerUser() {
-        return new Function<User, String>() {
-            @Override
-            public String get(User user) {
-                return StringUtils.trimToNull(StringUtils.lowerCase(user.getEmailAddress()));
-            }
-        };
-    }
-
-    protected <T> Predicate<T> onlyExistent() {
-        return new Predicate<T>() {
-            @Override
-            public boolean evaluate(T obj) {
-                return obj != null;
-            }
-        };
-    }
-
-    protected SortedSet<String> toSortedSet(InternetAddress[] addresses) {
-        return new TreeSet<String>(toSortedMap(addresses).keySet());
-    }
-
-    protected SortedMap<String, InternetAddress> toSortedMap(InternetAddress[] addresses) {
-        Predicate<String> filter = onlyExistent();
-        Function<InternetAddress, String> transformer = transformerInternetAddress();
-        SortedMap<String, InternetAddress> map = new TreeMap<String, InternetAddress>();
+    private SortedMap<String, InternetAddress> toSortedMap(InternetAddress[] addresses) {
+        SortedMap<String, InternetAddress> map = new TreeMap<>();
 
         for (InternetAddress address : addresses) {
-            String key = transformer.get(address);
+            String key = StringUtils.trimToNull(StringUtils.lowerCase(address.getAddress()));
 
-            if (filter.evaluate(key)) {
+            if (key != null) {
                 map.put(key, address);
             }
         }
 
         return map;
-    }
-
-    private static class FindUserConsumer implements Consumer<User> {
-        private final Map<String, User> map = new HashMap<String, User>();
-        private final SortedSet<String> addresses;
-
-        public FindUserConsumer(SortedSet<String> addresses) {
-            this.addresses = addresses;
-        }
-
-        @Override
-        public void consume(@NotNull User user) {
-            String email = StringUtils.lowerCase(StringUtils.trimToNull(user.getEmailAddress()));
-
-            if (email == null || !this.addresses.contains(email)) {
-                return;
-            }
-
-            User oldOne = map.get(email);
-
-            if (oldOne == null || !oldOne.isActive()) {
-                map.put(email, user);
-            }
-        }
     }
 }

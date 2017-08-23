@@ -1,6 +1,5 @@
 package com.bics.jira.mail.mock;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.event.type.EventDispatchOption;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.exception.DataAccessException;
@@ -8,10 +7,13 @@ import com.atlassian.jira.exception.RemoveException;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueManager;
 import com.atlassian.jira.issue.MutableIssue;
+import com.atlassian.jira.issue.UpdateIssueRequest;
 import com.atlassian.jira.user.ApplicationUser;
+import com.atlassian.jira.util.lang.Pair;
 import org.ofbiz.core.entity.GenericEntityException;
 import org.ofbiz.core.entity.GenericValue;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +44,40 @@ public class MockIssueManager implements IssueManager {
     }
 
     @Override
+    public Issue updateIssue(ApplicationUser applicationUser, MutableIssue mutableIssue, UpdateIssueRequest updateIssueRequest) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public long getIssueCount() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Nonnull
+    @Override
+    public Set<Pair<Long, String>> getProjectIssueTypePairsByKeys(Set<String> set) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Nonnull
+    @Override
+    public Set<Pair<Long, String>> getProjectIssueTypePairsByIds(Set<Long> set) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Nonnull
+    @Override
+    public Set<String> getKeysOfMissingIssues(Set<String> set) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Nonnull
+    @Override
+    public Set<Long> getIdsOfMissingIssues(Set<Long> set) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
     public GenericValue getIssueByWorkflow(Long aLong) throws GenericEntityException {
         throw new UnsupportedOperationException("Not implemented");
     }
@@ -49,6 +85,11 @@ public class MockIssueManager implements IssueManager {
     @Override
     public MutableIssue getIssueObjectByWorkflow(Long aLong) throws GenericEntityException {
         throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public boolean atLeastOneIssueExists() {
+        return !issuesByKey.isEmpty();
     }
 
     @Override
@@ -78,27 +119,7 @@ public class MockIssueManager implements IssueManager {
     }
 
     @Override
-    public List<Issue> getVotedIssues(User user) throws GenericEntityException {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public List<Issue> getVotedIssuesOverrideSecurity(User user) throws GenericEntityException {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public List<User> getWatchers(Issue issue) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public List<Issue> getWatchedIssues(User user) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public List<Issue> getWatchedIssuesOverrideSecurity(User user) {
+    public List<ApplicationUser> getWatchers(Issue issue) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -133,37 +154,37 @@ public class MockIssueManager implements IssueManager {
     }
 
     @Override
-    public GenericValue createIssue(User user, Map<String, Object> stringObjectMap) throws CreateException {
+    public GenericValue createIssue(ApplicationUser applicationUser, Map<String, Object> map) throws CreateException {
+        return null;
+    }
+
+    @Override
+    public Issue createIssueObject(ApplicationUser user, Map<String, Object> stringObjectMap) throws CreateException {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public Issue createIssueObject(User user, Map<String, Object> stringObjectMap) throws CreateException {
+    public GenericValue createIssue(ApplicationUser user, Issue issue) throws CreateException {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public GenericValue createIssue(User user, Issue issue) throws CreateException {
+    public Issue createIssueObject(ApplicationUser user, Issue issue) throws CreateException {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public Issue createIssueObject(User user, Issue issue) throws CreateException {
+    public Issue updateIssue(ApplicationUser user, MutableIssue mutableIssue, EventDispatchOption eventDispatchOption, boolean b) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public Issue updateIssue(User user, MutableIssue mutableIssue, EventDispatchOption eventDispatchOption, boolean b) {
+    public void deleteIssue(ApplicationUser user, Issue issue, EventDispatchOption eventDispatchOption, boolean b) throws RemoveException {
         throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override
-    public void deleteIssue(User user, Issue issue, EventDispatchOption eventDispatchOption, boolean b) throws RemoveException {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public void deleteIssue(User user, MutableIssue mutableIssue, EventDispatchOption eventDispatchOption, boolean b) throws RemoveException {
+    public void deleteIssue(ApplicationUser user, MutableIssue mutableIssue, EventDispatchOption eventDispatchOption, boolean b) throws RemoveException {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -188,7 +209,7 @@ public class MockIssueManager implements IssueManager {
     }
 
     @Override
-    public boolean isEditable(Issue issue, User user) {
+    public boolean isEditable(Issue issue, ApplicationUser user) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

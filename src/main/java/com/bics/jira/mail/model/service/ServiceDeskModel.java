@@ -1,7 +1,7 @@
 package com.bics.jira.mail.model.service;
 
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.issue.status.Status;
+import com.atlassian.jira.user.ApplicationUser;
 
 import java.util.Map;
 
@@ -12,7 +12,7 @@ import java.util.Map;
  * @since 03.02.13 22:29
  */
 public class ServiceDeskModel {
-    private User reporterUser;
+    private ApplicationUser reporterUser;
     private long resolvedBefore;
     private Map<Status, String> transitions;
     private boolean createUsers;
@@ -21,11 +21,11 @@ public class ServiceDeskModel {
     private boolean ccAssignee;
     private boolean stripQuotes;
 
-    public User getReporterUser() {
+    public ApplicationUser getReporterUser() {
         return reporterUser;
     }
 
-    public void setReporterUser(User reporterUser) {
+    public void setReporterUser(ApplicationUser reporterUser) {
         this.reporterUser = reporterUser;
     }
 

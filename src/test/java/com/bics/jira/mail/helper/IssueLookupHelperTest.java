@@ -14,7 +14,8 @@ import com.atlassian.jira.plugins.mail.DryRunMessageHandlerExecutionMonitor;
 import com.atlassian.jira.project.MockProject;
 import com.atlassian.jira.service.util.handler.MessageHandlerErrorCollector;
 import com.atlassian.jira.timezone.TimeZoneManagerImpl;
-import com.atlassian.jira.user.MockUser;
+import com.atlassian.jira.user.MockApplicationUser;
+import com.atlassian.jira.user.util.MockUserManager;
 import com.bics.jira.mail.mock.MockIssueManager;
 import com.bics.jira.mail.mock.MockSearchService;
 import com.bics.jira.mail.mock.MockUserPreferencesManager;
@@ -32,7 +33,7 @@ public class IssueLookupHelperTest extends Assert {
     private static final long RESOLVED_BEFORE = 30L * 24 * 60 * 60 * 1000;
 
     private final MockComponentWorker worker = new MockComponentWorker();
-    private final MockSimpleAuthenticationContext jiraAuthenticationContext = new MockSimpleAuthenticationContext(new MockUser("test"));
+    private final MockSimpleAuthenticationContext jiraAuthenticationContext = new MockSimpleAuthenticationContext(new MockApplicationUser("test"));
     private final MockApplicationProperties applicationProperties = new MockApplicationProperties();
     private final MockIssueManager issueManager = new MockIssueManager();
     private final MockSearchService searchService = new MockSearchService();
@@ -45,7 +46,7 @@ public class IssueLookupHelperTest extends Assert {
 
     @Before
     public void before() {
-        worker.addMock(JqlClauseBuilderFactory.class, new JqlClauseBuilderFactoryImpl(new JqlDateSupportImpl(new TimeZoneManagerImpl(jiraAuthenticationContext, new MockUserPreferencesManager(), applicationProperties))));
+        worker.addMock(JqlClauseBuilderFactory.class, new JqlClauseBuilderFactoryImpl(new JqlDateSupportImpl(new TimeZoneManagerImpl(jiraAuthenticationContext, new MockUserPreferencesManager(), applicationProperties, new MockUserManager()))));
 
         ComponentAccessor.initialiseWorker(worker);
 
