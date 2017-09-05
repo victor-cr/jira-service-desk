@@ -48,7 +48,7 @@ public class MockSearchService implements SearchService {
             }
         }
 
-        return new SearchResults(Collections.<Issue>emptyList(), pagerFilter);
+        return new SearchResults(Collections.emptyList(), pagerFilter);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class MockSearchService implements SearchService {
         public String visit(SingleValueOperand singleValueOperand) {
             String value = singleValueOperand.getStringValue();
 
-            return value == null || value.length() < 2 ? "" : value.substring(1, value.length() - 1);
+            return value == null || value.length() < 2 ? "" : value;
         }
     }
 }

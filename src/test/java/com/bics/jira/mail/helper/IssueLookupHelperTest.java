@@ -64,7 +64,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_SingleFirst() {
         MutableIssue expectedResult = issue1;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("TEST-110 Subject JS-21 JAM-1323", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("(TEST-110) Subject JS-21 JAM-1323", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }
@@ -72,7 +72,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_SingleFirstCase() {
         MutableIssue expectedResult = issue1;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("TEST-110 Subject TeST-111 JS-21 JAM-1323", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("(TEST-110) Subject TeST-111 JS-21 JAM-1323", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }
@@ -80,7 +80,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_SingleFirstWithJunk() {
         MutableIssue expectedResult = issue1;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("eTEST-111 TEST-111Subject TEST-110 JS-21 JAM-1323", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("eTEST-111 TEST-111Subject (TEST-110) JS-21 JAM-1323", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }
@@ -88,7 +88,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_SingleMiddle() {
         MutableIssue expectedResult = issue1;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("ssd fsdf TST-867 sd fTEST-111 TEST-110 JS-21 JAM-1323", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("ssd fsdf (TST-867) sd fTEST-111 (TEST-110) JS-21 JAM-1323", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }
@@ -96,7 +96,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_SingleMiddleCase() {
         MutableIssue expectedResult = issue1;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("sdlfkjsdf TST-10734 TEST-110 Subject TeST-111 JS-21 JAM-1323", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("sdlfkjsdf TST-10734 (TEST-110) Subject (TeST-111) JS-21 JAM-1323", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }
@@ -104,7 +104,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_SingleMiddleWithJunk() {
         MutableIssue expectedResult = issue1;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("ssd fsdf TST-867 sd fTEST-111 TEST-110 TEST-111JS-21 JAM-1323", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("ssd fsdf TST-867 sd fTEST-111 (TEST-110) TEST-111JS-21 JAM-1323", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }
@@ -112,7 +112,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_SingleLast() {
         MutableIssue expectedResult = issue1;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("Subject JS-21 JAM-1323 TEST-110", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("Subject JS-21 JAM-1323 (TEST-110)", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }
@@ -120,7 +120,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_SingleLastCase() {
         MutableIssue expectedResult = issue1;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("Subject TeST-111 JS-21 JAM-1323 TEST-110", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("Subject (TeST-111) JS-21 JAM-1323 (TEST-110)", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }
@@ -128,7 +128,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_SingleLastWithJunk() {
         MutableIssue expectedResult = issue1;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("eTEST-111 TEST-111Subject ,TEST-111_ JS-21 JAM-1323 TEST-110", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("eTEST-111 (TEST-111Subject ,TEST-111_) JS-21 JAM-1323 (TEST-110)", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }
@@ -136,7 +136,7 @@ public class IssueLookupHelperTest extends Assert {
     @Test
     public void testLookupByKey_Multiple() {
         MutableIssue expectedResult = issue2;
-        MutableIssue actualResult = issueLookupHelper.lookupByKey("eTEST-111 TEST-111 JS-21 JAM-1323 TEST-110", 0, monitor);
+        MutableIssue actualResult = issueLookupHelper.lookupByKey("eTEST-111 (TEST-111) (JS-21) (JAM-1323) (TEST-110)", 0, monitor);
 
         assertEquals(expectedResult, actualResult);
     }

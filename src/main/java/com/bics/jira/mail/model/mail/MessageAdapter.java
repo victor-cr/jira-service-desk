@@ -14,7 +14,6 @@ import javax.mail.Part;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimePart;
 import javax.mail.internet.MimeUtility;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -72,7 +70,7 @@ public class MessageAdapter {
         BodyPredicate textHtmlPredicate = new BodyPredicate(MimeType.HTML);
         AttachmentPredicate attachmentPredicate = new AttachmentPredicate();
 
-        apply(message, new ArrayList<Predicate<Part>>(Arrays.asList(textHtmlPredicate, textPlainPredicate, attachmentPredicate)));
+        apply(message, new ArrayList<>(Arrays.asList(textHtmlPredicate, textPlainPredicate, attachmentPredicate)));
 
         textBody = textPlainPredicate.body;
         htmlBody = textHtmlPredicate.body;
@@ -300,11 +298,7 @@ public class MessageAdapter {
         MimeType mimeType = MimeType.valueOf(part);
 
         if (mimeType != MimeType.MULTIPART) {
-            for (Iterator<Predicate<Part>> iterator = predicates.iterator(); iterator.hasNext(); ) {
-                if (!iterator.next().evaluate(part)) {
-                    iterator.remove();
-                }
-            }
+            predicates.removeIf(e -> !e.evaluate(part));
 
             return;
         }

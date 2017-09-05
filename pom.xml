@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bics.jira.mail</groupId>
     <artifactId>service-desk</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
 
     <name>JIRA Mail Service Desk</name>
     <packaging>atlassian-plugin</packaging>
@@ -31,8 +31,8 @@
     </developers>
 
     <properties>
-        <jira.version>7.4.1</jira.version>
-        <amps.version>6.3.2</amps.version>
+        <jira.version>7.4.3</jira.version>
+        <amps.version>6.3.3</amps.version>
     </properties>
 
     <dependencies>

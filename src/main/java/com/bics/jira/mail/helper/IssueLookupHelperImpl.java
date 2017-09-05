@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,10 +54,10 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         }
 
         if (pattern == null) {
-            pattern = ".*";
+            pattern = "[A-Z][A-Z0-9]+";
         }
 
-        Pattern projectKey = Pattern.compile("(?<!\\w)" + pattern + "\\-\\d+(?!\\w)");
+        Pattern projectKey = Pattern.compile("\\(" + pattern + "-\\d+\\)");
 
         Matcher matcher = projectKey.matcher(text);
 
@@ -64,7 +65,7 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
             int start = matcher.start();
             int offset = matcher.end();
 
-            String ticket = text.substring(start, offset);
+            String ticket = text.substring(start + 1, offset - 1);
 
             try {
                 MutableIssue issue = issueManager.getIssueObject(ticket);
@@ -82,17 +83,18 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
 
     @Override
     public MutableIssue lookupBySubject(Project project, String subject, long resolvedBefore, MessageHandlerErrorCollector monitor) {
-        subject = StringUtils.strip(subject);
+        String summary = StringUtils.strip(subject);
 
         ApplicationUser author = jiraAuthenticationContext.getLoggedInUser();
-        String preparedSubject = prepareSummary(subject);
+        String preparedSubject = prepareSummary(summary);
+        Predicate<Issue> predicate = e -> summary.equals(StringUtils.strip(e.getSummary()));
 
         try {
             Query unresolvedQuery = JqlQueryBuilder.newClauseBuilder()
                     .project(project.getId()).and().summary(preparedSubject).and()
                     .unresolved().buildQuery();
 
-            Issue issue = findIssue(author, unresolvedQuery, subject);
+            Issue issue = findIssue(author, unresolvedQuery, predicate);
 
             if (issue == null) {
                 JqlClauseBuilder builder = JqlQueryBuilder.newClauseBuilder().project(project.getId()).and().summary(preparedSubject);
@@ -103,7 +105,13 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
 
                 Query recentlyResolvedQuery = builder.buildQuery();
 
-                issue = findIssue(author, recentlyResolvedQuery, subject);
+                issue = findIssue(author, recentlyResolvedQuery, predicate);
+
+                if (issue == null) {
+                    Query movedQuery = JqlQueryBuilder.newClauseBuilder().summary(preparedSubject).buildQuery();
+
+                    issue = findIssue(author, movedQuery, predicate.and(e -> issueManager.getAllIssueKeys(e.getId()).stream().anyMatch(x -> x.startsWith(project.getKey() + "-"))));
+                }
             }
 
             if (issue != null) {
@@ -116,20 +124,14 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         return null;
     }
 
-    private Issue findIssue(ApplicationUser user, Query query, String fullSubject) throws SearchException {
+    private Issue findIssue(ApplicationUser user, Query query, Predicate<Issue> predicate) throws SearchException {
         List<Issue> issues = searchService.search(user, query, PagerFilter.getUnlimitedFilter()).getIssues();
 
         if (issues == null || issues.isEmpty()) {
             return null;
         }
 
-        for (Issue issue : issues) {
-            if (fullSubject.equals(StringUtils.strip(issue.getSummary()))) {
-                return issue;
-            }
-        }
-
-        return null;
+        return issues.stream().filter(predicate).findFirst().orElse(null);
     }
 
     protected static String prepareSummary(String subject) {
@@ -140,15 +142,15 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
         boolean whitespace = true;
         StringBuilder out = new StringBuilder(subject.length());
 
-        out.append('"');
-
         char[] a = subject.toCharArray();
 
         for (int i = 0; i < a.length; i++) {
             char ch = a[i];
 
             if (isSpecial(ch)) {
-                out.append(' ');
+                if (out.length() != 0) {
+                    out.append(' ');
+                }
                 whitespace = true;
             } else if (isVerySpecial(ch)) {
                 int j = i + 1;
@@ -156,17 +158,26 @@ public class IssueLookupHelperImpl implements IssueLookupHelper {
                 whitespace = whitespace || i == 0 || j == a.length || isWhitespace(a[j]);
 
                 if (whitespace) {
-                    out.append(' ');
+                    if (out.length() != 0 && out.charAt(out.length() - 1) != ' ') {
+                        out.append(' ');
+                    }
                 } else {
                     out.append(ch);
                 }
             } else {
                 whitespace = isWhitespace(ch);
-                out.append(ch);
+
+                if (whitespace) {
+                    if (out.length() != 0 && out.charAt(out.length() - 1) != ' ') {
+                        out.append(' ');
+                    }
+                } else {
+                    out.append(ch);
+                }
             }
         }
 
-        return out.append('"').toString();
+        return out.toString();
     }
 
     private static boolean isVerySpecial(char c) {
